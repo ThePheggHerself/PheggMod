@@ -1,0 +1,10 @@
+# IDEs
+.vs/
+Assembly-CSharp/
+Bot/
+packages/
+References/
+PheggMod/bin/
+PheggMod/obj/
+PheggMod/.editorconfig/
+PheggMod/Properties/
