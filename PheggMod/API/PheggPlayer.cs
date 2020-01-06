@@ -34,24 +34,27 @@ namespace PheggMod
 
         public PheggPlayer(GameObject player)
         {
-            #region Components
-            cmm = player.GetComponent<CharacterClassManager>();
-            sroles = player.GetComponent<ServerRoles>();
-            nsync = player.GetComponent<NicknameSync>();
-            qproc = player.GetComponent<RemoteAdmin.QueryProcessor>();
-            cuffs = player.GetComponent<Handcuffs>();
-            pstats = player.GetComponent<PlayerStats>();
-            #endregion
+            if (player != null)
+            {
+                #region Components
+                cmm = player.GetComponent<CharacterClassManager>();
+                sroles = player.GetComponent<ServerRoles>();
+                nsync = player.GetComponent<NicknameSync>();
+                qproc = player.GetComponent<RemoteAdmin.QueryProcessor>();
+                cuffs = player.GetComponent<Handcuffs>();
+                pstats = player.GetComponent<PlayerStats>();
+                #endregion
 
-            name = nsync.MyNick;
-            userId = cmm.UserId;
-            domain = cmm.UserId.Split('@')[1].ToUpper();
-            ipAddress = nsync.connectionToClient.address;
-            playerId = qproc.PlayerId;
+                name = nsync.MyNick;
+                userId = cmm.UserId;
+                domain = cmm.UserId.Split('@')[1].ToUpper();
+                ipAddress = nsync.connectionToClient.address;
+                playerId = qproc.PlayerId;
 
-            teamRole = new TeamRole { role = cmm.CurClass, team = cmm.Classes.SafeGet(cmm.CurClass).team };
+                teamRole = new TeamRole { role = cmm.CurClass, team = cmm.Classes.SafeGet(cmm.CurClass).team };
 
-            gameObject = player;
+                gameObject = player;
+            }
         }
 
         #region Godmode

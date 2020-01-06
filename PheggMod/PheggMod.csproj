@@ -83,11 +83,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Events\AdminEvents.cs" />
     <Compile Include="API\Events\Event.cs" />
     <Compile Include="API\Events\PlayerEvents.cs" />
     <Compile Include="API\Events\RoundEvent.cs" />
     <Compile Include="API\Plugin\Plugin.cs" />
-    <Compile Include="BaseGameMethods\PlayerEvents.cs" />
+    <Compile Include="EventTriggers\AlphaWarheadController.cs" />
+    <Compile Include="EventTriggers\BanPlayer.cs" />
+    <Compile Include="EventTriggers\CommandProcessor.cs" />
+    <Compile Include="EventTriggers\MTFRespawn.cs" />
+    <Compile Include="EventTriggers\PlayerStats.cs" />
+    <Compile Include="EventTriggers\CharacterClassManager.cs" />
+    <Compile Include="EventTriggers\RoundSummary.cs" />
     <Compile Include="BotWorker.cs" />
     <Compile Include="CustomTags.cs" />
     <Compile Include="PheggModBase.cs" />

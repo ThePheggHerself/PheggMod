@@ -17,6 +17,7 @@ namespace PheggMod.API.Events
         public PheggPlayer Player { get => player; }
     }
 
+    //PlayerHurtEvent
     public interface IEventHandlerPlayerHurt : IEventHandler
     {
         void OnPlayerHurt(PlayerHurtEvent ev);
@@ -40,6 +41,7 @@ namespace PheggMod.API.Events
         }
     }
 
+    //PlayerDieevent
     public interface IEventHandlerPlayerDie : IEventHandler
     {
         void OnPlayerDie(PlayerDeathEvent ev);
@@ -63,6 +65,7 @@ namespace PheggMod.API.Events
         }
     }
 
+    //PlayerSpawnEvent
     public interface IEventHandlerPlayerSpawn : IEventHandler
     {
         void OnPlayerSpawn(PlayerSpawnEvent ev);
@@ -83,6 +86,7 @@ namespace PheggMod.API.Events
         }
     }
 
+    //PlayerEscapeEvent
     public interface IEventHandlerPlayerEscape : IEventHandler
     {
         void OnPlayerEscape(PlayerEscapeEvent ev);
