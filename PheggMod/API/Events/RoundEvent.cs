@@ -137,6 +137,19 @@ namespace PheggMod.API.Events
         }
     }
 
+    //LCZDecontaminateEvent
+    public interface IEventHandlerLczDecontaminate : IEventHandler
+    {
+        void OnLczDecontaminate(LczDecontaminateEvent ev);
+    }
+    public class LczDecontaminateEvent : RoundEvent
+    {
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerLczDecontaminate)handler).OnLczDecontaminate(this);
+        }
+    }
+
     //RespawnEvent
     public interface IEventHandlerRespawn : IEventHandler
     {

@@ -26,7 +26,9 @@ namespace PheggMod.EventTriggers
 
             if (!q.ToUpper().Contains("SILENT"))
             {
-                PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault()), q));
+                PheggPlayer Sender = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
+
+                PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(Sender, q));
             }
 
             orig_ProcessQuery(q, sender);

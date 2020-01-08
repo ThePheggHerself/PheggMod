@@ -87,11 +87,15 @@
     <Compile Include="API\Events\Event.cs" />
     <Compile Include="API\Events\PlayerEvents.cs" />
     <Compile Include="API\Events\RoundEvent.cs" />
+    <Compile Include="API\PheggRoom.cs" />
     <Compile Include="API\Plugin\Plugin.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
+    <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
+    <Compile Include="EventTriggers\Generator079.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />
+    <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
     <Compile Include="EventTriggers\PlayerStats.cs" />
     <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
