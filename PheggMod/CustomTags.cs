@@ -8,6 +8,7 @@ using MEC;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
+using GameCore;
 
 namespace PheggMod
 {
@@ -34,9 +35,13 @@ namespace PheggMod
 
         public static IEnumerator<float> HandleTagUpdate()
         {
+            string ApiLocation = ConfigFile.ServerConfig.GetString("external_api_location", string.Empty);
+
+            if (ApiLocation == string.Empty) yield return 0f;
+
             DownloadHandlerBuffer download = new DownloadHandlerBuffer();
 
-            UnityWebRequest www = new UnityWebRequest($"{Base.APILocation}GetTags.php");
+            UnityWebRequest www = new UnityWebRequest($"{ApiLocation}GetTags.php");
             www.downloadHandler = download;
 
             yield return Timing.WaitUntilDone(www.SendWebRequest());
@@ -56,13 +61,9 @@ namespace PheggMod
 
         public static IEnumerator<float> CustomTag(CharacterClassManager player)
         {
-            Base.AddLog("APPLES");
-
             string[] uid = player.UserId.Split('@');
 
             int index = tagDataList.FindIndex(p => uid[1].ToUpper() == "DISCORD" ? p.discordID == uid[0] : p.steamID == uid[0]);
-
-            Base.AddLog(index.ToString());
 
             if (index < 0) yield return 0f;
 

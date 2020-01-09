@@ -16,8 +16,6 @@ namespace PheggMod
     [MonoModPatch("global::ServerConsole")]
     public class Base : ServerConsole
     {
-        public static string APILocation = "https://corruptionbot.xyz/DragonSCP/";
-
         private static string _serverName = string.Empty;
 
         public extern static void orig_ReloadServerName();
@@ -33,11 +31,6 @@ namespace PheggMod
             AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
 
             PluginManager.PluginPreLoad();
-
-            BotWorker.OpenConnection();
-            Timing.RunCoroutine(BotWorker.UpdatePlayerCount());
-
-            new Thread(() => BotWorker.BotListener()).Start();
         }
 
         public static void Error(string m) => Base.AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
