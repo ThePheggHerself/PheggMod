@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PheggMod", "PheggMod\PheggM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugins\ExamplePlugin.csproj", "{4216CED2-A507-40F7-824C-F1A05686186C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalAPI", "ExternalAPI", "{8F26A55C-DCCF-4E90-9FD1-B8C3E6E8DC9F}"
+	ProjectSection(SolutionItems) = preProject
+		PheggMod\GetTags.php = PheggMod\GetTags.php
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

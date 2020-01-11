@@ -28,6 +28,9 @@ namespace PheggMod
         public void Start()
         {
             orig_Start();
+
+            CustomNetworkManager.Modded = true;
+
             AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
 
             PluginManager.PluginPreLoad();

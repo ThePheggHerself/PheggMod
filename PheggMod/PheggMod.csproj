@@ -92,7 +92,6 @@
     <Compile Include="EventTriggers\BanPlayer.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
-    <Compile Include="EventTriggers\Generator079.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
     <Compile Include="EventTriggers\PlayerStats.cs" />
@@ -111,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="GetTags.php" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
