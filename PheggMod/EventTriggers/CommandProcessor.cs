@@ -32,7 +32,6 @@ namespace PheggMod.EventTriggers
             }
 
             orig_ProcessQuery(q, sender);
-
         }
     }
 }
