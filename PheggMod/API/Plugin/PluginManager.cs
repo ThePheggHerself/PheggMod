@@ -51,13 +51,18 @@ namespace PheggMod
                         {
                             foreach (Type t in asm.GetTypes())
                             {
-                                if (t.IsSubclassOf(typeof(API.Plugin.Plugin)) && t != typeof(API.Plugin.Plugin))
+                                if (t.IsSubclassOf(typeof(Plugin)) && t != typeof(API.Plugin.Plugin))
                                 {
                                     plugins.Add(asm);
 
-                                    MethodInfo method = t.GetMethod("initializePlugin");
                                     object obj = Activator.CreateInstance(t);
-                                    string aaa = (string)method.Invoke(obj, null);
+
+                                    try
+                                    {
+                                        MethodInfo method = t.GetMethod("initializePlugin");
+                                        string aaa = (string)method.Invoke(obj, null);
+                                    }
+                                    catch (Exception) { };
                                 }
                             }
                         }
@@ -70,8 +75,6 @@ namespace PheggMod
                     }
                 }
             }
-
-            //HandlersList(plugins);
         }
 
         public static void AddEventHandlers(Plugin plugin, IEventHandler handler)
