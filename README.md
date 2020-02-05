@@ -10,6 +10,7 @@ There are 2 locations where plugins can be loaded from:
 
 # Configs
 As always, these configs all go inside of the `config_gameplay` file
+
 | Config Option | Default value  | Description  |
 |:-------------:|:---------------:|:---------------:|
 | external_api_location | string.Empty | Url of any external API that you wish to use for features such as custom tags |
