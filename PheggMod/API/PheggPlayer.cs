@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using RemoteAdmin;
+
 namespace PheggMod
 {
     public class PheggPlayer
@@ -15,18 +17,21 @@ namespace PheggMod
         public string ipAddress { get; internal set; }
         public int playerId { get; internal set; }
 
-        public TeamRole teamRole { get; internal set; }
+        private CharacterClassManager _CharacterClassManager { get; set; }
+        private ServerRoles _serverRoles { get; set; }
+        private NicknameSync _nicknameSync { get; set; }
+        private QueryProcessor _queryProcessor { get; set; }
+        private Handcuffs _handcuffs { get; set; }
+        private PlayerStats _playerStats { get; set; }
+        private AmmoBox _ammoBox { get; set; }
+        private Inventory _inventory { get; set; }
+        private PlyMovementSync _plyMovementSync { get; set; }
+        private BanPlayer _banPlayer { get; set; }
 
-        private CharacterClassManager cmm { get; set; }
-        private ServerRoles sroles { get; set; }
-        private NicknameSync nsync { get; set; }
-        private RemoteAdmin.QueryProcessor qproc { get; set; }
-        private Handcuffs cuffs { get; set; }
-        private PlayerStats pstats { get; set; }
 
         public GameObject gameObject { get; internal set; }
 
-        public class TeamRole
+        public class TeamClass
         {
             public RoleType role { get; internal set; }
             public Team team { get; internal set; }
@@ -37,58 +42,120 @@ namespace PheggMod
             if (player != null)
             {
                 #region Components
-                cmm = player.GetComponent<CharacterClassManager>();
-                sroles = player.GetComponent<ServerRoles>();
-                nsync = player.GetComponent<NicknameSync>();
-                qproc = player.GetComponent<RemoteAdmin.QueryProcessor>();
-                cuffs = player.GetComponent<Handcuffs>();
-                pstats = player.GetComponent<PlayerStats>();
+                _CharacterClassManager = player.GetComponent<CharacterClassManager>();
+                _serverRoles = player.GetComponent<ServerRoles>();
+                _nicknameSync = player.GetComponent<NicknameSync>();
+                _queryProcessor = player.GetComponent<RemoteAdmin.QueryProcessor>();
+                _handcuffs = player.GetComponent<Handcuffs>();
+                _playerStats = player.GetComponent<PlayerStats>();
                 #endregion
 
-                name = nsync.MyNick;
-                userId = cmm.UserId;
-                domain = cmm.UserId.Split('@')[1].ToUpper();
-                ipAddress = nsync.connectionToClient.address;
-                playerId = qproc.PlayerId;
-
-                teamRole = new TeamRole { role = cmm.CurClass, team = cmm.Classes.SafeGet(cmm.CurClass).team };
+                name = _nicknameSync.MyNick;
+                userId = _CharacterClassManager.UserId;
+                domain = _CharacterClassManager.UserId.Split('@')[1].ToUpper();
+                ipAddress = _nicknameSync.connectionToClient.address;
+                playerId = _queryProcessor.PlayerId;
 
                 gameObject = player;
             }
         }
 
-        #region Godmode
-        public bool GetGodMode()
+        public override string ToString()
         {
-            return cmm.GodMode;
+            return $"{name} ({userId})";
         }
 
-        public void SetGodMode(bool godmode)
+        public bool GodMode()
         {
-            cmm.GodMode = (bool)godmode;
+            return _CharacterClassManager.GodMode;
         }
-        #endregion
-        #region Bypass Mode
-        public bool GetBypass()
+        public void GodMode(bool godmode)
+        {
+            _CharacterClassManager.GodMode = (bool)godmode;
+        }
+
+        public bool Bypass()
         {
             return gameObject.GetComponent<ServerRoles>().BypassMode;
         }
-
-        public void SetBypass(bool bypass)
+        public void Bypass(bool bypass)
         {
             gameObject.GetComponent<ServerRoles>().BypassMode = bypass;
         }
-        #endregion
-        #region Cuffs
-        public int GetDisarmed()
+
+        public int Disarmed()
         {
-            return cuffs.CufferId;
+            return _handcuffs.CufferId;
+        }
+        public void Disarmed(int playerid)
+        {
+            _handcuffs.CufferId = this.playerId;
         }
 
-        public void SetDisarmed(int playerid)
+        public float Health()
         {
-            cuffs.CufferId = this.playerId;
+            return _playerStats.health;
         }
-        #endregion
+        public void Health(float hp)
+        {
+            _playerStats.health = hp;
+        }
+
+        public TeamClass Teamclass()
+        {
+            return new TeamClass { role = _CharacterClassManager.CurClass, team = _CharacterClassManager.Classes.SafeGet(_CharacterClassManager.CurClass).team };
+        }
+        public void Teamclass(RoleType role)
+        {
+            _CharacterClassManager.SetClassID(role);
+        }
+
+        public void SetAmmo(int type, int ammount)
+        {
+            _ammoBox.SetOneAmount(type, ammount.ToString());
+        }
+
+        public void Kill()
+        {
+            _playerStats.HurtPlayer(new PlayerStats.HitInfo(5555, "WORLD", DamageTypes.Nuke, playerId), gameObject);
+        }
+
+        public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
+        {
+            BanHandler.IssueBan(new BanDetails
+            {
+                OriginalName = name,
+                Id = userId,
+                Issuer = issuer,
+                IssuanceTime = DateTime.UtcNow.Ticks,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(duration).Ticks,
+                Reason = reason
+            }, BanHandler.BanType.UserId);
+
+            BanHandler.IssueBan(new BanDetails
+            {
+                OriginalName = name,
+                Id = ipAddress,
+                Issuer = issuer,
+                IssuanceTime = DateTime.UtcNow.Ticks,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(duration).Ticks,
+                Reason = reason
+            }, BanHandler.BanType.IP);
+        }
+
+        public void Kick(string reason = "No reason provided", string issuer = "SERVER")
+        {
+            _banPlayer.KickUser(gameObject, reason, issuer);
+        }
+
+        public void GiveItem(ItemType type)
+        {
+            _inventory.AddNewItem(type);
+        }
+
+        private void Teleport(Vector3 vector3)
+        {
+            _plyMovementSync.OverridePosition(vector3, 0, true);
+        }
     }
 }

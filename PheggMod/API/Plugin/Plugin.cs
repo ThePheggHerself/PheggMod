@@ -1,4 +1,5 @@
-﻿using PheggMod.API.Events;
+﻿using PheggMod.API.Commands;
+using PheggMod.API.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +27,11 @@ namespace PheggMod.API.Plugin
             internal set;
         }
 
-        public void AddEventHandlers(IEventHandler handler)
-        {
-            PluginManager.AddEventHandlers(this, handler);
-        }
+        public void AddEventHandlers(IEventHandler handler) => PluginManager.AddEventHandlers(this, handler);
+        public void AddCommand(ICommand command, string name, string[] alias = null) => PluginManager.AddCommand(this, command, name, alias);
 
-        public void Error(string m) => Base.Error(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
-        public void Warn(string m) => Base.Warn(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
-        public void Info(string m) => Base.Info(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
+        public static void Error(string m) => Base.Error(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
+        public static void Warn(string m) => Base.Warn(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
+        public static void Info(string m) => Base.Info(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
     }
 }

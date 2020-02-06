@@ -83,6 +83,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Commands\Command.cs" />
     <Compile Include="API\Events\AdminEvents.cs" />
     <Compile Include="API\Events\Event.cs" />
     <Compile Include="API\Events\PlayerEvents.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="EventTriggers\PlayerStats.cs" />
     <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
-    <Compile Include="CustomTags.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />
     <Compile Include="API\Plugin\PluginManager.cs" />
@@ -110,7 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
-    <None Include="GetTags.php" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

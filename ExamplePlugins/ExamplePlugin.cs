@@ -10,6 +10,8 @@ using PheggMod.API.Plugin;
 using PheggMod.API.Events;
 using UnityEngine;
 using System;
+using PheggMod.API.Commands;
+using Mirror;
 
 namespace ExamplePlugin
 {
@@ -22,34 +24,18 @@ namespace ExamplePlugin
 
     public class ExamplePlugin : Plugin
     {
-        public static Plugin plugin;
-
         public override void initializePlugin()
         {
-            try
-            {
+            Assembly assembly = Assembly.GetCallingAssembly();
 
-                plugin = this;
+            var harmony = HarmonyInstance.Create("com.phegg.pheggmod.test");
+            harmony.PatchAll();
 
-                Assembly assembly = Assembly.GetCallingAssembly();
+            this.AddEventHandlers(new Playerhurt());
 
-                var harmony = HarmonyInstance.Create("com.phegg.pheggmod.test");
-                //harmony.PatchAll(assembly);
-                harmony.PatchAll();
+            this.AddCommand(new myCommand(), "testing", new string[] { "test", "apples", "pears" });
 
-                this.AddEventHandlers(new Playerhurt(this));
-
-                Info(assembly.FullName);
-
-                //Info($"{Assembly.GetCallingAssembly().GetType("PocketDimensionTeleport").GetMethod("OnTriggerEnter", BindingFlags.NonPublic | BindingFlags.Instance).Name}");
-
-                Info($"Plugin loaded successfully with {harmony.GetPatchedMethods().Count()} patched methods!");
-            }
-            catch(Exception e)
-            {
-                Error(e.InnerException.Message);
-                Error(e.InnerException.StackTrace);
-            }
+            Info($"Plugin loaded successfully with {harmony.GetPatchedMethods().Count()} patched methods!");
         }
     }
 
@@ -60,7 +46,7 @@ namespace ExamplePlugin
         [HarmonyPrefix]
         public static bool DoStuff(PlayerStats.HitInfo __0, GameObject __1)
         {
-            ExamplePlugin.plugin.Info("Prefix");
+            Plugin.Info("Prefix");
 
             return true;
         }
@@ -68,7 +54,33 @@ namespace ExamplePlugin
         [HarmonyPostfix]
         public static void DoStuffAfter()
         {
-            ExamplePlugin.plugin.Info("Postefix");
+            Plugin.Info("Postefix");
+        }
+    }
+    internal class Playerhurt : IEventHandlerPlayerHurt, IEventHandlerAdminQuery
+    {
+        public void OnPlayerHurt(PlayerHurtEvent ev)
+        {
+            Plugin.Info($"{ev.Player.name} was injured {ev.DamageType.name}");
+        }
+
+        public void OnAdminQuery(AdminQueryEvent ev)
+        {
+            Plugin.Info($"{ev.Admin.name} ran command {ev.Query}");
+        }
+    }
+
+    internal class myCommand : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            Plugin.Error(sender.Nickname);
+
+            //admin.GetComponent<RemoteAdmin.QueryProcessor>().TargetReplyPlain(admin.GetComponent<NetworkConnection>(), "#What if mama said boo at line 79!", true, true, "");
+
+            sender.RaReply("What if mama said boo at line 81!", true, true, "");
+
+            return;
         }
     }
 }

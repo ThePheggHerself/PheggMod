@@ -1,18 +1,10 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using System;
+using MonoMod;
+using PheggMod.API.Commands;
+using PheggMod.API.Events;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MonoMod;
-using System.IO;
-using System.Reflection;
 using UnityEngine;
-using Mirror;
-using System.Net;
-using GameCore;
-
-using PheggMod.API.Events;
 
 namespace PheggMod.EventTriggers
 {
@@ -29,6 +21,23 @@ namespace PheggMod.EventTriggers
                 PheggPlayer Sender = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
 
                 PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(Sender, q));
+
+                KeyValuePair<string, ICommand> cmdPair = PluginManager.allCommands.FirstOrDefault(w => w.Key == query[0].ToUpper());
+
+                if (!cmdPair.Equals(default(KeyValuePair<string, ICommand>)))
+                {
+                    GameObject admin = PlayerManager.players.Where(s => s.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault();
+                    if (admin == null)
+                    {
+                        Base.Error($"Admin is null. This most likely means that the sender is the server!");
+                        return;
+                    }
+                    else
+                    {
+                        PluginManager.TriggerCommand(cmdPair, q, admin, sender);
+                    }
+                    return;
+                }
             }
 
             orig_ProcessQuery(q, sender);

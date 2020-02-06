@@ -23,6 +23,7 @@ namespace PheggMod.EventTriggers
 
         public new bool BanUser(GameObject user, int duration, string reason, string issuer, bool isGlobalBan)
         {
+
             bool result = orig_BanUser(user, duration, reason, issuer, isGlobalBan);
 
             if (result)

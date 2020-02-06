@@ -15,6 +15,7 @@ using GameCore;
 
 using PheggMod.API.Events;
 using PheggMod.API.Plugin;
+using PheggMod.API.Commands;
 
 namespace PheggMod
 {
@@ -22,6 +23,8 @@ namespace PheggMod
     {
         public static List<Assembly> plugins = new List<Assembly>();
         public static List<Tuple<Type, IEventHandler>> allEvents = new List<Tuple<Type, IEventHandler>>();
+
+        public static Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
 
         public static void PluginPreLoad()
         {
@@ -87,7 +90,6 @@ namespace PheggMod
                 }
             }
         }
-
         internal static void TriggerEvent<t1>(Event ev) where t1 : IEventHandler
         {
             foreach (t1 handler in GetEvents<t1>())
@@ -99,7 +101,6 @@ namespace PheggMod
                 catch (Exception e) { Base.Error($"{e.Message}\n{e.StackTrace}"); }
             }
         }
-
         internal static List<IEventHandler> GetEvents<t1>() where t1 : IEventHandler
         {
             List<IEventHandler> events = new List<IEventHandler>();
@@ -113,6 +114,34 @@ namespace PheggMod
             }
 
             return events;
+        }
+
+        public static void AddCommand(Plugin plugin, ICommand command, string name, string[] alias)
+        {
+            if (allCommands.ContainsKey(name))
+            {
+                Base.Error($"{plugin.Details.name} tried to register a pre-existing command: {name.ToUpper()}");
+            }
+            else
+            {
+                allCommands.Add(name.ToUpper(), command);
+            }
+
+            if(alias != null)
+            {
+                foreach(string cmdalias in alias)
+                {
+                    if (!allCommands.ContainsKey(cmdalias))
+                    {
+                        allCommands.Add(cmdalias.ToUpper(), command);
+                    }
+                }
+            }
+        }
+
+        internal static void TriggerCommand(KeyValuePair<string, ICommand> cmdPair, string command, GameObject admin, CommandSender sender)
+        {
+            cmdPair.Value.HandleCommand(command, admin, sender);
         }
     }
 }

@@ -17,17 +17,17 @@ using PheggMod.API.Events;
 namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::PlayerStats")]
-    class PMPlayerStats : PlayerStats
+    public class PMPlayerStats : PlayerStats
     {
         //PlayerHurtEvent
         public extern bool orig_HurtPlayer(PlayerStats.HitInfo info, GameObject go);
-        public new bool HurtPlayer(PlayerStats.HitInfo info, GameObject Player)
+        public new bool HurtPlayer(PlayerStats.HitInfo info, GameObject go)
         {
             try
             {
-                if (!Player.GetComponent<CharacterClassManager>().isLocalPlayer)
+                if (!go.GetComponent<CharacterClassManager>().isLocalPlayer)
                 {
-                    PheggPlayer pPlayer = new PheggPlayer(Player);
+                    PheggPlayer pPlayer = new PheggPlayer(go);
                     PheggPlayer pAttacker = null;
 
                     if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
@@ -37,7 +37,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e) { Base.Error(e.Message); }
 
-            orig_HurtPlayer(info, Player);
+            orig_HurtPlayer(info, go);
 
             return false;
         }
