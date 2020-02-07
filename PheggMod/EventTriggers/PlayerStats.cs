@@ -1,18 +1,8 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoMod;
-using System.IO;
-using System.Reflection;
-using UnityEngine;
-using Mirror;
-using System.Net;
-using MEC;
-
 using PheggMod.API.Events;
+using System;
+using UnityEngine;
 
 namespace PheggMod.EventTriggers
 {
@@ -23,19 +13,18 @@ namespace PheggMod.EventTriggers
         public extern bool orig_HurtPlayer(PlayerStats.HitInfo info, GameObject go);
         public new bool HurtPlayer(PlayerStats.HitInfo info, GameObject go)
         {
-            try
+
+            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer)
             {
-                if (!go.GetComponent<CharacterClassManager>().isLocalPlayer)
-                {
-                    PheggPlayer pPlayer = new PheggPlayer(go);
-                    PheggPlayer pAttacker = null;
+                PheggPlayer pPlayer = new PheggPlayer(go);
+                PlayerStats Pstats = go.GetComponent<PlayerStats>();
+                PheggPlayer pAttacker = null;
 
-                    if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
-
-                    PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
-                }
+                if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
+                if (Pstats.health - info.Amount < 1) PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
+                else PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
             }
-            catch (Exception e) { Base.Error(e.Message); }
+
 
             orig_HurtPlayer(info, go);
 

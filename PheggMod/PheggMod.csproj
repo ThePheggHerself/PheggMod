@@ -93,10 +93,13 @@
     <Compile Include="EventTriggers\BanPlayer.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
+    <Compile Include="EventTriggers\GrenadeManager.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />
+    <Compile Include="EventTriggers\NicknameSync.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
     <Compile Include="EventTriggers\PlayerStats.cs" />
     <Compile Include="EventTriggers\CharacterClassManager.cs" />
+    <Compile Include="EventTriggers\QueryProcessor.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />

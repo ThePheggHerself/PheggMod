@@ -43,7 +43,7 @@ namespace PheggMod.API.Events
     }
 
     //PlayerDieevent
-    public interface IEventHandlerPlayerDie : IEventHandler
+    public interface IEventHandlerPlayerDeath : IEventHandler
     {
         void OnPlayerDie(PlayerDeathEvent ev);
     }
@@ -62,7 +62,7 @@ namespace PheggMod.API.Events
 
         public override void ExecuteHandler(IEventHandler handler)
         {
-            ((IEventHandlerPlayerDie)handler).OnPlayerDie(this);
+            ((IEventHandlerPlayerDeath)handler).OnPlayerDie(this);
         }
     }
 
@@ -107,6 +107,77 @@ namespace PheggMod.API.Events
         public override void ExecuteHandler(IEventHandler handler)
         {
             ((IEventHandlerPlayerEscape)handler).OnPlayerEscape(this);
+        }
+    }
+
+    //PlayerJoinEvent
+    public interface IEventHandlerPlayerJoin : IEventHandler
+    {
+        void OnPlayerJoin(PlayerJoinEvent ev);
+    }
+    public class PlayerJoinEvent : PlayerEvent
+    {
+        public PlayerJoinEvent(PheggPlayer player) : base(player)
+        {
+            Name = player.name;
+            UserID = player.userId;
+            IpAddress = player.ipAddress;
+        }
+
+        public string Name { get; private set; }
+        public string UserID { get; private set; }
+        public string IpAddress { get; private set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerPlayerJoin)handler).OnPlayerJoin(this);
+        }
+    }
+
+    //PlayerLeaveEvent
+    public interface IEventHandlerPlayerLeave : IEventHandler
+    {
+        void OnPlayerLeave(PlayerLeaveEvent ev);
+    }
+    public class PlayerLeaveEvent : PlayerEvent
+    {
+        public PlayerLeaveEvent(PheggPlayer player) : base(player)
+        {
+            Name = player.name;
+            UserID = player.userId;
+            IpAddress = player.ipAddress;
+        }
+
+        public string Name { get; private set; }
+        public string UserID { get; private set; }
+        public string IpAddress { get; private set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerPlayerLeave)handler).OnPlayerLeave(this);
+        }
+    }
+
+    //PlayerThrowGrenade
+    public interface IEventHandlerPlayerThrowGrenade : IEventHandler
+    {
+        void OnThrowGrenade(PlayerThrowGrenadeEvent ev);
+    }
+    public class PlayerThrowGrenadeEvent : PlayerEvent
+    {
+        public PlayerThrowGrenadeEvent(PheggPlayer player, Grenades.GrenadeSettings settings) : base(player)
+        {
+            Name = player.name;
+            Grenade = settings.apiName;
+        }
+
+        public string Name { get; private set; }
+        public string Grenade { get; private set; }
+        public string IpAddress { get; private set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerPlayerThrowGrenade)handler).OnThrowGrenade(this);
         }
     }
 }
