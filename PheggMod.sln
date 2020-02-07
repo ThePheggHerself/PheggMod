@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PheggMod", "PheggMod\PheggM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugins\ExamplePlugin.csproj", "{4216CED2-A507-40F7-824C-F1A05686186C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DiscordLab", "DiscordLab", "{BC2C6E37-6FEA-48E7-AF14-E7573EF439A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordLab", "DiscordLab\DiscordLab.csproj", "{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +25,16 @@ Global
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076} = {BC2C6E37-6FEA-48E7-AF14-E7573EF439A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8CFE2CB7-5745-4625-9E64-76839C4C6A69}

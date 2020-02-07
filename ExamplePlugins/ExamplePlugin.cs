@@ -1,17 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Reflection;
-using Harmony;
-
-using PheggMod.API.Plugin;
-using PheggMod.API.Events;
-using UnityEngine;
-using System;
+﻿using Harmony;
 using PheggMod.API.Commands;
-using Mirror;
+using PheggMod.API.Events;
+using PheggMod.API.Plugin;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
 
 namespace ExamplePlugin
 {
@@ -74,11 +67,9 @@ namespace ExamplePlugin
     {
         public void HandleCommand(string command, GameObject admin, CommandSender sender)
         {
-            Plugin.Error(sender.Nickname);
+            sender.RaReply(command.Split(' ')[0].ToUpper() + "#What if mama said BOO!", true, true, "");
 
-            //admin.GetComponent<RemoteAdmin.QueryProcessor>().TargetReplyPlain(admin.GetComponent<NetworkConnection>(), "#What if mama said boo at line 79!", true, true, "");
-
-            sender.RaReply("What if mama said boo at line 81!", true, true, "");
+            admin.GetComponent<CharacterClassManager>().SetClassID(RoleType.Spectator);
 
             return;
         }
