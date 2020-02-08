@@ -89,7 +89,9 @@
     <Compile Include="API\Events\PlayerEvents.cs" />
     <Compile Include="API\Events\RoundEvent.cs" />
     <Compile Include="API\Plugin\Plugin.cs" />
+    <Compile Include="Commands\CustomCommandHandler.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
+    <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />

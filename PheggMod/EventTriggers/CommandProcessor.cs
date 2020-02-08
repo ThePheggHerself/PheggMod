@@ -11,6 +11,8 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::RemoteAdmin.CommandProcessor")]
     class PMCommandProcessor
     {
+        internal static string lastCommand;
+
         public static extern void orig_ProcessQuery(string q, CommandSender sender);
         public static void ProcessQuery(string q, CommandSender sender)
         {
@@ -18,6 +20,8 @@ namespace PheggMod.EventTriggers
 
             if (!q.ToUpper().Contains("SILENT"))
             {
+                lastCommand = q;
+
                 PheggPlayer Sender = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
 
                 PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(Sender, q));

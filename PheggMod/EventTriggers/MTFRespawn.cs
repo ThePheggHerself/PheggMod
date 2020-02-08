@@ -15,7 +15,7 @@ namespace PheggMod.EventTriggers
 
             PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(nextWaveIsCI));
 
-            if (ConfigFile.ServerConfig.GetBool("announce_chaos_spawn", true))
+            if (nextWaveIsCI && ConfigFile.ServerConfig.GetBool("announce_chaos_spawn", true))
             {
                 PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(ConfigFile.ServerConfig.GetString("chaos_announcement", "ATTENTION ALL PERSONNEL . CHAOS INSURGENCY BREACH IN PROGRESS"), false, true);
             }

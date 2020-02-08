@@ -35,6 +35,8 @@ namespace PheggMod
 
             AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
 
+            new Commands.CustomCommandHandler();
+
             PluginManager.PluginPreLoad();
         }
 

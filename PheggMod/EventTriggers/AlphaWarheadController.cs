@@ -17,11 +17,15 @@ using PheggMod.API.Events;
 namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::AlphaWarheadController")]
-    class PMAlphaWarheadController : AlphaWarheadController
+    internal class PMAlphaWarheadController : AlphaWarheadController
     {
+        public static bool nukeLock = false;
+
         public extern void orig_CancelDetonation(GameObject disabler);
         public new void CancelDetonation(GameObject disabler)
         {
+            if (nukeLock && disabler != null) return;
+
             orig_CancelDetonation(disabler);
 
             if (!(this.timeToDetonation <= 10f)) PluginManager.TriggerEvent<IEventHandlerWarheadCancel>(new WarheadCancelEvent(new PheggPlayer(disabler)));
@@ -30,6 +34,8 @@ namespace PheggMod.EventTriggers
         public extern void orig_StartDetonation();
         public new void StartDetonation()
         {
+            if (nukeLock && !PMCommandProcessor.lastCommand.ToUpper().Contains("DETONATION_START")) return;
+
             orig_StartDetonation();
 
             bool InitialStart;
@@ -49,4 +55,5 @@ namespace PheggMod.EventTriggers
             PluginManager.TriggerEvent<IEventHandlerWarheadDetonate>(new WarheadDetonateEvent());
         }
     }
+
 }
