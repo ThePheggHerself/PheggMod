@@ -27,6 +27,8 @@ namespace PheggMod
         public extern void orig_Start();
         public void Start()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             orig_Start();
 
             CustomNetworkManager.Modded = true;
@@ -34,6 +36,13 @@ namespace PheggMod
             AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
 
             PluginManager.PluginPreLoad();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = (Exception)e.ExceptionObject;
+
+            Error($"{ex.Message}\n{ex.StackTrace}");
         }
 
         public static void Error(string m) => Base.AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));

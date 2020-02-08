@@ -49,11 +49,19 @@ namespace DiscordLab
 
         public void OnPlayerJoin(PlayerJoinEvent ev) => DiscordLab.bot.NewMessage($"**{ev.Player.name} ({ev.Player.userId} from ||~~{ev.Player.ipAddress}~~||) has joined the server**");
 
-        public void OnPlayerKick(PlayerKickEvent ev) => DiscordLab.bot.NewMessage($"**Player kicked!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {ev.Admin.ToString()}```");
+        public void OnPlayerKick(PlayerKickEvent ev) => DiscordLab.bot.NewMessage($"**Player kicked!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {(ev.Admin.ToString() == " ()" ? "Server console" : ev.Admin.ToString())}```");
 
         public void OnPlayerLeave(PlayerLeaveEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.ToString()} disconnected from the server.");
 
-        public void OnPlayerSpawn(PlayerSpawnEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.name} spawned as {ev.Role}");
+        private string _lastSpawnMessage = "a";
+        public void OnPlayerSpawn(PlayerSpawnEvent ev)
+        {
+            string newMsg = $"{ev.Player.name} spawned as {ev.Role}";
+            if (_lastSpawnMessage == newMsg) return;
+
+            DiscordLab.bot.NewMessage(newMsg);
+            _lastSpawnMessage = newMsg;
+        }
 
         public void OnRespawn(RespawnEvent ev) => DiscordLab.bot.NewMessage(ev.IsCI ? "**Attention all personnel: Chaos insurgency breach in progress**" : "**Mobile Task Force unit Epsilon 11 has entered the facility!**");
 
@@ -75,7 +83,7 @@ namespace DiscordLab
         public void OnWarheadDetonate(WarheadDetonateEvent ev) => DiscordLab.bot.NewMessage("The alpha warhead has been detonated");
 
         public void OnWarheadStart(WarheadStartEvent ev) => DiscordLab.bot.NewMessage(
-            ev.InitialStart ? $"**Alpha warhead detonation sequence engaged! The underground ection of the facility will be detonated in T-minus {ev.TimeToDetonation} seconds!**":
+            ev.InitialStart ? $"**Alpha warhead detonation sequence engaged! The underground ection of the facility will be detonated in T-minus {ev.TimeToDetonation} seconds!**" :
             $"**Alpha warhead detonation sequence resumed! {ev.TimeToDetonation} seconds to detonation!**");
     }
 }

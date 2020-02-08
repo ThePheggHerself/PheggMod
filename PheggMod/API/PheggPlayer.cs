@@ -41,14 +41,16 @@ namespace PheggMod
         {
             if (player != null)
             {
-                #region Components
                 _CharacterClassManager = player.GetComponent<CharacterClassManager>();
                 _serverRoles = player.GetComponent<ServerRoles>();
                 _nicknameSync = player.GetComponent<NicknameSync>();
                 _queryProcessor = player.GetComponent<RemoteAdmin.QueryProcessor>();
                 _handcuffs = player.GetComponent<Handcuffs>();
                 _playerStats = player.GetComponent<PlayerStats>();
-                #endregion
+                _ammoBox = player.GetComponent<AmmoBox>();
+                _inventory = player.GetComponent<Inventory>();
+                _plyMovementSync = player.GetComponent<PlyMovementSync>();
+                _banPlayer = player.GetComponent<BanPlayer>();
 
                 name = _nicknameSync.MyNick;
                 userId = _CharacterClassManager.UserId;
@@ -58,6 +60,7 @@ namespace PheggMod
 
                 gameObject = player;
             }
+            else throw new Exception("Cannot create PheggPlayer from null game object");
         }
 
         public override string ToString()
@@ -145,17 +148,26 @@ namespace PheggMod
 
         public void Kick(string reason = "No reason provided", string issuer = "SERVER")
         {
-            _banPlayer.KickUser(gameObject, reason, issuer);
+            _banPlayer.KickUser(gameObject, reason, issuer, false);
         }
 
         public void GiveItem(ItemType type)
         {
             _inventory.AddNewItem(type);
         }
-
-        private void Teleport(Vector3 vector3)
+        public void GiveItems(ItemType[] items)
         {
-            _plyMovementSync.OverridePosition(vector3, 0, true);
+            foreach (ItemType item in items)
+                _inventory.AddNewItem(item);
+        }
+        public void ClearItems()
+        {
+            _inventory.Clear();
+        }
+
+        public void Teleport(Vector3 vector3, float rotation = 0, bool forcegound = true )
+        {
+            _plyMovementSync.OverridePosition(vector3, rotation, forcegound);
         }
     }
 }

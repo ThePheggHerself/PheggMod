@@ -282,6 +282,10 @@ namespace DiscordLab
                 case "RBAN":
                 case "REMOTEBAN":
                     return BanCommand(command, jObj);
+                case "KICK":
+                case "RKICK":
+                case "REMOTEKICK":
+                    return KickCommand(command, jObj);
                 default:
                     return "```diff\n- Invalid command```";
             }
@@ -320,6 +324,7 @@ namespace DiscordLab
                 PheggPlayer player = new PheggPlayer(go);
 
                 player.Ban(duration.Minutes, reason, jObject["Staff"].ToString(), true);
+                player.Kick(reason);
 
                 return $"`{player.ToString()}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
             }
@@ -340,6 +345,29 @@ namespace DiscordLab
                     return new TimeSpan(30 * amount, 0, 0, 0);
                 case 'y':
                     return new TimeSpan(365 * amount, 0, 0, 0);
+            }
+        }
+
+        private string KickCommand(string[] arg, JObject jObject)
+        {
+            if (arg.Count() < 4) return "```KICK [UserID] [Reason]```";
+            else if (!arg[2].Contains('@')) return "Invalid UserID given";
+
+            string reason = string.Join(" ", arg.Skip(3));
+
+            GameObject go = PlayerManager.players.Where(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]).FirstOrDefault();
+
+
+            if (go == null || go.Equals(default(GameObject)))
+            {
+                return $"Unable to find user `{arg[2]}` on the server!";
+            }
+            else
+            {
+                PheggPlayer player = new PheggPlayer(go);
+                player.Kick(reason);
+
+                return $"`{player.ToString()}` was kicked with reason {reason}!";
             }
         }
     }
