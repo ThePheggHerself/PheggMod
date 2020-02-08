@@ -9,7 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DiscordLab", "DiscordLab", "{BC2C6E37-6FEA-48E7-AF14-E7573EF439A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordLab", "DiscordLab\DiscordLab.csproj", "{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordLab", "DiscordLab\Plugin\DiscordLab.csproj", "{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot", "Bot", "{9C17E867-DBB0-42D2-B8F7-3284216AE585}"
+	ProjectSection(SolutionItems) = preProject
+		DiscordLab\Bot\config.json = DiscordLab\Bot\config.json
+		DiscordLab\Bot\DiscordLabBot.js = DiscordLab\Bot\DiscordLabBot.js
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +41,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076} = {BC2C6E37-6FEA-48E7-AF14-E7573EF439A9}
+		{9C17E867-DBB0-42D2-B8F7-3284216AE585} = {BC2C6E37-6FEA-48E7-AF14-E7573EF439A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8CFE2CB7-5745-4625-9E64-76839C4C6A69}

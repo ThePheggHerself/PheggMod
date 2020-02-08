@@ -30,9 +30,27 @@ namespace PheggMod
         {
             bool universalConfigs = ConfigFile.ServerConfig.GetBool("universal_config_file", false);
 
-            Base.AddLog(universalConfigs.ToString());
+            string pluginsFolder = universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
 
-            LoadPlugins(universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins");
+            LoadDependencies(pluginsFolder + "/Dependencies");
+
+            LoadPlugins(pluginsFolder);
+        }
+
+        private static void LoadDependencies(string pluginsFolder)
+        {
+            if (Directory.Exists(pluginsFolder))
+            {
+                List<string> files = Directory.GetFiles(pluginsFolder).ToList<string>();
+                foreach (string dllfile in files)
+                {
+                    if (dllfile.EndsWith(".dll"))
+                    {
+                        Assembly asm = Assembly.LoadFrom(dllfile);
+                        Base.Info("DEPENDENCY LOADER | Loading dependency " + asm.GetName().Name);
+                    }
+                }
+            }
         }
 
         private static void LoadPlugins(string pluginsFolder)
@@ -41,7 +59,6 @@ namespace PheggMod
             {
                 List<string> files = Directory.GetFiles(pluginsFolder).ToList<string>();
                 List<string> nondll = new List<string>();
-
 
                 foreach (string dllfile in files)
                 {
@@ -127,9 +144,9 @@ namespace PheggMod
                 allCommands.Add(name.ToUpper(), command);
             }
 
-            if(alias != null)
+            if (alias != null)
             {
-                foreach(string cmdalias in alias)
+                foreach (string cmdalias in alias)
                 {
                     if (!allCommands.ContainsKey(cmdalias))
                     {

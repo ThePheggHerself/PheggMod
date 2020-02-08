@@ -1,0 +1,6 @@
+{
+    "token": "TOKEN-HERE",
+    "channel" : "LOG-CHANNEL-HERE",
+    "staffRole" : "STAFF-ROLE-NAME-HERE",
+    "port": 8888
+}
