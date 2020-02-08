@@ -101,6 +101,7 @@
     <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\QueryProcessor.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
+    <Compile Include="EventTriggers\ServerRoles.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />
     <Compile Include="API\Plugin\PluginManager.cs" />

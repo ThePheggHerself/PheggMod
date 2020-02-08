@@ -97,4 +97,23 @@ namespace PheggMod.API.Events
             ((IEventHandlerAdminQuery)handler).OnAdminQuery(this);
         }
     }
+
+    //RefreshAdminPerms
+    public interface IEventHandlerRefreshAdminPerms : IEventHandler
+    {
+        void OnRefreshAdminPerms(RefreshAdminPermsEvent ev);
+    }
+    public class RefreshAdminPermsEvent : AdminEvent
+    {
+        public RefreshAdminPermsEvent(PheggPlayer admin)
+        {
+            Admin = admin;
+        }
+        public PheggPlayer Admin { get; internal set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerRefreshAdminPerms)handler).OnRefreshAdminPerms(this);
+        }
+    }
 }
