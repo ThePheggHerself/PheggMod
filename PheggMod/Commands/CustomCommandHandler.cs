@@ -19,6 +19,7 @@ namespace PheggMod.Commands
             PluginManager.AddInternalCommand(new nukeLock(), "nuke", new string[] { });
             PluginManager.AddInternalCommand(new personalBroadcast(), "pbc", new string[] { "personalbroadcast", "privatebroadcast" });
             PluginManager.AddInternalCommand(new dropItems(), "drop", new string[] { "dropall", "dropinv" });
+            PluginManager.AddInternalCommand(new killCommand(), "kill", new string[] { });
         }
 
         internal static TimeSpan GetBanDuration(char unit, int amount)
@@ -54,18 +55,10 @@ namespace PheggMod.Commands
             sender.RaReply(queryZero.ToUpper() + "#You don't have permissions to execute this command.\nMissing permission: " + perm, false, true, "");
             return false;
         }
-    }
 
-    internal class dropItems : ICommand
-    {
-        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        public static List<GameObject> GetPlayersFromString(string users)
         {
-            string[] arg = command.Split(' ');
-
-            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            string[] playerStrings = arg[1].Split('.');
+            string[] playerStrings = users.Split('.');
             List<GameObject> playerList = new List<GameObject>();
 
             foreach (string player in playerStrings)
@@ -77,6 +70,36 @@ namespace PheggMod.Commands
                     playerList.Add(go);
                 }
             }
+
+            return playerList;
+        }
+    }
+
+    internal class killCommand : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            string[] arg = command.Split(' ');
+
+            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
+                return;
+
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
+
+            foreach (GameObject player in playerList)
+                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, admin.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), admin);
+        }
+    }
+    internal class dropItems : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            string[] arg = command.Split(' ');
+
+            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
+                return;
+
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[2]);
 
             foreach (GameObject player in playerList)
                 player.GetComponent<Inventory>().ServerDropAll();
@@ -104,18 +127,7 @@ namespace PheggMod.Commands
                 return;
             }
 
-            string[] playerStrings = arg[1].Split('.');
-            List<GameObject> playerList = new List<GameObject>();
-
-            foreach (string player in playerStrings)
-            {
-                GameObject go = PlayerManager.players.Where(p => p.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString() == player || p.GetComponent<NicknameSync>().MyNick == player).FirstOrDefault();
-                if (go.Equals(default(GameObject)) || go == null) continue;
-                else
-                {
-                    playerList.Add(go);
-                }
-            }
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
 
             string message = string.Join(" ", arg.Skip(3));
 
@@ -148,10 +160,11 @@ namespace PheggMod.Commands
                 default:
                     sender.RaReply(args[1].ToUpper() + $"#{args[1]} <- Invalid argument [ON/OFF | LOCK]", true, true, "");
                     return;
-            }            
+            }
         }
 
-        public void Lock(string queryZero, CommandSender sender) {
+        public void Lock(string queryZero, CommandSender sender)
+        {
             EventTriggers.PMAlphaWarheadController.nukeLock = !EventTriggers.PMAlphaWarheadController.nukeLock;
 
             sender.RaReply(queryZero.ToUpper() + $"#Warhead lock has been {(EventTriggers.PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}", true, true, "");

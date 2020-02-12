@@ -20,6 +20,9 @@ namespace PheggMod.EventTriggers
 
                 if (string.IsNullOrEmpty(player.UserId) || !player.UserId.Contains('@')) return;
                 else PluginManager.TriggerEvent<IEventHandlerPlayerLeave>(new PlayerLeaveEvent(new PheggPlayer(this.gameObject)));
+
+                if (PlayerManager.players.Count - 1 < 1 && RoundSummary.RoundInProgress())
+                    PMRoundSummary.RoundFix();
             }
         }
     }

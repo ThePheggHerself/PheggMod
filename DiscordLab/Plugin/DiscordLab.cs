@@ -23,6 +23,7 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 
 using PheggMod;
+using MEC;
 
 namespace DiscordLab
 {
@@ -102,36 +103,45 @@ namespace DiscordLab
             public string Staff = null;
         }
 
-        private supdateMessage _lastSupdateMessage;
+        private supdateMessage _lastSupdateMessage = null;
 
         public Bot()
         {
             Plugin.Error("BLARGLEBLORGLE");
 
-            new Thread(() =>
-            {
-                Timer _playerStatus = new Timer((t) => { StatusUpdate(); }, null, TimeSpan.Zero, TimeSpan.FromSeconds(15));
-            });
-            new Thread(() =>
-            {
-                Timer _keepAlive = new Timer((t) => { KeepAlive(); }, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
-            });
+            Timing.RunCoroutine(StatusUpdate());
+            Timing.RunCoroutine(KeepAlive());
             new Thread(() =>
             {
                 BotListener();
             }).Start();
         }
 
-        private void StatusUpdate()
+        private IEnumerator<float> StatusUpdate()
         {
             supdateMessage message = new supdateMessage();
-            if (_lastSupdateMessage.CurrentPlayers == message.CurrentPlayers) return;
-        }
-        private void KeepAlive()
-        {
-            if ((DateTime.Now - _lastSentMessage).TotalMinutes < 30) return;
 
-            NewMessage("RandomStringToKeepAlive", messageType.KEEPALIVE);
+            if (_socket.Connected)
+            {
+                if (_lastSupdateMessage == null || _lastSupdateMessage.CurrentPlayers != message.CurrentPlayers)
+                {
+                    SendMessage(JsonConvert.SerializeObject(message));
+                    _lastSupdateMessage = message;
+                }
+            }
+
+            yield return Timing.WaitForSeconds(6f);
+
+            Timing.RunCoroutine(StatusUpdate());
+        }
+        private IEnumerator<float> KeepAlive()
+        {
+            if ((DateTime.Now - _lastSentMessage).TotalMinutes > 30)
+                NewMessage("RandomStringToKeepAlive", messageType.KEEPALIVE);
+
+            yield return Timing.WaitForSeconds(1800f);
+
+            Timing.RunCoroutine(KeepAlive());
         }
 
         public void NewMessage(string message, messageType type = messageType.MSG, JObject jObj = null)
@@ -176,6 +186,12 @@ namespace DiscordLab
 
                 json = JsonConvert.SerializeObject(msg);
             }
+            else if(type == messageType.SUPDATE)
+            {
+                supdateMessage msg = new supdateMessage();
+
+                json = JsonConvert.SerializeObject(msg);
+            }
             else
             {
                 Plugin.Warn("Invalid messageType given!");
@@ -188,6 +204,8 @@ namespace DiscordLab
         {
             if (!_socket.Connected)
                 OpenConnection();
+
+            //Plugin.Info(json);
 
             if (!_socket.Connected) return;
 

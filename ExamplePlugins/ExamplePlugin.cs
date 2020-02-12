@@ -47,7 +47,7 @@ namespace ExamplePlugin
         [HarmonyPostfix]
         public static void DoStuffAfter()
         {
-            Plugin.Info("Postefix");
+            Plugin.Info("Postfix");
         }
     }
     internal class Playerhurt : IEventHandlerPlayerHurt, IEventHandlerAdminQuery

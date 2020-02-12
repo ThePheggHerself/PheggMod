@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
 using System;
+using GameCore;
 using MonoMod;
 
 using PheggMod.API.Events;
@@ -17,6 +18,14 @@ namespace PheggMod.EventTriggers
             PluginManager.TriggerEvent<IEventHandlerRoundEnd>(new RoundEndEvent(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd, string.Format("{0} minutes and {1} seconds", (int)tspan.TotalMinutes, tspan.Seconds)));
 
             orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
+        }
+
+        internal static void RoundFix()
+        {
+            if (!ConfigFile.ServerConfig.GetBool("fix_sticky_round", true)) return;
+
+            Base.Info("The server's player count has reached 0, so the round will be ended");
+            PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
         }
     }
 }

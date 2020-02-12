@@ -18,7 +18,7 @@ namespace DiscordLab
 
         public void OnPlayerDie(PlayerDeathEvent ev)
         {
-            if (!RoundSummary.RoundInProgress()) return;
+            if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected) return;
 
             if (ev.Attacker == ev.Player)
                 DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide using {ev.DamageType.name}");
@@ -37,7 +37,7 @@ namespace DiscordLab
 
         public void OnPlayerHurt(PlayerHurtEvent ev)
         {
-            if (!RoundSummary.RoundInProgress()) return;
+            if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected) return;
 
             if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
                 DiscordLab.bot.NewMessage($"**{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} using {ev.DamageType.name}**");

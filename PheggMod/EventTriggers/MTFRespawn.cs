@@ -2,6 +2,8 @@
 using GameCore;
 using MonoMod;
 using PheggMod.API.Events;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace PheggMod.EventTriggers
 {
@@ -9,7 +11,7 @@ namespace PheggMod.EventTriggers
     class PMMTFRespawn : MTFRespawn
     {
         public extern void orig_RespawnDeadPlayers();
-        public new void RespawnDeadPlayers()
+        public void RespawnDeadPlayers()
         {
             orig_RespawnDeadPlayers();
 

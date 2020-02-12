@@ -64,10 +64,10 @@ tcpSocket.on("connection", (socket) => {
 				if (object.CurrentPlayers === "0/30") status = 'idle'
 				else status = 'online'
 
-				client.user.setPresence({ game: { name: `${CurrentPlayers}`, type: "WATCHING" }, status: status })
+				client.user.setPresence({ game: { name: `${object.CurrentPlayers}`, type: "WATCHING" }, status: status })
 			}
 			else if (object.Type === "plist") {
-				console.log(string)
+
 				client.channels.get(object.ChannelID).send(`${object.PlayerNames}`);
 			}
 			else if (object.Type === "cmdmsg") {

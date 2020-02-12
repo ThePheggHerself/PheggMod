@@ -13,18 +13,20 @@ namespace PheggMod.EventTriggers
         public extern bool orig_HurtPlayer(PlayerStats.HitInfo info, GameObject go);
         public new bool HurtPlayer(PlayerStats.HitInfo info, GameObject go)
         {
-
-            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer)
+            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer && info.GetDamageType() != DamageTypes.None)
             {
                 PheggPlayer pPlayer = new PheggPlayer(go);
                 PlayerStats Pstats = go.GetComponent<PlayerStats>();
                 PheggPlayer pAttacker = null;
 
                 if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
+
+                if (pAttacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected)
+                    info.Amount = 0;
+
                 if (Pstats.health - info.Amount < 1) PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
                 else PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
             }
-
 
             orig_HurtPlayer(info, go);
 
