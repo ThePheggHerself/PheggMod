@@ -21,9 +21,6 @@ namespace PheggMod.EventTriggers
 
                 if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
 
-                if (pAttacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected)
-                    info.Amount = 0;
-
                 if (Pstats.health - info.Amount < 1) PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
                 else PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
             }

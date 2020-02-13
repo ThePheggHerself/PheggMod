@@ -158,13 +158,10 @@ namespace PheggMod
 
         internal static void AddInternalCommand(ICommand command, string name, string[] alias)
         {
-            Base.Info(name);
-
             allCommands.Add(name.ToUpper(), command);
 
             foreach (string cmdalias in alias)
             {
-                Base.Info(cmdalias);
                 allCommands.Add(cmdalias.ToUpper(), command);
             }
 
