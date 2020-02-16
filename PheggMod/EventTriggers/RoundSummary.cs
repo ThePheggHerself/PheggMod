@@ -26,6 +26,8 @@ namespace PheggMod.EventTriggers
 
             Base.Info("The server's player count has reached 0, so the round will be ended");
             PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
+
+            PMAlphaWarheadController.nukeLock = false;
         }
     }
 }

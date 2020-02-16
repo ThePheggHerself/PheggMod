@@ -87,7 +87,7 @@ namespace PheggMod.Commands
             List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
 
             foreach (GameObject player in playerList)
-                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, admin.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), admin);
+                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, admin.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), player);
         }
     }
     internal class dropItems : ICommand
@@ -114,7 +114,7 @@ namespace PheggMod.Commands
             if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.Broadcasting))
                 return;
 
-            bool success = uint.TryParse(arg[3], out uint duration);
+            bool success = uint.TryParse(arg[2], out uint duration);
 
             if (arg.Count() < 4)
             {
@@ -218,7 +218,7 @@ namespace PheggMod.Commands
             BanHandler.IssueBan(new BanDetails
             {
                 OriginalName = "Offline player",
-                Id = arg[2],
+                Id = arg[1],
                 Issuer = admin.GetComponent<NicknameSync>().MyNick,
                 IssuanceTime = DateTime.UtcNow.Ticks,
                 Expires = DateTime.UtcNow.Add(duration).Ticks,

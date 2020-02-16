@@ -14,22 +14,22 @@ namespace DiscordLab
         public void OnLczDecontaminate(LczDecontaminateEvent ev) => DiscordLab.bot.NewMessage($"Light containment zone decontamination has begun!");
 
         public void OnPlayerBan(PlayerBanEvent ev) =>
-            DiscordLab.bot.NewMessage($"**Player Banned!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {ev.Admin.ToString()}\nDuration: {ev.Duration} {(ev.Duration > 1 ? "minutes" : "minute")}```");
+            DiscordLab.bot.NewMessage($"**New Ban!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {ev.Admin.ToString()}\nDuration: {ev.Duration} {(ev.Duration > 1 ? "minutes" : "minute")}```");
 
         public void OnPlayerDie(PlayerDeathEvent ev)
         {
-            if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected) return;
+            if (!RoundSummary.RoundInProgress() || ev.Attacker == null) return;
 
             if (ev.Attacker == ev.Player)
-                DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide using {ev.DamageType.name}");
+                DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide with {ev.DamageType.name}");
             else if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
                 DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {ev.Attacker.Teamclass().role} {ev.Attacker.ToString()}"
-                    + $"\nKilled: {ev.Attacker.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+                    + $"\nKilled: {ev.Player.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
             else if (ev.Player.Disarmed() > 0 && !ev.Attacker.gameObject.GetComponent<CharacterClassManager>().IsAnyScp())
                 DiscordLab.bot.NewMessage($"__Disarmed Kill__\n```autohotkey\nPlayer: {ev.Attacker.Teamclass().role} {ev.Attacker.ToString()}"
-                    + $"\nKilled: {ev.Attacker.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+                    + $"\nKilled: {ev.Player    .Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
             else
-                DiscordLab.bot.NewMessage($"{ev.Attacker.Teamclass().role} {ev.Attacker.name} killed {ev.Player.Teamclass().role} {ev.Player.name} using {ev.DamageType.name}");
+                DiscordLab.bot.NewMessage($"{ev.Attacker.Teamclass().role} {ev.Attacker.name} killed {ev.Player.Teamclass().role} {ev.Player.name} with {ev.DamageType.name}");
 
         }
 
@@ -40,9 +40,9 @@ namespace DiscordLab
             if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected) return;
 
             if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
-                DiscordLab.bot.NewMessage($"**{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} using {ev.DamageType.name}**");
+                DiscordLab.bot.NewMessage($"**{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} with {ev.DamageType.name}**");
             else if (ev.Player.Disarmed() > 0 && !ev.Attacker.gameObject.GetComponent<CharacterClassManager>().IsAnyScp())
-                DiscordLab.bot.NewMessage($"__{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} using {ev.DamageType.name}__");
+                DiscordLab.bot.NewMessage($"__{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} with {ev.DamageType.name}__");
             else
                 DiscordLab.bot.NewMessage($"{ev.Attacker.name} -> {ev.Player.name} -> {Math.Round(ev.Damage)} ({ev.DamageType.name})");
         }

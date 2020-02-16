@@ -32,6 +32,7 @@ namespace PheggMod.EventTriggers
                 try
                 {
                     PluginManager.TriggerEvent<IEventHandlerWaitingForPlayers>(new WaitingForPlayersEvent());
+                    PMAlphaWarheadController.nukeLock = false;
                 }
                 catch (Exception e) { Base.Error(e.Message); }
             }
