@@ -7,6 +7,8 @@ namespace DiscordLab
         IEventHandlerPlayerDeath, IEventHandlerPlayerEscape, IEventHandlerPlayerHurt, IEventHandlerPlayerKick, IEventHandlerPlayerSpawn, IEventHandlerPlayerThrowGrenade, IEventHandlerRespawn, IEventHandlerRoundEnd,
         IEventHandlerRoundStart, IEventHandlerWarheadCancel, IEventHandlerWarheadDetonate, IEventHandlerWarheadStart
     {
+        internal static DateTime RoundEnded;
+
         public void OnAdminQuery(AdminQueryEvent ev) => DiscordLab.bot.NewMessage($"```yaml\nAdmin: {ev.Admin.name}\nExecuted: {ev.Query.ToUpper()}```");
 
         public void OnGlobalBan(GlobalBanEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.ToString()} was globally banned for cheating");
@@ -65,12 +67,16 @@ namespace DiscordLab
 
         public void OnRespawn(RespawnEvent ev) => DiscordLab.bot.NewMessage(ev.IsCI ? "**Attention all personnel: Chaos insurgency breach in progress**" : "**Mobile Task Force unit Epsilon 11 has entered the facility!**");
 
-        public void OnRoundEnd(RoundEndEvent ev) =>
+        public void OnRoundEnd(RoundEndEvent ev)
+        {
             DiscordLab.bot.NewMessage($"**Round Ended**\n```Round Time: {ev.RoundTime}"
                 + $"\nEscaped Class-D: {ev.Class_D.Escaped_ClassD}/{ev.Class_D.Starting_ClassD}"
                 + $"\nRescued Scientists: {ev.Scientist.Escaped_Scientists}/{ev.Scientist.Starting_Scientists}"
                 + $"\nTerminated SCPs: {ev.SCP.Terminated_SCPs}/{ev.SCP.Starting_SCPs}"
                 + $"\nWarhead Status: {(AlphaWarheadController.Host.detonated == false ? "Not Detonated" : $"Detonated")}```");
+
+            Events.RoundEnded = DateTime.Now;
+        }
 
         public void OnRoundStart(RoundStartEvent ev) => DiscordLab.bot.NewMessage($"**A new round has begun**");
 

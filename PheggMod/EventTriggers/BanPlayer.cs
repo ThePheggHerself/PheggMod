@@ -23,19 +23,27 @@ namespace PheggMod.EventTriggers
 
         public new bool BanUser(GameObject user, int duration, string reason, string issuer, bool isGlobalBan)
         {
-
             bool result = orig_BanUser(user, duration, reason, issuer, isGlobalBan);
 
             if (result)
             {
-                GameObject Admin = PlayerManager.players.Where(player => player.GetComponent<NicknameSync>().MyNick == issuer).FirstOrDefault();
+                try
+                {
+                    int index = PlayerManager.players.FindIndex(player => player.GetComponent<NicknameSync>().MyNick == issuer);
 
-                if (isGlobalBan)
-                    PluginManager.TriggerEvent<IEventHandlerGlobalBan>(new GlobalBanEvent(new PheggPlayer(user)));
-                else if (duration < 1)
-                    PluginManager.TriggerEvent<IEventHandlerPlayerKick>(new PlayerKickEvent(new PheggPlayer(user), new PheggPlayer(Admin), reason));
-                else
-                    PluginManager.TriggerEvent<IEventHandlerPlayerBan>(new PlayerBanEvent(new PheggPlayer(user), duration, new PheggPlayer(Admin), reason));
+                    if(index > -1)
+                    {
+                        if (isGlobalBan)
+                            PluginManager.TriggerEvent<IEventHandlerGlobalBan>(new GlobalBanEvent(new PheggPlayer(user)));
+                        else if (duration < 1)
+                            PluginManager.TriggerEvent<IEventHandlerPlayerKick>(new PlayerKickEvent(new PheggPlayer(user), new PheggPlayer(PlayerManager.players[index]), reason));
+                        else
+                            PluginManager.TriggerEvent<IEventHandlerPlayerBan>(new PlayerBanEvent(new PheggPlayer(user), duration, new PheggPlayer(PlayerManager.players[index]), reason));
+                    }
+
+
+                }
+                catch (Exception) { }
             }
 
             return result;

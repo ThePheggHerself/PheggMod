@@ -10,3 +10,4 @@ ExamplePlugins/bin/
 ExamplePlugins/obj
 DiscordLab/Plugin/bin/
 DiscordLab/Plugin/obj/
+/PheggMod/Commands/CustomAttributes.cs

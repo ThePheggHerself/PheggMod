@@ -75,64 +75,49 @@ namespace PheggMod.Commands
         }
     }
 
-    internal class killCommand : ICommand
+    internal class obanCommand : ICommand
     {
         public void HandleCommand(string command, GameObject admin, CommandSender sender)
         {
             string[] arg = command.Split(' ');
-
-            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
-
-            foreach (GameObject player in playerList)
-                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, admin.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), player);
-        }
-    }
-    internal class dropItems : ICommand
-    {
-        public void HandleCommand(string command, GameObject admin, CommandSender sender)
-        {
-            string[] arg = command.Split(' ');
-
-            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[2]);
-
-            foreach (GameObject player in playerList)
-                player.GetComponent<Inventory>().ServerDropAll();
-        }
-    }
-    internal class personalBroadcast : ICommand
-    {
-        public void HandleCommand(string command, GameObject admin, CommandSender sender)
-        {
-            string[] arg = command.Split(' ');
-
-            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.Broadcasting))
-                return;
-
-            bool success = uint.TryParse(arg[2], out uint duration);
 
             if (arg.Count() < 4)
             {
-                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([Players], [Seconds], [Message])", false, true, "");
+                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([UserID], [Minutes], [Reason])", false, true, "");
                 return;
             }
-            else if (!success || duration < 1 || duration > 255)
+            else if (!arg[1].Contains('@'))
             {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid duration given", false, true, "");
+                sender.RaReply(arg[0].ToUpper() + "#Invalid UserID given", false, true, "");
+                return;
+            }
+            char unit = arg[2].ToString().Where(Char.IsLetter).ToArray()[0];
+
+            if (!int.TryParse(new string(arg[2].Where(Char.IsDigit).ToArray()), out int amount) || !CustomCommandHandler.validUnits.Contains(unit) || amount < 1)
+            {
+                sender.RaReply(arg[0].ToUpper() + "#Invalid duration", false, true, "");
                 return;
             }
 
-            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
+            TimeSpan duration = CustomCommandHandler.GetBanDuration(unit, amount);
+            string reason = string.Join(" ", arg.Skip(3));
 
-            string message = string.Join(" ", arg.Skip(3));
+            if (duration.Minutes > 60 && !CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.KickingAndShortTermBanning))
+                return;
+            else if (duration.Minutes > 1440 && !CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.BanningUpToDay))
+                return;
 
-            foreach (GameObject player in playerList)
-                player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, false);
+            BanHandler.IssueBan(new BanDetails
+            {
+                OriginalName = "Offline player",
+                Id = arg[1],
+                Issuer = admin.GetComponent<NicknameSync>().MyNick,
+                IssuanceTime = DateTime.UtcNow.Ticks,
+                Expires = DateTime.UtcNow.Add(duration).Ticks,
+                Reason = reason
+            }, BanHandler.BanType.UserId);
+
+            sender.RaReply(arg[0].ToUpper() + $"#{arg[1]} was offline banned for {arg[2]}", true, true, "");
         }
     }
     internal class nukeLock : ICommand
@@ -183,49 +168,64 @@ namespace PheggMod.Commands
             sender.RaReply(queryZero.ToUpper() + $"#Warhead has been turned off", true, true, "");
         }
     }
-    internal class obanCommand : ICommand
+    internal class personalBroadcast : ICommand
     {
         public void HandleCommand(string command, GameObject admin, CommandSender sender)
         {
             string[] arg = command.Split(' ');
 
+            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.Broadcasting))
+                return;
+
+            bool success = uint.TryParse(arg[2], out uint duration);
+
             if (arg.Count() < 4)
             {
-                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([UserID], [Minutes], [Reason])", false, true, "");
+                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([Players], [Seconds], [Message])", false, true, "");
                 return;
             }
-            else if (!arg[1].Contains('@'))
+            else if (!success || duration < 1 || duration > 255)
             {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid UserID given", false, true, "");
-                return;
-            }
-            char unit = arg[2].ToString().Where(Char.IsLetter).ToArray()[0];
-
-            if (!int.TryParse(new string(arg[2].Where(Char.IsDigit).ToArray()), out int amount) || !CustomCommandHandler.validUnits.Contains(unit) || amount < 1)
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid duration", false, true, "");
+                sender.RaReply(arg[0].ToUpper() + "#Invalid duration given", false, true, "");
                 return;
             }
 
-            TimeSpan duration = CustomCommandHandler.GetBanDuration(unit, amount);
-            string reason = string.Join(" ", arg.Skip(3));
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
 
-            if (duration.Minutes > 60 && !CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.KickingAndShortTermBanning))
+            string message = string.Join(" ", arg.Skip(3));
+
+            foreach (GameObject player in playerList)
+                player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, false);
+        }
+    }
+    internal class dropItems : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            string[] arg = command.Split(' ');
+
+            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
                 return;
-            else if (duration.Minutes > 1440 && !CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.BanningUpToDay))
+
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[2]);
+
+            foreach (GameObject player in playerList)
+                player.GetComponent<Inventory>().ServerDropAll();
+        }
+    }
+    internal class killCommand : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            string[] arg = command.Split(' ');
+
+            if (!CustomCommandHandler.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
                 return;
 
-            BanHandler.IssueBan(new BanDetails
-            {
-                OriginalName = "Offline player",
-                Id = arg[1],
-                Issuer = admin.GetComponent<NicknameSync>().MyNick,
-                IssuanceTime = DateTime.UtcNow.Ticks,
-                Expires = DateTime.UtcNow.Add(duration).Ticks,
-                Reason = reason
-            }, BanHandler.BanType.UserId);
+            List<GameObject> playerList = CustomCommandHandler.GetPlayersFromString(arg[1]);
 
-            sender.RaReply(arg[0].ToUpper() + $"#{arg[1]} was offline banned for {arg[2]}", true, true, "");
+            foreach (GameObject player in playerList)
+                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, admin.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), player);
         }
     }
 }

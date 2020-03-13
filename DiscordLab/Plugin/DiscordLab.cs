@@ -107,8 +107,6 @@ namespace DiscordLab
 
         public Bot()
         {
-            Plugin.Error("BLARGLEBLORGLE");
-
             Timing.RunCoroutine(StatusUpdate());
             Timing.RunCoroutine(KeepAlive());
             new Thread(() =>
@@ -150,6 +148,9 @@ namespace DiscordLab
 
             string json;
 
+            message = message.Replace("_", "\\_");
+            message = message.Replace("*", "\\*");
+
             if (type == messageType.MSG)
             {
                 msgMessage msg = new msgMessage()
@@ -186,7 +187,7 @@ namespace DiscordLab
 
                 json = JsonConvert.SerializeObject(msg);
             }
-            else if(type == messageType.SUPDATE)
+            else if (type == messageType.SUPDATE)
             {
                 supdateMessage msg = new supdateMessage();
 
@@ -279,7 +280,12 @@ namespace DiscordLab
         private string Playerlist()
         {
             if (PlayerManager.players.Count < 1)
-                return "**No online players**";
+            {
+                if ((DateTime.Now - Events.RoundEnded).TotalSeconds < 45)
+                    return "*The round has recently restarted, so the playercount may not be accurate*\n**No online players**";
+                else
+                    return "**No online players**";
+            }
 
             List<string> players = new List<string>();
             foreach (GameObject go in PlayerManager.players)
@@ -312,18 +318,27 @@ namespace DiscordLab
         private string BanCommand(string[] arg, JObject jObject)
         {
             if (arg.Count() < 5) return "```BAN [UserID] [Duration] [Reason]```";
-            else if (!arg[2].Contains('@')) return "Invalid UserID given";
+            else if (!arg[2].Contains('@')) return "```diff\n- Invalid UserID given```";
             char unit = arg[3].ToString().Where(Char.IsLetter).ToArray()[0];
 
             if (!int.TryParse(new string(arg[3].Where(Char.IsDigit).ToArray()), out int amount) || !validUnits.Contains(unit) || amount < 1)
-                return "Invalid duration";
+                return "```diff\n- Invalid duration```";
 
             TimeSpan duration = GetBanDuration(unit, amount);
             string reason = string.Join(" ", arg.Skip(4));
 
-            GameObject go = PlayerManager.players.Where(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]).FirstOrDefault();
+            int index = PlayerManager.players.FindIndex(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]);
 
-            if (go.Equals(default(GameObject)))
+            if (index > -1)
+            {
+                PheggPlayer player = new PheggPlayer(PlayerManager.players[index]);
+
+                player.Ban(duration.Minutes, reason, jObject["Staff"].ToString(), true);
+                player.Kick(reason);
+
+                return $"`{player.ToString()}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
+            }
+            else
             {
                 BanHandler.IssueBan(new BanDetails
                 {
@@ -336,15 +351,6 @@ namespace DiscordLab
                 }, BanHandler.BanType.UserId);
 
                 return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
-            }
-            else
-            {
-                PheggPlayer player = new PheggPlayer(go);
-
-                player.Ban(duration.Minutes, reason, jObject["Staff"].ToString(), true);
-                player.Kick(reason);
-
-                return $"`{player.ToString()}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
             }
         }
         private TimeSpan GetBanDuration(char unit, int amount)

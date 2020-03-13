@@ -49,7 +49,6 @@ namespace PheggMod.EventTriggers
                 tts = tts + str + " ";
             }
             PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(tts, false, true);
-
         }
 
         private List<string> newWords = new List<string>();
