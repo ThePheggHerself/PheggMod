@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace PheggMod.Commands
 {
+    public enum RequirementType
+    {
+        Single = 0,
+        All
+    }
+
 
     #region Command and Alias
     /// <summary>
@@ -65,48 +71,54 @@ namespace PheggMod.Commands
             return false;
         }
     }
+
     /// <summary>
-    /// List of permissions that a user can have to run the command (Only needs 1 permission from the list)
+    /// List of permissions required to run the command
     /// </summary>
-    public class PMPermissionsSingle : Attribute
+    public class PMPermissions : Attribute
     {
         public PlayerPermissions[] perms;
-        public PMPermissionsSingle(PlayerPermissions[] perms) => this.perms = perms;
+        public RequirementType type;
 
-        public bool CheckPermissions(CommandSender sender, PlayerPermissions[] playerPermission)
+        public PMPermissions(PlayerPermissions[] perms, RequirementType type = RequirementType.Single)
         {
-            if (ServerStatic.IsDedicated && sender.FullPermissions)
-                return true;
-
-            foreach(PlayerPermissions check in playerPermission)
-            {
-                if (PermissionsHandler.IsPermitted(sender.Permissions, check))
-                    return true;
-            }
-
-            return false;
+            this.perms = perms;
+            this.type = type;
         }
-    }
-    /// <summary>
-    /// List of permissions that a user must have to run the command (Requires all permissions listed)
-    /// </summary>
-    public class PMPermissionsMultiple : Attribute
-    {
-        public PlayerPermissions[] perms;
-        public PMPermissionsMultiple(PlayerPermissions[] perms) => this.perms = perms;
 
-        public PlayerPermissions? CheckPermissions(CommandSender sender, PlayerPermissions[] playerPermission)
+        public List<PlayerPermissions> CheckPermissions(CommandSender sender, PlayerPermissions[] pPerms)
         {
-            if (ServerStatic.IsDedicated && sender.FullPermissions)
-                return null;
+            List<PlayerPermissions> missingPerms = new List<PlayerPermissions>();
 
-            foreach (PlayerPermissions check in playerPermission)
+            if (type == RequirementType.Single)
             {
-                if (!PermissionsHandler.IsPermitted(sender.Permissions, check))
-                    return check;
-            }
+                if (ServerStatic.IsDedicated && sender.FullPermissions)
+                    return null;
 
-            return null;
+                foreach (PlayerPermissions check in pPerms)
+                {
+                    if (PermissionsHandler.IsPermitted(sender.Permissions, check))
+                        return null;
+                }
+
+                return missingPerms = perms.ToList();
+            }
+            else
+            {
+                if (ServerStatic.IsDedicated && sender.FullPermissions)
+                    return null;
+
+                foreach (PlayerPermissions check in pPerms)
+                {
+                    if (!PermissionsHandler.IsPermitted(sender.Permissions, check))
+                        missingPerms.Add(check);
+                }
+
+                if (missingPerms.Count > 0)
+                    return missingPerms;
+                else
+                    return null;
+            }
         }
     }
 

@@ -157,20 +157,17 @@ namespace PheggMod
                     return false;
                 }
 
-                PMPermissionsSingle permSingle = (PMPermissionsSingle)cmd.GetCustomAttribute(typeof(PMPermissionsSingle));
-                if (permSingle != null && !permSingle.CheckPermissions(cInfo.commandSender, permSingle.perms))
+                PMPermissions perms = (PMPermissions)cmd.GetCustomAttribute(typeof(PMPermissions));
+                if (perms != null)
                 {
-                    cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + permSingle.perms[0], false, true, "");
-                    return false;
-                }
-
-                PMPermissionsMultiple permMulti = (PMPermissionsMultiple)cmd.GetCustomAttribute(typeof(PMPermissionsMultiple));
-                if (permMulti != null)
-                {
-                    PlayerPermissions? checkPerm = permMulti.CheckPermissions(cInfo.commandSender, permMulti.perms);
-                    if (checkPerm != null)
+                    PlayerPermissions[] permList = perms.CheckPermissions(cInfo.commandSender, perms.perms).ToArray();
+                    if(permList != null)
                     {
-                        cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + checkPerm, false, true, "");
+                        if(perms.type == RequirementType.Single)
+                            cInfo.commandSender.RaReply(cInfo.commandName + $"#You don't have permission to execute this command.\nYou must have one of the following: {string.Join(", ", permList)}", false, true, "");
+                        else if(perms.type == RequirementType.All)
+                            cInfo.commandSender.RaReply(cInfo.commandName + $"#You must have one of the following permmissions to run this command.\nMissing permissions: {string.Join(", ", permList)}", false, true, "");
+
                         return false;
                     }
                 }
