@@ -16,6 +16,7 @@ using GameCore;
 using PheggMod.API.Events;
 using PheggMod.API.Plugin;
 using PheggMod.API.Commands;
+using PheggMod.Commands;
 
 namespace PheggMod
 {
@@ -24,16 +25,17 @@ namespace PheggMod
         public static List<Assembly> plugins = new List<Assembly>();
         public static List<Tuple<Type, IEventHandler>> allEvents = new List<Tuple<Type, IEventHandler>>();
 
-        public static Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
+        public static Dictionary<string, MethodInfo> allCommands = new Dictionary<string, MethodInfo>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<MethodInfo, object> commandInstances = new Dictionary<MethodInfo, object>();
 
         public static void PluginPreLoad()
         {
             bool universalConfigs = ConfigFile.ServerConfig.GetBool("universal_config_file", false);
-
             string pluginsFolder = universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
 
-            LoadDependencies(pluginsFolder + "/Dependencies");
+            AddCommands(Assembly.GetExecutingAssembly());
 
+            LoadDependencies(pluginsFolder + "/Dependencies");
             LoadPlugins(pluginsFolder);
         }
 
@@ -81,6 +83,8 @@ namespace PheggMod
                                     {
                                         MethodInfo method = t.GetMethod("initializePlugin");
                                         string aaa = (string)method.Invoke(obj, null);
+
+                                        AddCommands(asm);
                                     }
                                     catch (Exception) { };
                                 }
@@ -133,43 +137,130 @@ namespace PheggMod
             return events;
         }
 
-        public static void AddCommand(Plugin plugin, ICommand command, string name, string[] alias)
+        internal static bool TriggerCommand(CommandInfo cInfo)
         {
-            if (allCommands.ContainsKey(name))
+            if (!allCommands.ContainsKey(cInfo.commandName)) return false;
+
+            MethodInfo cmd = allCommands[cInfo.commandName];
+            if (cmd == null || cmd.Equals(default(Type)))
+                return false;
+
+            UserGroup uGroup = ServerStatic.GetPermissionsHandler().GetUserGroup(cInfo.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString());
+
+            PMOverrideRanks overrideRanks = (PMOverrideRanks)cmd.GetCustomAttribute(typeof(PMOverrideRanks));
+            if (overrideRanks == null || !overrideRanks.ranks.Contains(uGroup.ToString()))
             {
-                Base.Error($"{plugin.Details.name} tried to register a pre-existing command: {name.ToUpper()}");
-            }
-            else
-            {
-                allCommands.Add(name.ToUpper(), command);
+                PMPermission perm = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
+                if (perm != null && !perm.CheckPermissions(cInfo.commandSender, perm.perm))
+                {
+                    cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + perm.perm, false, true, "");
+                    return false;
+                }
+
+                PMPermissionsSingle permSingle = (PMPermissionsSingle)cmd.GetCustomAttribute(typeof(PMPermissionsSingle));
+                if (permSingle != null && !permSingle.CheckPermissions(cInfo.commandSender, permSingle.perms))
+                {
+                    cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + permSingle.perms[0], false, true, "");
+                    return false;
+                }
+
+                PMPermissionsMultiple permMulti = (PMPermissionsMultiple)cmd.GetCustomAttribute(typeof(PMPermissionsMultiple));
+                if (permMulti != null)
+                {
+                    PlayerPermissions? checkPerm = permMulti.CheckPermissions(cInfo.commandSender, permMulti.perms);
+                    if (checkPerm != null)
+                    {
+                        cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + checkPerm, false, true, "");
+                        return false;
+                    }
+                }
+
+                PMRankWhitelist whitelist = (PMRankWhitelist)cmd.GetCustomAttribute(typeof(PMRankWhitelist));
+                if (whitelist != null && !whitelist.ranks.Contains(uGroup.ToString()))
+                {
+                    cInfo.commandSender.RaReply(cInfo.commandName + "#You are not whitelisted to run this command.", false, true, "");
+                    return false;
+                }
+
+                PMRankBlacklist blacklist = (PMRankBlacklist)cmd.GetCustomAttribute(typeof(PMRankBlacklist));
+                if (blacklist != null && blacklist.ranks.Contains(uGroup.ToString()))
+                {
+                    cInfo.commandSender.RaReply(cInfo.commandName + "#You are not whitelisted to run this command.", false, true, "");
+                    return false;
+                }
             }
 
-            if (alias != null)
+            PMParameters parameters = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
+            PMCanExtend pmCanExtend = (PMCanExtend)cmd.GetCustomAttribute(typeof(PMCanExtend));
+
+            bool canExtend = (pmCanExtend != null ? pmCanExtend.canExtend : false);
+            if (parameters == null)
             {
-                foreach (string cmdalias in alias)
+                throw new Exception($"PMParameters is null for command: {cInfo.commandName}");
+                return false;
+            }
+
+            if (cInfo.commandArgs.Length - 1 < parameters.parameters.Length)
+            {
+                cInfo.commandSender.RaReply(cInfo.commandName + $"#{cInfo.commandName.ToUpper()} [{string.Join("] [", parameters.parameters).ToUpper()}]", false, true, "");
+                return false;
+            }
+            if (!canExtend && cInfo.commandArgs.Length - 1 > parameters.parameters.Length)
+            {
+                cInfo.commandSender.RaReply(cInfo.commandName + $"#{cInfo.commandName.ToUpper()} [{string.Join("] [", parameters.parameters).ToUpper()}]", false, true, "");
+                return false;
+            }
+
+            object instance;
+
+            if (commandInstances.ContainsKey(cmd))
+                instance = commandInstances[cmd];
+            else
+            {
+                instance = Activator.CreateInstance(cmd.DeclaringType);
+
+                commandInstances.Add(cmd, instance);
+            }
+
+            cmd.Invoke(instance, new object[] { cInfo });
+            return true;
+        }
+
+        internal static void AddCommands(Assembly assembly)
+        {
+            List<MethodInfo> commands = assembly.GetTypes().SelectMany(t => t.GetMethods()).Where(m => m.GetCustomAttributes().OfType<PMCommand>().Any()).ToList();
+
+            foreach(MethodInfo command in commands)
+            {
+                PMCommand pmCommand = (PMCommand)command.GetCustomAttribute(typeof(PMCommand));
+
+                if (!allCommands.ContainsKey(pmCommand.name))
                 {
-                    if (!allCommands.ContainsKey(cmdalias))
+                    allCommands.Add(pmCommand.name, command);
+                }
+                else
+                {
+                    Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {pmCommand.name}");
+                }
+                
+                PMAlias pmAlias = (PMAlias)command.GetCustomAttribute(typeof(PMAlias));
+                if(pmAlias != null)
+                {
+                    foreach (string alias in pmAlias.alias)
                     {
-                        allCommands.Add(cmdalias.ToUpper(), command);
+                        Base.AddLog(alias);
+
+                        if (!allCommands.ContainsKey(alias))
+                        {
+                            allCommands.Add(alias, command);
+                        }
+                        else
+                        {
+                            Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {alias}");
+                        }
                     }
                 }
             }
-        }
-
-        internal static void AddInternalCommand(ICommand command, string name, string[] alias)
-        {
-            allCommands.Add(name.ToUpper(), command);
-
-            foreach (string cmdalias in alias)
-            {
-                allCommands.Add(cmdalias.ToUpper(), command);
-            }
-
-        }
-
-        internal static void TriggerCommand(KeyValuePair<string, ICommand> cmdPair, string command, GameObject admin, CommandSender sender)
-        {
-            cmdPair.Value.HandleCommand(command, admin, sender);
         }
     }
 }

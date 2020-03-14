@@ -17,6 +17,15 @@ namespace PheggMod.EventTriggers
 
             PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(nextWaveIsCI));
 
+            if (Commands.CustomInternalCommands.isLightsout)
+            {
+                foreach (GameObject player in PlayerManager.players)
+                {
+                    if (player.GetComponent<Inventory>().items.FindIndex(i => i.id == ItemType.Flashlight) < 0)
+                        player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
+                }
+            }
+
             if (nextWaveIsCI && ConfigFile.ServerConfig.GetBool("announce_chaos_spawn", true))
             {
                 PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(ConfigFile.ServerConfig.GetString("chaos_announcement", "ATTENTION ALL PERSONNEL . CHAOS INSURGENCY BREACH IN PROGRESS"), false, true);

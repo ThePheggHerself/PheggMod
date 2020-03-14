@@ -83,13 +83,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\Commands\Command.cs" />
+    <Compile Include="API\Commands\CommandInfo.cs" />
     <Compile Include="API\Events\AdminEvents.cs" />
     <Compile Include="API\Events\Event.cs" />
     <Compile Include="API\Events\PlayerEvents.cs" />
     <Compile Include="API\Events\RoundEvent.cs" />
     <Compile Include="API\Plugin\Plugin.cs" />
-    <Compile Include="Commands\CustomCommandHandler.cs" />
+    <Compile Include="API\Commands\CustomAttributes.cs" />
+    <Compile Include="Commands\CustomInternalCommands.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />

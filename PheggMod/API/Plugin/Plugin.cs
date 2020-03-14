@@ -28,8 +28,6 @@ namespace PheggMod.API.Plugin
         }
 
         public void AddEventHandlers(IEventHandler handler) => PluginManager.AddEventHandlers(this, handler);
-        public void AddCommand(ICommand command, string name, string[] alias = null) => PluginManager.AddCommand(this, command, name, alias);
-
         public static void Error(string m) => Base.Error(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
         public static void Warn(string m) => Base.Warn(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
         public static void Info(string m) => Base.Info(string.Format("{0} | {1}", Assembly.GetCallingAssembly().GetName().Name, m));
