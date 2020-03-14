@@ -1,6 +1,8 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
 using System;
+using System.Collections.Generic;
 using GameCore;
+using MEC;
 using MonoMod;
 
 using PheggMod.API.Events;
@@ -19,6 +21,9 @@ namespace PheggMod.EventTriggers
 
             PluginManager.TriggerEvent<IEventHandlerRoundEnd>(new RoundEndEvent(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd, string.Format("{0} minutes and {1} seconds", (int)tspan.TotalMinutes, tspan.Seconds)));
 
+            if (Commands.CustomInternalCommands.reloadPlugins)
+                Timing.RunCoroutine(TriggerPluginReload());
+
             orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
         }
 
@@ -30,6 +35,13 @@ namespace PheggMod.EventTriggers
             PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
 
             PMAlphaWarheadController.nukeLock = false;
+        }
+
+        private IEnumerator<float> TriggerPluginReload()
+        {
+            yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetFloat("auto_round_restart_time", 10) + 1f);
+
+            PluginManager.Reload();
         }
     }
 }

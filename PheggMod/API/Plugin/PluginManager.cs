@@ -28,6 +28,18 @@ namespace PheggMod
         public static Dictionary<string, MethodInfo> allCommands = new Dictionary<string, MethodInfo>(StringComparer.OrdinalIgnoreCase);
         public static Dictionary<MethodInfo, object> commandInstances = new Dictionary<MethodInfo, object>();
 
+        public static void Reload()
+        {
+            Base.Info($"Reloading plugins. Clearing lists and dictionaries");
+
+            plugins.Clear();
+            allEvents.Clear();
+            allCommands.Clear();
+            commandInstances.Clear();
+
+            PluginPreLoad();
+        }
+
         public static void PluginPreLoad()
         {
             bool universalConfigs = ConfigFile.ServerConfig.GetBool("universal_config_file", false);
@@ -43,6 +55,8 @@ namespace PheggMod
         {
             if (Directory.Exists(pluginsFolder))
             {
+                Base.Info("Loading dependancies...");
+
                 List<string> files = Directory.GetFiles(pluginsFolder).ToList<string>();
                 foreach (string dllfile in files)
                 {
@@ -52,6 +66,8 @@ namespace PheggMod
                         Base.Info("DEPENDENCY LOADER | Loading dependency " + asm.GetName().Name);
                     }
                 }
+
+                Base.Info("Dependancies loaded!");
             }
         }
 
@@ -59,6 +75,8 @@ namespace PheggMod
         {
             if (Directory.Exists(pluginsFolder))
             {
+                Base.Info("Loading plugins...");
+
                 List<string> files = Directory.GetFiles(pluginsFolder).ToList<string>();
                 List<string> nondll = new List<string>();
 
@@ -73,7 +91,7 @@ namespace PheggMod
                         {
                             foreach (Type t in asm.GetTypes())
                             {
-                                if (t.IsSubclassOf(typeof(Plugin)) && t != typeof(API.Plugin.Plugin))
+                                if (t.IsSubclassOf(typeof(Plugin)) && t != typeof(Plugin))
                                 {
                                     plugins.Add(asm);
 
@@ -98,6 +116,7 @@ namespace PheggMod
                         }
                     }
                 }
+                Base.Info("Plugins loaded!");
             }
         }
 

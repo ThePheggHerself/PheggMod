@@ -247,5 +247,22 @@ namespace PheggMod.Commands
                 Timing.RunCoroutine(CheckLights());
             }
         }
+
+        internal static bool reloadPlugins = false;
+        [PMCommand("pluginreload"), PMAlias("reloadplugins", "plreload"), PMParameters(), PMPermission(PlayerPermissions.ServerConfigs)]
+        public void cmd_ReloadPlugins(CommandInfo info)
+        {
+            if (!reloadPlugins)
+            {
+                reloadPlugins = true;
+                info.commandSender.RaReply(info.commandName + $"#Server plugins will be reloaded upon round restart.", true, true, "");
+
+                Base.Warn($"{info.commandSender.Nickname} ({info.gameObject.GetComponent<CharacterClassManager>().UserId}) has triggered the pluginreload command!\nAll plugins and custom commands will be reloaded upon round restart");
+            }
+            else
+            {
+                info.commandSender.RaReply(info.commandName + $"#Server plugins are already set to reload upon round restart.", true, true, "");
+            }
+        }
     }
 }
