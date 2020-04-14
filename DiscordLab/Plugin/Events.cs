@@ -22,7 +22,7 @@ namespace DiscordLab
         {
             if (!RoundSummary.RoundInProgress() || ev.Attacker == null) return;
 
-            if (ev.Attacker == ev.Player)
+            if (ev.Attacker.userId == ev.Player.userId)
                 DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide with {ev.DamageType.name}");
             else if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
                 DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {ev.Attacker.Teamclass().role} {ev.Attacker.ToString()}"

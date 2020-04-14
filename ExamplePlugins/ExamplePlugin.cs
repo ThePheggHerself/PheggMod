@@ -119,8 +119,8 @@ namespace ExamplePlugin
         [PMCommand("nevergonna"), PMParameters("give", "you", "up")]
         public void cmd_RickRoll(CommandInfo info)
         {
-            info.commandSender.RaReply(info.commandName + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you", true, true, "");
-            Plugin.Info("Never gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you");
+            info.commandSender.RaReply(info.commandName + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.", true, true, "");
+            Plugin.Info("Never gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.");
         }
     }
     #endregion

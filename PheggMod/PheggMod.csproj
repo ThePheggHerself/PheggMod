@@ -95,6 +95,7 @@
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
+    <Compile Include="EventTriggers\CustomLiteNetLib4MirrorTransport.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
     <Compile Include="EventTriggers\GrenadeManager.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />
@@ -114,6 +115,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="SmartGuard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

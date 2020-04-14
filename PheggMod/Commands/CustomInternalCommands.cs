@@ -1,4 +1,5 @@
-﻿using MEC;
+﻿using GameCore;
+using MEC;
 using Mirror;
 using PheggMod.API.Commands;
 using System;
@@ -12,6 +13,11 @@ namespace PheggMod.Commands
 {
     public class CustomInternalCommands
     {
+        public CustomInternalCommands()
+        {
+            nodamageplayers = new Dictionary<int, GameObject>();
+        }
+
         internal static char[] validUnits = { 'm', 'h', 'd', 'w', 'M', 'y' };
         internal static TimeSpan GetBanDuration(char unit, int amount)
         {
@@ -63,8 +69,7 @@ namespace PheggMod.Commands
             return playerList;
         }
 
-
-        [PMCommand("oban"), PMAlias("offlineban", "ltapban"), PMParameters("userid", "duration", "reason"), PMCanExtend(true), PMPermission(PlayerPermissions.LongTermBanning)]
+        [PMCommand("oban"), PMAlias("offlineban", "ltapban"), PMParameters("userid", "duration", "reason"), PMCanExtend(true), PMPermission(PlayerPermissions.BanningUpToDay)]
         public void cmd_oban(CommandInfo info)
         {
             CommandSender sender = info.commandSender;
@@ -103,7 +108,7 @@ namespace PheggMod.Commands
                 Issuer = sender.Nickname,
                 IssuanceTime = DateTime.UtcNow.Ticks,
                 Expires = DateTime.UtcNow.Add(duration).Ticks,
-                Reason = reason
+                Reason = reason.Replace(Environment.NewLine, "")
             }, BanHandler.BanType.UserId);
 
             sender.RaReply(arg[0].ToUpper() + $"#{arg[1]} was offline banned for {arg[2]}", true, true, "");
@@ -234,6 +239,8 @@ namespace PheggMod.Commands
         }
         private IEnumerator<float> CheckLights()
         {
+            yield return Timing.WaitForSeconds(33f);
+
             if (!isLightsout)
             {
                 PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement("FACILITY LIGHT CONTROL SYSTEM REPAIR COMPLETE . LIGHT SYSTEM ENGAGED", false, true);
@@ -241,9 +248,9 @@ namespace PheggMod.Commands
             }
             else
             {
-                UnityEngine.Object.FindObjectsOfType<Generator079>()[0].RpcCustomOverchargeForOurBeautifulModCreators(30f, false);
+                foreach (Generator079 gen in UnityEngine.Object.FindObjectsOfType<Generator079>())
+                    gen.RpcCustomOverchargeForOurBeautifulModCreators(30f, false);
 
-                yield return Timing.WaitForSeconds(29.8f);
                 Timing.RunCoroutine(CheckLights());
             }
         }
@@ -264,5 +271,81 @@ namespace PheggMod.Commands
                 info.commandSender.RaReply(info.commandName + $"#Server plugins are already set to reload upon round restart.", true, true, "");
             }
         }
+
+        [PMCommand("nevergonna"), PMParameters("give", "you", "up")]
+        public void cmd_RickRoll(CommandInfo info)
+        {
+            info.commandSender.RaReply(info.commandName + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
+        }
+
+        public static Dictionary<int, GameObject> nodamageplayers { get; private set; }
+        [PMCommand("nodamage"), PMParameters("playerid")]
+        public void cmd_nodamage(CommandInfo info)
+        {
+            string[] arg = info.commandArgs;
+            CommandSender sender = info.commandSender;
+
+            if (!CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
+                return;
+
+            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
+
+            foreach (GameObject player in playerList)
+            {
+                int id = player.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId;
+
+                if (!nodamageplayers.ContainsKey(id))
+                {
+                    nodamageplayers.Add(id, player);
+                }
+                else
+                {
+                    nodamageplayers.Remove(id);
+                }
+            }
+        }
+
+        /* //[PMCommand("endround"), PMAlias("forceend"), PMParameters(), PMPermission(PlayerPermissions.RoundEvents)]
+        //public void cmd_ForceEnd(CommandInfo info) => Timing.RunCoroutine(ForceEnd(info));
+        //private IEnumerator<float> ForceEnd(CommandInfo info)
+        //{
+        //    RoundSummary rS = RoundSummary.singleton;
+
+        //    RoundSummary.SumInfo_ClassList newList = new RoundSummary.SumInfo_ClassList();
+        //    foreach (GameObject plr in PlayerManager.players)
+        //    {
+        //        CharacterClassManager ccm = plr.GetComponent<CharacterClassManager>();
+
+        //        switch (ccm.Classes.SafeGet(ccm.CurClass).team)
+        //        {
+        //            case Team.CHI:
+        //                newList.chaos_insurgents++; break;
+        //            case Team.MTF:
+        //                newList.mtf_and_guards++; break;
+        //            case Team.CDP:
+        //                newList.class_ds++; break;
+        //            case Team.RSC:
+        //                newList.scientists++; break;
+        //            case Team.SCP:
+        //                if (ccm.CurClass == RoleType.Scp0492)
+        //                    newList.zombies++;
+        //                else
+        //                    newList.scps_except_zombies++;
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
+
+        //    newList.warhead_kills = (AlphaWarheadController.Host.detonated ? AlphaWarheadController.Host.warheadKills : -1);
+        //    newList.time = TimeSpan.FromSeconds((int)Time.realtimeSinceStartup - DateTime.Now.Second).Seconds;
+
+        //    int ttr = ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10);
+        //    EventTriggers.PMRoundSummary.singleton.CallRpcShowRoundSummary(rS.classlistStart, newList, RoundSummary.LeadingTeam.Draw, RoundSummary.escaped_ds, RoundSummary.escaped_scientists, RoundSummary.kills_by_scp, ttr);
+
+        //    yield return Timing.WaitForSeconds(ttr);
+
+        //    PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
+        //} */
     }
 }

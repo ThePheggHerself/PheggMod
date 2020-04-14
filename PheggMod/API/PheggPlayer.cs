@@ -65,7 +65,7 @@ namespace PheggMod
 
         public override string ToString()
         {
-            return $"{name} ({userId})";
+            return $"{name} ({userId})".Replace("_", "\\_").Replace("*", "\\*").Replace("`", "\\`");
         }
 
         public bool GodMode()
