@@ -2,6 +2,7 @@
 using MonoMod;
 using PheggMod.API.Commands;
 using PheggMod.API.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,35 +17,24 @@ namespace PheggMod.EventTriggers
         public static extern void orig_ProcessQuery(string q, CommandSender sender);
         public static void ProcessQuery(string q, CommandSender sender)
         {
-            string[] query = q.Split(new char[] { ' ' });
-
-            if (!q.ToUpper().Contains("SILENT"))
+            try
             {
-                lastCommand = q;
+                string[] query = q.Split(new char[] { ' ' });
 
-                PheggPlayer Sender = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
-
-                PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(Sender, q));
-
-                KeyValuePair<string, ICommand> cmdPair = PluginManager.allCommands.FirstOrDefault(w => w.Key == query[0].ToUpper());
-
-                if (!cmdPair.Equals(default(KeyValuePair<string, ICommand>)))
+                if (!q.ToUpper().Contains("SILENT"))
                 {
-                    GameObject admin = PlayerManager.players.Where(s => s.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault();
-                    if (admin == null)
-                    {
-                        Base.Error($"Admin is null. This most likely means that the sender is the server!");
-                        return;
-                    }
-                    else
-                    {
-                        PluginManager.TriggerCommand(cmdPair, q, admin, sender);
-                    }
-                    return;
-                }
-            }
+                    lastCommand = q;
+                    PheggPlayer pheggPlayer = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
 
-            orig_ProcessQuery(q, sender);
+                    PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
+                    if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
+                }
+                orig_ProcessQuery(q, sender);
+            }
+            catch(Exception e)
+            {
+                Base.Error($"{e.Message}\n{e.StackTrace}");
+            }
         }
     }
 }
