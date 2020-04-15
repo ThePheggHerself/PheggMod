@@ -20,10 +20,10 @@ As always, these configs all go inside of the `config_gameplay` file
 | cassie_glitch | false | Disable's CASSIE's random glitching during (non-decontamination) announcements |
 | cassie_glitch_post_detonation | false | Limit's CASSIE's random glitching to post-warhead detonation |
 | fix_sticky_round | true | Fixes sticky rounds (Rounds that stay active despite no players being on the server) |
+| auto_restart_time | null | Specifies (on 24-hour format) when the server should automatically restart itself |
 
 # Commands
 These are the available custom commands that Pheggmod offers
-
 | Command (Aliases) | Variables | Permission | Description |
 |:---------------:|:---------------:|:---------------:|:---------------:|
 | oban (offlineban ltapban) | [UserID] [Duration (e.g 3d, 1y)] [Reason] | BanningUpToDay | Adds the UserID to the UserIdBans file |
