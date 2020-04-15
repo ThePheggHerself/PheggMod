@@ -24,7 +24,6 @@ As always, these configs all go inside of the `config_gameplay` file
 
 # Commands
 These are the available custom commands that Pheggmod offers
-
 | Command (Aliases) | Variables | Permission | Description |
 |:---------------:|:---------------:|:---------------:|:---------------:|
 | oban (offlineban ltapban) | [UserID] [Duration (e.g 3d, 1y)] [Reason] | BanningUpToDay | Adds the UserID to the UserIdBans file |
