@@ -1,6 +1,7 @@
 {
-    "token": "TOKEN-HERE",
-    "channel" : "LOG-CHANNEL-HERE",
-    "staffRole" : "STAFF-ROLE-NAME-HERE",
-    "port": 8888
+    "token": "Discord-Bot-Token-Here",
+    "channel" : "Channel-For-Logs",
+    "staffRoleID" : "Role-Id-Here",
+    "address" : "127.0.0.1",
+    "port": 8777
 }

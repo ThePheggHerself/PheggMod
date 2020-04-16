@@ -24,7 +24,6 @@ using Newtonsoft.Json.Linq;
 
 using PheggMod;
 using MEC;
-using System.Diagnostics;
 
 namespace DiscordLab
 {
@@ -51,9 +50,9 @@ namespace DiscordLab
     public class Bot
     {
         private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)");
-        private static Regex _rgx2 = new Regex("[{\"}`]");
 
         private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private IPAddress _ipAddress;
         private DateTime _lastSentMessage;
         internal static char[] validUnits = { 'm', 'h', 'd', 'w', 'M', 'y' };
 
@@ -109,6 +108,8 @@ namespace DiscordLab
 
         public Bot()
         {
+            _ipAddress = IPAddress.Parse(ConfigFile.ServerConfig.GetString("dl_address", "127.0.0.1"));
+
             Timing.RunCoroutine(StatusUpdate());
             Timing.RunCoroutine(KeepAlive());
             new Thread(() =>
@@ -130,7 +131,7 @@ namespace DiscordLab
                 }
             }
 
-            yield return Timing.WaitForSeconds(10f);
+            yield return Timing.WaitForSeconds(6f);
 
             Timing.RunCoroutine(StatusUpdate());
         }
@@ -149,6 +150,9 @@ namespace DiscordLab
             if (string.IsNullOrEmpty(message)) return;
 
             string json;
+
+            message = message.Replace("_", "\\_");
+            message = message.Replace("*", "\\*");
 
             if (type == messageType.MSG)
             {
@@ -224,38 +228,24 @@ namespace DiscordLab
         {
             int port = ServerConsole.Port + 1000;
 
-            if (_socket == null || _socket.Equals(default(Socket)))
-                Plugin.Info("Pears");
-
             if (port == 1000) return;
             try
             {
-                //Plugin.Info("APPLES");
-                _socket.Connect(IPAddress.Parse("127.0.0.1"), port);
-
-                //Plugin.Info("Pears");
+                _socket.Connect(_ipAddress, port);
                 Plugin.Info("Bot connection established");
             }
             catch (Exception)
             {
                 try
                 {
-                    _socket.Close();
                     _socket.Disconnect(true);
 
-                    _socket.Connect(IPAddress.Parse("127.0.0.1"), port);
+                    _socket.Connect(_ipAddress, port);
                     Plugin.Info("Bot connection established");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    try
-                    {
-                        _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    }
-                    catch (Exception ex)
-                    {
-                        Plugin.Error($"{ex.Message}\n{ex.StackTrace}\n\n{ex.InnerException.Message}\n{ex.InnerException.StackTrace}");
-                    }
+                    Plugin.Error($"{e.InnerException.Message}\n{e.InnerException.StackTrace}");
                 }
             }
         }
@@ -302,9 +292,7 @@ namespace DiscordLab
 
             List<string> players = new List<string>();
             foreach (GameObject go in PlayerManager.players)
-                players.Add(_rgx2.Replace(go.GetComponent<NicknameSync>().MyNick, string.Empty));
-
-            SendMessage(JsonConvert.SerializeObject(new supdateMessage()));
+                players.Add(go.GetComponent<NicknameSync>().MyNick);
 
             return $"**{PlayerManager.players.Count()}/{ConfigFile.ServerConfig.GetInt("max_players", 20)}**\n```\n{string.Join(", ", players)}```";
         }
@@ -325,16 +313,10 @@ namespace DiscordLab
                 case "RKICK":
                 case "REMOTEKICK":
                     return KickCommand(command, jObj);
-                case "WHITELIST":
-                case "WL":
-                case "GRANT":
-                    return WhitelistCommand(command, jObj);
                 default:
                     return "```diff\n- Invalid command```";
             }
         }
-
-        #region Commands
 
         private string BanCommand(string[] arg, JObject jObject)
         {
@@ -348,22 +330,31 @@ namespace DiscordLab
             TimeSpan duration = GetBanDuration(unit, amount);
             string reason = string.Join(" ", arg.Skip(4));
 
-            BanHandler.IssueBan(new BanDetails
-            {
-                OriginalName = "Offline player",
-                Id = arg[2],
-                Issuer = jObject["Staff"].ToString(),
-                IssuanceTime = DateTime.UtcNow.Ticks,
-                Expires = DateTime.UtcNow.Add(duration).Ticks,
-                Reason = reason
-            }, BanHandler.BanType.UserId);
-
-            int index = PlayerManager.players.FindIndex(s => s.GetComponent<CharacterClassManager>().UserId == arg[2]);
+            int index = PlayerManager.players.FindIndex(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]);
 
             if (index > -1)
-                PlayerManager.localPlayer.GetComponent<BanPlayer>().KickUser(PlayerManager.players[index], reason, jObject["Staff"].ToString());
+            {
+                PheggPlayer player = new PheggPlayer(PlayerManager.players[index]);
 
-            return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
+                player.Ban(duration.Minutes, reason, jObject["Staff"].ToString(), true);
+                player.Kick(reason);
+
+                return $"`{player.ToString()}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
+            }
+            else
+            {
+                BanHandler.IssueBan(new BanDetails
+                {
+                    OriginalName = "Offline player",
+                    Id = arg[2],
+                    Issuer = jObject["Staff"].ToString(),
+                    IssuanceTime = DateTime.UtcNow.Ticks,
+                    Expires = DateTime.UtcNow.Add(duration).Ticks,
+                    Reason = reason
+                }, BanHandler.BanType.UserId);
+
+                return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
+            }
         }
         private TimeSpan GetBanDuration(char unit, int amount)
         {
@@ -383,7 +374,6 @@ namespace DiscordLab
                     return new TimeSpan(365 * amount, 0, 0, 0);
             }
         }
-
 
         private string KickCommand(string[] arg, JObject jObject)
         {
@@ -407,20 +397,5 @@ namespace DiscordLab
                 return $"`{player.ToString()}` was kicked with reason {reason}!";
             }
         }
-
-
-        private string WhitelistCommand(string[] arg, JObject jObject)
-        {
-            if (arg.Count() < 3) return "```WHITELIST [USERID]```";
-            else if (!arg[2].Contains('@')) return "```diff\n- Invalid UserID given```";
-
-            FileManager.AppendFileSafe(arg[2], ConfigSharing.Paths[2] + "UserIDWhitelist.txt");
-
-            WhiteList.Reload();
-
-            return $"`{arg[2]}` was added to the whitelist.";
-        }
-
-        #endregion
     }
 }
