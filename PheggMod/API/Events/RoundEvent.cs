@@ -115,8 +115,11 @@ namespace PheggMod.API.Events
         public WarheadCancelEvent(PheggPlayer disabler = null)
         {
             Disablier = disabler;
+            Disabler = disabler;
         }
+        [Obsolete]
         public PheggPlayer Disablier { get; private set; }
+        public PheggPlayer Disabler { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {

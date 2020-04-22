@@ -173,7 +173,6 @@ namespace PheggMod.API.Events
 
         public string Name { get; private set; }
         public string Grenade { get; private set; }
-        public string IpAddress { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {

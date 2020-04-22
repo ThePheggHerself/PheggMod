@@ -3,7 +3,7 @@ const client = new Discord.Client();
 const net = require('net');
 const config = require("./config.json");
 const tcpSocket = net.createServer();
-const connection = tcpSocket.listen(config.port, "127.0.0.1")
+const connection = tcpSocket.listen(config.port, config.address)
 
 var messages = []
 var mainSocket;
@@ -47,8 +47,11 @@ tcpSocket.on("connection", (socket) => {
 		var string = String.fromCharCode.apply(String, data)
 
 		try {
-			var SplitJson = string.replace(/{/gi, '[[{');
+			///You may be thinking why on earth this has been put here, however it's due to the way the system works. 
+			///Sometimes the JSON messages get mashed together while sending it, causing the bot to error out.
+			///So this solves the issue. With this, forces a split whenever the recieved data recieves "{", splitting the JSON strings and fixing the issue
 
+			var SplitJson = string.replace(/{/gi, '[[{');
 			var array = SplitJson.split('[[');
 			array.shift();
 
@@ -110,13 +113,9 @@ client.on('message', async message => {
 	try {
 		if (message.author.bot || message.member == null || message.author == null || !message.guild) return
 
-		console.log("apples");
-
 		if (message.mentions.users.first() != undefined && message.mentions.users.first().id === client.user.id) {
 			if (message.content.split(" ").length == 1) {
 				var object = { Type: "plist", channel: message.channel.id }
-
-				console.log("plist Command");
 
 				if (mainSocket) {
 					try {
@@ -125,13 +124,10 @@ client.on('message', async message => {
 					catch (e) { message.channel.send(e.message) }
 				}
 			}
-			else if (message.member.roles.find(r => r.name === config.staffRole)) {
+			else if (message.member.roles.find(r => r.id === config.staffRoleID)) {
 				var object = { Type: "cmd", channel: message.channel.id, Message: message.content, StaffID: message.author.id, Staff: message.member.user.tag }
 
-				console.log("rban");
-
 				if (mainSocket) {
-					console.log("Sending ban command!")
 					mainSocket.write(JSON.stringify(object))
 				}
 			}

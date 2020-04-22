@@ -35,3 +35,38 @@ These are the available custom commands that Pheggmod offers
 | lightsout | | FacilityManagement | Causes the lights to go out inside the facility (Due to the limitations of the game's code, this is quite buggy ATM) |
 | pluginreload (reloadplugins plreload) | | ServerConfigs | Reloads the server's plugins on the next round restart |
 | nevergonna | [Give] [You] [Up] | | See for yourself |
+
+
+# Events
+These are the available events that Pheggmod offers
+
+**Admin Events**
+| Event | Parameters |
+|:-----:|:----------:|
+| PlayerBanEvent | Player (PheggPlayer), Admin (PheggPlayer), Duration (Int), Reason (String) |
+| PlayerKickEvent | Player (PheggPlayer), Admin (PheggPlayer), Reason (String) |
+| GlobalBanEvent | Player (PheggPlayer) |
+| AdminQueryEvent | Admin (PheggPlayer), Query (String) |
+| RefreshAdminPermEvent | Admin (PheggPlayer) |
+
+**Player Events**
+| Event | Parameters |
+|:-----:|:----------:|
+| PlayerHurtEvent | Player (PheggPlayer), Attacker (PheggPlayer), Damage (Float), DamageType (DamageType) |
+| PlayerDeathEvent | Player (PheggPlayer), Attacker (PheggPlayer), Damage(Float), Damagetype (DamageType) |
+| PlayerSpawnEvent | Player (PheggPlayer), Role (Role), Team (Team) |
+| PlayerEscapeEvent | Player (PheggPlayer), Role (Role), NewRole (Role), Team (Team)|
+| PlayerJoinEvent | Player (PheggPlayer), Name (String), UserId (String), IpAddress (String) |
+| PlayerLeaveEvent | Player (PheggPlayer), Name (String), UserId (String), IpAddress (String) |
+| PlayerThrowGrenadeEvent | Player (PheggPlayer), Name(String), Grenade (String) |
+
+**Round Events**
+| Event | Parameters |
+|:-----:|:----------:|
+| WaitingForPlayersEvent | |
+| RoundStartEvent |  |
+| RoundEndEvent | SCP (SCPs), ClassD (ClassD), Scientist (Scientists), Roundtime (String), LeadingTeam (LeadingTeam) |
+| WarheadStartEvent | InitialStart (Bool), TimeToDetonation (Float) |
+| WarheadCancelEvent | Disabler (PheggPlayer) |
+| WarheadDetonationEvent |  |
+| RespawnEvent | IsChaos (Bool) |
