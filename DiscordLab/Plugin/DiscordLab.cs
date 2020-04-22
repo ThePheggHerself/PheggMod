@@ -151,9 +151,6 @@ namespace DiscordLab
 
             string json;
 
-            message = message.Replace("_", "\\_");
-            message = message.Replace("*", "\\*");
-
             if (type == messageType.MSG)
             {
                 msgMessage msg = new msgMessage()
@@ -297,11 +294,12 @@ namespace DiscordLab
             return $"**{PlayerManager.players.Count()}/{ConfigFile.ServerConfig.GetInt("max_players", 20)}**\n```\n{string.Join(", ", players)}```";
         }
 
+
+        #region Commands
+
         private string HandleCommand(JObject jObj)
         {
             string[] command = jObj["Message"].ToString().Split(' ');
-
-            Plugin.Info(command[1].ToUpper());
 
             switch (command[1].ToUpper())
             {
@@ -313,6 +311,10 @@ namespace DiscordLab
                 case "RKICK":
                 case "REMOTEKICK":
                     return KickCommand(command, jObj);
+                case "UNBAN":
+                case "RUNBAN":
+                case "REMOTEUNBAN":
+                    return UnbanCommand(command, jObj);
                 default:
                     return "```diff\n- Invalid command```";
             }
@@ -320,8 +322,17 @@ namespace DiscordLab
 
         private string BanCommand(string[] arg, JObject jObject)
         {
-            if (arg.Count() < 5) return "```BAN [UserID] [Duration] [Reason]```";
-            else if (!arg[2].Contains('@')) return "```diff\n- Invalid UserID given```";
+            if (arg.Count() < 5) return $"```{arg[1]} [UserID/Ip] [Duration] [Reason]```";
+
+            bool validUID = arg[2].Contains('@');
+            bool validIP = IPAddress.TryParse(arg[2], out IPAddress ip);
+
+            BanDetails details;
+
+            if (!validIP && !validUID)
+                return $"```diff\n- Invalid UserID or IP given```";
+
+
             char unit = arg[3].ToString().Where(Char.IsLetter).ToArray()[0];
 
             if (!int.TryParse(new string(arg[3].Where(Char.IsDigit).ToArray()), out int amount) || !validUnits.Contains(unit) || amount < 1)
@@ -330,7 +341,12 @@ namespace DiscordLab
             TimeSpan duration = GetBanDuration(unit, amount);
             string reason = string.Join(" ", arg.Skip(4));
 
-            int index = PlayerManager.players.FindIndex(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]);
+
+            int index;
+            if (validUID)
+                index = PlayerManager.players.FindIndex(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]);
+            else
+                index = PlayerManager.players.FindIndex(p => p.GetComponent<CharacterClassManager>().connectionToClient.address == arg[2]);
 
             if (index > -1)
             {
@@ -338,8 +354,6 @@ namespace DiscordLab
 
                 player.Ban(duration.Minutes, reason, jObject["Staff"].ToString(), true);
                 player.Kick(reason);
-
-                return $"`{player.ToString()}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
             }
             else
             {
@@ -351,10 +365,10 @@ namespace DiscordLab
                     IssuanceTime = DateTime.UtcNow.Ticks,
                     Expires = DateTime.UtcNow.Add(duration).Ticks,
                     Reason = reason
-                }, BanHandler.BanType.UserId);
-
-                return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}\nDo not forget to log this ban!";
+                }, (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP)); 
             }
+
+            return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}!";
         }
         private TimeSpan GetBanDuration(char unit, int amount)
         {
@@ -377,7 +391,7 @@ namespace DiscordLab
 
         private string KickCommand(string[] arg, JObject jObject)
         {
-            if (arg.Count() < 4) return "```KICK [UserID] [Reason]```";
+            if (arg.Count() < 4) return $"```{arg[1]} [UserID] [Reason]```";
             else if (!arg[2].Contains('@')) return "Invalid UserID given";
 
             string reason = string.Join(" ", arg.Skip(3));
@@ -397,5 +411,32 @@ namespace DiscordLab
                 return $"`{player.ToString()}` was kicked with reason {reason}!";
             }
         }
+
+        private string UnbanCommand(string[] arg, JObject jObject)
+        {
+            if (arg.Count() < 3) return $"```{arg[1]} [UserID/Ip]```";
+
+            bool validUID = arg[2].Contains('@');
+            bool validIP = IPAddress.TryParse(arg[2], out IPAddress ip);
+
+            BanDetails details;
+
+            if (!validIP && !validUID)
+                return $"```diff\n- Invalid UserID or IP given```";
+
+            if(validUID)
+                details = BanHandler.QueryBan(arg[2], null).Key;
+            else
+                details = BanHandler.QueryBan(null, arg[2]).Value;
+
+            if(details == null)
+                return $"No ban found for `{arg[2]}`.\nMake sure you have typed it correctly, and that it has the @domain prefix if it's a UserID";
+
+            BanHandler.RemoveBan(arg[2], (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));
+
+            return $"`{arg[2]}` has been unbanned.";
+        }
+
+        #endregion
     }
 }

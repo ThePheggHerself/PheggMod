@@ -26,6 +26,9 @@ namespace PheggMod.EventTriggers
                     lastCommand = q;
                     PheggPlayer pheggPlayer = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
 
+                    if (q.ToUpper().Contains("CASSIE"))
+                        q = q.ToUpper() + " PITCH_1";
+
                     PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
                     if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
                 }

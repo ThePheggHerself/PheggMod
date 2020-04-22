@@ -264,8 +264,6 @@ namespace PheggMod
                 {
                     foreach (string alias in pmAlias.alias)
                     {
-                        Base.AddLog(alias);
-
                         if (!allCommands.ContainsKey(alias))
                         {
                             allCommands.Add(alias, command);
