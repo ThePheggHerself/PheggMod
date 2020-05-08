@@ -17,7 +17,14 @@ namespace PheggMod.EventTriggers
         {
             TimeSpan tspan = TimeSpan.FromSeconds(list_finish.time - list_start.time);
 
-            PluginManager.TriggerEvent<IEventHandlerRoundEnd>(new RoundEndEvent(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd, string.Format("{0} minutes and {1} seconds", (int)tspan.TotalMinutes, tspan.Seconds)));
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerRoundEnd>(new RoundEndEvent(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd, string.Format("{0} minutes and {1} seconds", (int)tspan.TotalMinutes, tspan.Seconds)));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering RoundEndEvent: {e.ToString()}");
+            }
 
             orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
         }

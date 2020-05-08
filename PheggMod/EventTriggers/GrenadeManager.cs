@@ -2,6 +2,7 @@
 using Grenades;
 using MonoMod;
 using PheggMod.API.Events;
+using System;
 using System.Collections.Generic;
 
 namespace PheggMod.EventTriggers
@@ -14,7 +15,14 @@ namespace PheggMod.EventTriggers
         {
             IEnumerator<float> @return = orig__ServerThrowGrenade(settings, forceMultiplier, itemIndex, delay);
 
-            PluginManager.TriggerEvent<IEventHandlerPlayerThrowGrenade>(new PlayerThrowGrenadeEvent(new PheggPlayer(base.gameObject), settings));
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerPlayerThrowGrenade>(new PlayerThrowGrenadeEvent(new PheggPlayer(base.gameObject), settings));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering PlayerThrowGrenadeEvent: {e.ToString()}");
+            }
 
             return @return;
         }

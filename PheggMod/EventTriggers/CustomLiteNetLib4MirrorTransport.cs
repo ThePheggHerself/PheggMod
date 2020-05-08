@@ -43,8 +43,8 @@ namespace PheggMod.EventTriggers
 
             //NetDataWriter a = new NetDataWriter();
             //a.Reset();
-            //a.Put(6);
-            //a.Put(DateTime.Now.AddDays(4).Ticks);
+            //a.Put(10);
+            //a.Put("Smelling badly");
             //a.Put("Testing");
 
 

@@ -12,6 +12,17 @@ namespace PheggMod.Commands
         All
     }
 
+    public class PMConsoleRunnable : Attribute
+    {
+        public bool consoleRunnable;
+        public PMConsoleRunnable(bool canConsoleRun = false) => this.consoleRunnable = canConsoleRun;
+    }
+
+    public class PMCommandSummary : Attribute
+    {
+        public string commandSummary;
+        public PMCommandSummary(string summary = "No command summary found!") => this.commandSummary = summary;
+    }
 
     #region Command and Alias
     /// <summary>

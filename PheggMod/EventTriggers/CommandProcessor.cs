@@ -19,22 +19,42 @@ namespace PheggMod.EventTriggers
         {
             try
             {
+                GameObject go = PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault();
+
                 string[] query = q.Split(new char[] { ' ' });
 
                 if (!q.ToUpper().Contains("SILENT"))
                 {
-                    lastCommand = q;
-                    PheggPlayer pheggPlayer = new PheggPlayer(PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == sender.Nickname).FirstOrDefault());
+                    if (go != null)
+                    {
+                        lastCommand = q;
+                        PheggPlayer pheggPlayer = new PheggPlayer(go);
 
-                    if (q.ToUpper().Contains("CASSIE"))
-                        q = q.ToUpper() + " PITCH_1";
+                        if (q.ToUpper().Contains("CASSIE"))
+                            q = q.ToUpper() + " PITCH_1";
 
-                    PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
-                    if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
+                        PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
+
+                        List<string> cmds = new List<string>();
+
+                        if (PluginManager.oldCommands.ContainsKey(query[0]))
+                        {
+                            PluginManager.TriggerCommand(PluginManager.oldCommands[query[0]], q, pheggPlayer.gameObject, sender);
+                            return;
+                        }
+                        else
+                        {
+                            if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
+                        }
+                    }
+                    else
+                    {
+                        if (PluginManager.TriggerConsoleCommand(new CommandInfo(sender, null, query[0], query))) return;
+                    }
                 }
                 orig_ProcessQuery(q, sender);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Base.Error($"{e.Message}\n{e.StackTrace}");
             }

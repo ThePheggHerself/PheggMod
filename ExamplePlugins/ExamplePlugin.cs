@@ -30,8 +30,17 @@ namespace ExamplePlugin
             harmony.PatchAll();
 
             this.AddEventHandlers(new Playerhurt());
+            this.AddCommand(new TestCommand(), "Test", new string[] { "apples", "pears" });
 
             Info($"Plugin loaded successfully with {harmony.GetPatchedMethods().Count()} patched methods!");
+        }
+    }
+
+    internal class TestCommand : ICommand
+    {
+        public void HandleCommand(string command, GameObject admin, CommandSender sender)
+        {
+            sender.RaReply(command.Split(' ')[0] + "#You don't have permissions to execute this command.\nMissing permission: ", false, true, "");
         }
     }
 

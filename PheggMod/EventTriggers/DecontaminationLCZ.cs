@@ -2,6 +2,7 @@
 using Mirror;
 using MonoMod;
 using PheggMod.API.Events;
+using System;
 
 namespace PheggMod.EventTriggers
 {
@@ -17,7 +18,13 @@ namespace PheggMod.EventTriggers
             {
                 if (NetworkServer.active)
                 {
+                    try { 
                     PluginManager.TriggerEvent<IEventHandlerLczDecontaminate>(new LczDecontaminateEvent());
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering LczDecontaminateEvent: {e.ToString()}");
+                    }
                 }
             }
         }

@@ -23,6 +23,7 @@ namespace PheggMod
         private static bool _debug;
         private string _restartTime;
         private int[] _restartTimeClean;
+        public static int roundCount = 0;
 
         private extern void orig_FixedUpdate();
 
@@ -86,7 +87,7 @@ namespace PheggMod
             ///This is the time that the server will check for with the auto-restarting system.
             ///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
             ///Keeping as null will disable;
-            _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", null);
+            _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", "04:30");
 
             new Commands.CustomInternalCommands();
             PluginManager.PluginPreLoad();

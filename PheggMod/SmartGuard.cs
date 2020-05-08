@@ -103,6 +103,8 @@ namespace PheggMod
                 ServerRoles sr = go.GetComponent<ServerRoles>();
                 NicknameSync ns = go.GetComponent<NicknameSync>();
 
+                CustomLiteNetLib4MirrorTransport cln = go.GetComponent<CustomLiteNetLib4MirrorTransport>();
+
                 //Whitelist Check
                 if (sr.BypassStaff && _skipGlobalStaff)
                 {

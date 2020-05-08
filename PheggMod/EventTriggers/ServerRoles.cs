@@ -23,7 +23,14 @@ namespace PheggMod.EventTriggers
         {
             orig_RefreshPermissions(disp);
 
-            PluginManager.TriggerEvent<IEventHandlerRefreshAdminPerms>(new RefreshAdminPermsEvent(new PheggPlayer(gameObject)));
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerRefreshAdminPerms>(new RefreshAdminPermsEvent(new PheggPlayer(gameObject)));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering RefreshAdminPermsEvent: {e.ToString()}");
+            }
         }
     }
 }
