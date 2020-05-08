@@ -16,7 +16,7 @@ namespace PheggMod.EventTriggers
         public extern bool orig_HurtPlayer(PlayerStats.HitInfo info, GameObject go);
         public new bool HurtPlayer(PlayerStats.HitInfo info, GameObject go)
         {
-            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer && info.GetDamageType() != DamageTypes.None)
+            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer && info.GetDamageType() != DamageTypes.None && !go.GetComponent<CharacterClassManager>().GodMode)
             {
                 //if (Commands.CustomInternalCommands.nodamageplayers.ContainsKey(go.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId))
                 //    info.Amount = 0;
@@ -47,9 +47,7 @@ namespace PheggMod.EventTriggers
                     }
             }
 
-            orig_HurtPlayer(info, go);
-
-            return false;
+            return orig_HurtPlayer(info, go);
         }
 
         public extern void orig_Roundrestart();

@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking.Match;
 
 namespace PheggMod.Commands
 {
@@ -120,7 +121,7 @@ namespace PheggMod.Commands
         {
             EventTriggers.PMAlphaWarheadController.nukeLock = !EventTriggers.PMAlphaWarheadController.nukeLock;
 
-            info.commandSender.RaReply(info.commandArgs[0] + $"#Warhead lock has been {(EventTriggers.PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}", true, true, "");
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead lock has been {(EventTriggers.PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}", true, true, "");
         }
 
         [PMCommand("nuke"), PMParameters("enable/disable"), PMPermission(PlayerPermissions.WarheadEvents)]
@@ -131,11 +132,11 @@ namespace PheggMod.Commands
                 case "enable":
                 case "on":
                     EventTriggers.PMAlphaWarheadNukesitePanel.Enable();
-                    info.commandSender.RaReply(info.commandName + $"#Warhead has been enabled", true, true, "");
+                    info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead has been enabled", true, true, "");
                     break;
                 default:
                     EventTriggers.PMAlphaWarheadNukesitePanel.Disable();
-                    info.commandSender.RaReply(info.commandName + $"#Warhead has been disabled", true, true, "");
+                    info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead has been disabled", true, true, "");
                     break;
             }
         }
@@ -185,7 +186,7 @@ namespace PheggMod.Commands
             foreach (GameObject player in playerList)
                 player.GetComponent<Inventory>().ServerDropAll();
 
-            info.commandSender.RaReply(info.commandName + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
         }
 
         [PMCommand("slay"), PMAlias("suicide"), PMParameters()]
@@ -221,7 +222,7 @@ namespace PheggMod.Commands
             foreach (GameObject player in playerList)
                 player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), player);
 
-            info.commandSender.RaReply(info.commandName + $"#Killed {playerList.Count} {(playerList.Count > 1 ? "players" : "player")}", true, true, "");
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Killed {playerList.Count} {(playerList.Count > 1 ? "players" : "player")}", true, true, "");
         }
 
         internal static bool isLightsout = false;
@@ -252,7 +253,7 @@ namespace PheggMod.Commands
             else if (isLightsout)
             {
                 isLightsout = false;
-                info.commandSender.RaReply(info.commandName + $"#Facility lights will be enabled next cycle!", true, true, "");
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Facility lights will be enabled next cycle!", true, true, "");
             }
 
             yield return 0f;
@@ -295,7 +296,7 @@ namespace PheggMod.Commands
         [PMCommand("nevergonna"), PMParameters("give", "you", "up"), PMCommandSummary("Test command. Try it :)")]
         public void cmd_RickRoll(CommandInfo info)
         {
-            info.commandSender.RaReply(info.commandName + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
         }
 
         public static Dictionary<int, GameObject> nodamageplayers { get; private set; }
@@ -342,7 +343,7 @@ namespace PheggMod.Commands
 
 
             if (info.gameObject != null)
-                info.commandSender.RaReply(info.commandArgs[0] + $"#{status}", true, false, "");
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{status}", true, false, "");
             else 
                 Base.Info(status);
 
@@ -381,9 +382,24 @@ namespace PheggMod.Commands
             }
 
             if (info.gameObject != null)
-                info.commandSender.RaReply(info.commandArgs[0] + $"#{msg}", true, false, "");
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{msg}", true, false, "");
             else
                 Base.Info(msg);
+        }
+
+        [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
+        public void cmd_pos(CommandInfo info)
+        {
+            Vector3 pos = info.gameObject.GetComponent<PlyMovementSync>().RealModelPosition;
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Current player position: x={pos.x} y={pos.y} z={pos.z}", true, true, "");
+        }
+
+        [PMCommand("tower2"), PMParameters(), PMCommandSummary("Teleports the user to a second tower on the surface")]
+        public void cmd_tower2(CommandInfo info)
+        {
+            info.gameObject.GetComponent<PlyMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#You have been teleported to the second surface tower", true, true, "");
         }
 
         /* //[PMCommand("endround"), PMAlias("forceend"), PMParameters(), PMPermission(PlayerPermissions.RoundEvents)]
