@@ -208,7 +208,7 @@ namespace PheggMod
                 if (perm != null && !perm.CheckPermissions(cInfo.commandSender, perm.perm))
                 {
                     cInfo.commandSender.RaReply(cInfo.commandName + "#You don't have permission to execute this command.\nMissing permission: " + perm.perm, false, true, "");
-                    return false;
+                    return true;
                 }
 
                 PMPermissions perms = (PMPermissions)cmd.GetCustomAttribute(typeof(PMPermissions));
@@ -222,7 +222,7 @@ namespace PheggMod
                         else if(perms.type == RequirementType.All)
                             cInfo.commandSender.RaReply(cInfo.commandName + $"#You must have one of the following permmissions to run this command.\nMissing permissions: {string.Join(", ", permList)}", false, true, "");
 
-                        return false;
+                        return true;
                     }
                 }
 
@@ -230,14 +230,14 @@ namespace PheggMod
                 if (whitelist != null && !whitelist.ranks.Contains(uGroup.ToString()))
                 {
                     cInfo.commandSender.RaReply(cInfo.commandName + "#You are not whitelisted to run this command.", false, true, "");
-                    return false;
+                    return true;
                 }
 
                 PMRankBlacklist blacklist = (PMRankBlacklist)cmd.GetCustomAttribute(typeof(PMRankBlacklist));
                 if (blacklist != null && blacklist.ranks.Contains(uGroup.ToString()))
                 {
                     cInfo.commandSender.RaReply(cInfo.commandName + "#You are not whitelisted to run this command.", false, true, "");
-                    return false;
+                    return true;
                 }
             }
 
@@ -248,18 +248,18 @@ namespace PheggMod
             if (parameters == null)
             {
                 throw new Exception($"PMParameters is null for command: {cInfo.commandName}");
-                return false;
+                return true;
             }
 
             if (cInfo.commandArgs.Length - 1 < parameters.parameters.Length)
             {
                 cInfo.commandSender.RaReply(cInfo.commandName + $"#{cInfo.commandName.ToUpper()} [{string.Join("] [", parameters.parameters).ToUpper()}]", false, true, "");
-                return false;
+                return true;
             }
             if (!canExtend && cInfo.commandArgs.Length - 1 > parameters.parameters.Length)
             {
                 cInfo.commandSender.RaReply(cInfo.commandName + $"#{cInfo.commandName.ToUpper()} [{string.Join("] [", parameters.parameters).ToUpper()}]", false, true, "");
-                return false;
+                return true;
             }
 
             object instance;

@@ -44,7 +44,7 @@ namespace PheggMod.EventTriggers
                         }
                         else
                         {
-                            if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
+                            if(PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
                         }
                     }
                     else
