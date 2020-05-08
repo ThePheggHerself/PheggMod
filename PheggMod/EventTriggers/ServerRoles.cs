@@ -25,6 +25,7 @@ namespace PheggMod.EventTriggers
 
             try
             {
+                Base.Debug("Triggering RefreshAdminPermsEvent");
                 PluginManager.TriggerEvent<IEventHandlerRefreshAdminPerms>(new RefreshAdminPermsEvent(new PheggPlayer(gameObject)));
             }
             catch (Exception e)

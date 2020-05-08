@@ -1,4 +1,6 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
+#pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace PheggMod
         private string _restartTime;
         private int[] _restartTimeClean;
         public static int roundCount = 0;
+        public static DateTime? roundStartTime = null;
 
         private extern void orig_FixedUpdate();
 

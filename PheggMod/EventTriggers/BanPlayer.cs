@@ -36,6 +36,7 @@ namespace PheggMod.EventTriggers
                         if (isGlobalBan)
                             try
                             {
+                                Base.Debug("Triggering GlobalBanEvent");
                                 PluginManager.TriggerEvent<IEventHandlerGlobalBan>(new GlobalBanEvent(new PheggPlayer(user)));
                             }
                             catch (Exception e)
@@ -45,6 +46,7 @@ namespace PheggMod.EventTriggers
                         else if (duration < 1)
                             try
                             {
+                                Base.Debug("Triggering PlayerKickEvent");
                                 PluginManager.TriggerEvent<IEventHandlerPlayerKick>(new PlayerKickEvent(new PheggPlayer(user), new PheggPlayer(PlayerManager.players[index]), reason));
                             }
                             catch (Exception e)
@@ -54,6 +56,7 @@ namespace PheggMod.EventTriggers
                         else
                             try
                             {
+                                Base.Debug("Triggering PlayerBanEvent");
                                 PluginManager.TriggerEvent<IEventHandlerPlayerBan>(new PlayerBanEvent(new PheggPlayer(user), duration, new PheggPlayer(PlayerManager.players[index]), reason));
                             }
                             catch (Exception e)

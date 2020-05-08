@@ -30,6 +30,7 @@ namespace PheggMod.EventTriggers
                 if (Pstats.health - info.Amount < 1)
                     try
                     {
+                        Base.Debug("Triggering PlayerDeathEvent");
                         PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
                     }
                     catch (Exception e)
@@ -39,6 +40,7 @@ namespace PheggMod.EventTriggers
                 else
                     try
                     {
+                        Base.Debug("Triggering PlayerHurtEvent");
                         PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
                     }
                     catch (Exception e)

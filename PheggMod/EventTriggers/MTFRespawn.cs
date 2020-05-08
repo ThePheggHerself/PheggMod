@@ -18,6 +18,7 @@ namespace PheggMod.EventTriggers
 
             try
             {
+                Base.Debug("Triggering RespawnEvent");
                 PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(nextWaveIsCI));
             }
             catch (Exception e)

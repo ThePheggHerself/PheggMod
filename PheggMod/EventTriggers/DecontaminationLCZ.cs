@@ -1,4 +1,6 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
+#pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
+
 using Mirror;
 using MonoMod;
 using PheggMod.API.Events;
@@ -18,8 +20,10 @@ namespace PheggMod.EventTriggers
             {
                 if (NetworkServer.active)
                 {
-                    try { 
-                    PluginManager.TriggerEvent<IEventHandlerLczDecontaminate>(new LczDecontaminateEvent());
+                    try
+                    {
+                        Base.Debug("Triggering LczDecontaminateEvent");
+                        PluginManager.TriggerEvent<IEventHandlerLczDecontaminate>(new LczDecontaminateEvent());
                     }
                     catch (Exception e)
                     {

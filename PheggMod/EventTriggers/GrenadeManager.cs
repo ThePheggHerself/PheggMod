@@ -17,6 +17,7 @@ namespace PheggMod.EventTriggers
 
             try
             {
+                Base.Debug("Triggering PlayerThrowGrenadeEvent");
                 PluginManager.TriggerEvent<IEventHandlerPlayerThrowGrenade>(new PlayerThrowGrenadeEvent(new PheggPlayer(base.gameObject), settings));
             }
             catch (Exception e)

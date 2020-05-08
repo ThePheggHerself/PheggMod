@@ -30,7 +30,8 @@ namespace PheggMod.EventTriggers
 
             if (!(this.timeToDetonation <= 10f))
             {
-                try { 
+                try {
+                    Base.Debug("Triggering WarheadCancelEvent");
                     PluginManager.TriggerEvent<IEventHandlerWarheadCancel>(new WarheadCancelEvent(new PheggPlayer(disabler)));
                 }
                 catch (Exception e)
@@ -54,6 +55,7 @@ namespace PheggMod.EventTriggers
                 InitialStart = false;
             try
             {
+                Base.Debug("Triggering WarheadStartEvent");
                 PluginManager.TriggerEvent<IEventHandlerWarheadStart>(new WarheadStartEvent(InitialStart, this.timeToDetonation));
             }
             catch (Exception e)
@@ -69,6 +71,7 @@ namespace PheggMod.EventTriggers
 
             try
             {
+                Base.Debug("Triggering WarheadDetonateEvent");
                 PluginManager.TriggerEvent<IEventHandlerWarheadDetonate>(new WarheadDetonateEvent());
             }
             catch (Exception e)

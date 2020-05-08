@@ -22,6 +22,7 @@ namespace PheggMod.EventTriggers
                 if (string.IsNullOrEmpty(player.UserId) || !player.UserId.Contains('@')) return;
                 else try
                     {
+                        Base.Debug("Triggering PlayerLeaveEvent");
                         PluginManager.TriggerEvent<IEventHandlerPlayerLeave>(new PlayerLeaveEvent(new PheggPlayer(this.gameObject)));
                     }
                     catch (Exception e)

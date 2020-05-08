@@ -248,7 +248,6 @@ namespace PheggMod
             if (parameters == null)
             {
                 throw new Exception($"PMParameters is null for command: {cInfo.commandName}");
-                return true;
             }
 
             if (cInfo.commandArgs.Length - 1 < parameters.parameters.Length)

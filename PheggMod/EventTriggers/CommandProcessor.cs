@@ -33,13 +33,23 @@ namespace PheggMod.EventTriggers
                         if (q.ToUpper().Contains("CASSIE"))
                             q = q.ToUpper() + " PITCH_1";
 
-                        PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
+                        try
+                        {
+                            Base.Debug("Triggering AdminQueryEvent");
+                            PluginManager.TriggerEvent<IEventHandlerAdminQuery>(new AdminQueryEvent(pheggPlayer, q));
+                        }
+                        catch (Exception e)
+                        {
+                            Base.Error($"Error triggering AdminQueryEvent: {e.ToString()}");
+                        }
 
                         List<string> cmds = new List<string>();
 
                         if (PluginManager.oldCommands.ContainsKey(query[0]))
                         {
+#pragma warning disable CS0618 // Type or member is obsolete
                             PluginManager.TriggerCommand(PluginManager.oldCommands[query[0]], q, pheggPlayer.gameObject, sender);
+#pragma warning restore CS0618 // Type or member is obsolete
                             return;
                         }
                         else

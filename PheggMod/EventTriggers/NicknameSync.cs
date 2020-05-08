@@ -31,6 +31,7 @@ namespace PheggMod.EventTriggers
             {
                 try
                 {
+                    Base.Debug("Triggering PlayerJoinEvent");
                     PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
                 }
                 catch (Exception e)

@@ -31,6 +31,7 @@ namespace PheggMod.EventTriggers
             {
                 try
                 {
+                    Base.Debug("Triggering WaitingForPlayersEvent");
                     PluginManager.TriggerEvent<IEventHandlerWaitingForPlayers>(new WaitingForPlayersEvent());
                     PMAlphaWarheadController.nukeLock = false;
                 }
@@ -50,9 +51,11 @@ namespace PheggMod.EventTriggers
             bool Bool = orig_ForceRoundStart();
 
             Base.roundCount++;
+            Base.roundStartTime = DateTime.Now;
 
             try
             {
+                Base.Debug("Triggering RoundStartEvent");
                 PluginManager.TriggerEvent<IEventHandlerRoundStart>(new RoundStartEvent());
             }
             catch (Exception e)
@@ -78,6 +81,7 @@ namespace PheggMod.EventTriggers
                 if (!escape)
                     try
                     {
+                        Base.Debug("Triggering PlayerSpawnEvent");
                         PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
                     }
                     catch (Exception e)
@@ -87,6 +91,7 @@ namespace PheggMod.EventTriggers
                 else
                     try
                     {
+                        Base.Debug("Triggering PlayerEscapeEvent");
                         PluginManager.TriggerEvent<IEventHandlerPlayerEscape>(new PlayerEscapeEvent(new PheggPlayer(this.gameObject), originalrole, this.CurClass, this.Classes.SafeGet(this.CurClass).team));
                     }
                     catch (Exception e)

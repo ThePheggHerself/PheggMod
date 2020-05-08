@@ -114,7 +114,9 @@ namespace PheggMod.API.Events
     {
         public WarheadCancelEvent(PheggPlayer disabler = null)
         {
+#pragma warning disable CS0612 // Type or member is obsolete
             Disablier = disabler;
+#pragma warning restore CS0612 // Type or member is obsolete
             Disabler = disabler;
         }
         [Obsolete]

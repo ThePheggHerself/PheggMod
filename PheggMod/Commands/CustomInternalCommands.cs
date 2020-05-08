@@ -329,22 +329,29 @@ namespace PheggMod.Commands
         [PMCommand("status"), PMAlias("serverstatus", "serverinfo", "sinfo"), PMParameters(), PMConsoleRunnable(true)]
         public void cmd_sinfo(CommandInfo info)
         {
+            string playerCount = $"{PlayerManager.players.Count} / {ConfigFile.ServerConfig.GetInt("max_players", 20)}";
+            string roundCount = Base.roundCount.ToString();
+            string roundDuration = RoundSummary.RoundInProgress() == true ? $"{new DateTime(TimeSpan.FromSeconds((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds).Ticks):HH:mm:ss}" : "Round not started";
+            string timeSinceStart = $"{new DateTime(TimeSpan.FromSeconds((double)(new decimal(Time.realtimeSinceStartup))).Ticks):HH:mm:ss}";
+            string curPlayerID = PlayerManager.localPlayer.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString();
+            string memory = $"{ ((GC.GetTotalMemory(false) / 1024) / 1024) } MB";
+
 
             //(double)(new decimal(Time.realtimeSinceStartup))
 
             string status = "Server status:"
-                    + $"\nPlayer count: {PlayerManager.players.Count} / {ConfigFile.ServerConfig.GetInt("max_players", 20)}"
-                    + $"\nRound count: {Base.roundCount}"
-                    + $"\nRound duration: {(RoundSummary.RoundInProgress() == true ? $"{TimeSpan.FromSeconds(RoundSummary.roundTime):HH:MM:ss}" : "Round not started")}"
-                    + $"\nTime since startup: {new DateTime(TimeSpan.FromSeconds((double)(new decimal(Time.realtimeSinceStartup))).Ticks):HH:MM:ss}"
-                    + $"\nCurrent PlayerID: {PlayerManager.localPlayer.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId}"
-                    + $"\nMemory usage: {((GC.GetTotalMemory(false)/1024)/1024)} MB"
+                    + $"\nPlayer count: {playerCount}"
+                    + $"\nRound count: {roundCount}"
+                    + $"\nRound duration: {roundDuration}"
+                    + $"\nTime since startup: {timeSinceStart}"
+                    + $"\nCurrent PlayerID: {curPlayerID}"
+                    + $"\nMemory usage: {memory}"
                     ;
 
 
             if (info.gameObject != null)
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{status}", true, false, "");
-            else 
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{status}", true, true, "");
+            else
                 Base.Info(status);
 
             //+ $"\nMemory usage: {GC.GetTotalMemory(false)}"
@@ -370,7 +377,7 @@ namespace PheggMod.Commands
                     PMParameters pmParams = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
                     PMPermission pmPerms = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
 
-                    string usage = $"{q} {(pmParams != null? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
+                    string usage = $"{q} {(pmParams != null ? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
                     string summary = pmSummary != null ? pmSummary.commandSummary : "No command summary found!";
                     string permission = pmPerms != null ? pmPerms.perm.ToString() : "No specific permissions required";
 
