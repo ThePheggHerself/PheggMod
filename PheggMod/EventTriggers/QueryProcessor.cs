@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
 using MonoMod;
 using PheggMod.API.Events;
+using System;
 using System.Linq;
 
 namespace PheggMod.EventTriggers
@@ -19,7 +20,14 @@ namespace PheggMod.EventTriggers
                 NicknameSync name = this.GetComponent<NicknameSync>();
 
                 if (string.IsNullOrEmpty(player.UserId) || !player.UserId.Contains('@')) return;
-                else PluginManager.TriggerEvent<IEventHandlerPlayerLeave>(new PlayerLeaveEvent(new PheggPlayer(this.gameObject)));
+                else try
+                    {
+                        PluginManager.TriggerEvent<IEventHandlerPlayerLeave>(new PlayerLeaveEvent(new PheggPlayer(this.gameObject)));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerLeaveEvent: {e.ToString()}");
+                    }
 
                 if (PlayerManager.players.Count - 1 < 1 && RoundSummary.RoundInProgress())
                     PMRoundSummary.RoundFix();

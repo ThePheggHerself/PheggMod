@@ -2,6 +2,7 @@
 using GameCore;
 using MonoMod;
 using PheggMod.API.Events;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,14 @@ namespace PheggMod.EventTriggers
         {
             orig_RespawnDeadPlayers();
 
-            PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(nextWaveIsCI));
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(nextWaveIsCI));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering RespawnEvent: {e.ToString()}");
+            }
 
             if (Commands.CustomInternalCommands.isLightsout)
             {

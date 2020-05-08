@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using RemoteAdmin;
+using Telepathy;
 
 namespace PheggMod
 {
@@ -16,6 +17,7 @@ namespace PheggMod
         public string domain { get; internal set; }
         public string ipAddress { get; internal set; }
         public int playerId { get; internal set; }
+        public Components commonComponents;
 
         private CharacterClassManager _CharacterClassManager { get; set; }
         private ServerRoles _serverRoles { get; set; }
@@ -28,39 +30,82 @@ namespace PheggMod
         private PlyMovementSync _plyMovementSync { get; set; }
         private BanPlayer _banPlayer { get; set; }
 
-
         public GameObject gameObject { get; internal set; }
+
 
         public class TeamClass
         {
             public RoleType role { get; internal set; }
             public Team team { get; internal set; }
         }
+        public class Components
+        {
+            public CharacterClassManager ccm;
+            public ServerRoles sr;
+            public NicknameSync ns;
+            public QueryProcessor qp;
+            public Handcuffs hc;
+            public PlayerStats ps;
+            public AmmoBox ab;
+            public Inventory inv;
+            public PlyMovementSync pms;
+            public BanPlayer bp;
+        }
+
 
         public PheggPlayer(GameObject player)
         {
-            if (player != null)
+            if (player == null)
+                throw new Exception("Cannot create PheggPlayer from null game object");
+            else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
             {
-                _CharacterClassManager = player.GetComponent<CharacterClassManager>();
-                _serverRoles = player.GetComponent<ServerRoles>();
-                _nicknameSync = player.GetComponent<NicknameSync>();
-                _queryProcessor = player.GetComponent<RemoteAdmin.QueryProcessor>();
-                _handcuffs = player.GetComponent<Handcuffs>();
-                _playerStats = player.GetComponent<PlayerStats>();
-                _ammoBox = player.GetComponent<AmmoBox>();
-                _inventory = player.GetComponent<Inventory>();
-                _plyMovementSync = player.GetComponent<PlyMovementSync>();
-                _banPlayer = player.GetComponent<BanPlayer>();
-
-                name = _nicknameSync.MyNick;
-                userId = _CharacterClassManager.UserId;
-                domain = _CharacterClassManager.UserId.Split('@')[1].ToUpper();
-                ipAddress = _nicknameSync.connectionToClient.address;
-                playerId = _queryProcessor.PlayerId;
-
-                gameObject = player;
+                Base.Debug("Cannot create PheggPlayer for server");
+                return;
             }
-            else throw new Exception("Cannot create PheggPlayer from null game object");
+            else
+            {
+                try
+                {
+                    #region components
+                    _CharacterClassManager = player.GetComponent<CharacterClassManager>();
+                    _serverRoles = player.GetComponent<ServerRoles>();
+                    _nicknameSync = player.GetComponent<NicknameSync>();
+                    _queryProcessor = player.GetComponent<QueryProcessor>();
+                    _handcuffs = player.GetComponent<Handcuffs>();
+                    _playerStats = player.GetComponent<PlayerStats>();
+                    _ammoBox = player.GetComponent<AmmoBox>();
+                    _inventory = player.GetComponent<Inventory>();
+                    _plyMovementSync = player.GetComponent<PlyMovementSync>();
+                    _banPlayer = player.GetComponent<BanPlayer>();
+                    #endregion
+
+                    name = _nicknameSync.MyNick;
+                    userId = _CharacterClassManager.UserId;
+                    domain = _CharacterClassManager.UserId.Split('@')[1].ToUpper();
+                    ipAddress = _nicknameSync.connectionToClient.address;
+                    playerId = _queryProcessor.PlayerId;
+
+                    gameObject = player;
+
+                    commonComponents = new Components
+                    {
+                        ccm = _CharacterClassManager,
+                        sr = _serverRoles,
+                        ns = _nicknameSync,
+                        qp = _queryProcessor,
+                        hc = _handcuffs,
+                        ps = _playerStats,
+                        ab = _ammoBox,
+                        inv = _inventory,
+                        pms = _plyMovementSync,
+                        bp = _banPlayer
+                    };
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.ToString());
+                }
+            }
         }
 
         public override string ToString()
@@ -165,7 +210,7 @@ namespace PheggMod
             _inventory.Clear();
         }
 
-        public void Teleport(Vector3 vector3, float rotation = 0, bool forcegound = true )
+        public void Teleport(Vector3 vector3, float rotation = 0, bool forcegound = true)
         {
             _plyMovementSync.OverridePosition(vector3, rotation, forcegound);
         }

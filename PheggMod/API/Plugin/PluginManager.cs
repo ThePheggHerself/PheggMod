@@ -26,6 +26,7 @@ namespace PheggMod
         public static List<Tuple<Type, IEventHandler>> allEvents = new List<Tuple<Type, IEventHandler>>();
 
         public static Dictionary<string, MethodInfo> allCommands = new Dictionary<string, MethodInfo>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, ICommand> oldCommands = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase);
         public static Dictionary<MethodInfo, object> commandInstances = new Dictionary<MethodInfo, object>();
 
         public static void Reload()
@@ -156,6 +157,40 @@ namespace PheggMod
             return events;
         }
 
+        internal static void AddCommands(Assembly assembly)
+        {
+            List<MethodInfo> commands = assembly.GetTypes().SelectMany(t => t.GetMethods()).Where(m => m.GetCustomAttributes().OfType<PMCommand>().Any()).ToList();
+
+            foreach (MethodInfo command in commands)
+            {
+                PMCommand pmCommand = (PMCommand)command.GetCustomAttribute(typeof(PMCommand));
+
+                if (allCommands.ContainsKey(pmCommand.name) || oldCommands.ContainsKey(pmCommand.name))
+                {
+                    Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {pmCommand.name}");
+                }
+                else
+                {
+                    allCommands.Add(pmCommand.name, command);
+                }
+
+                PMAlias pmAlias = (PMAlias)command.GetCustomAttribute(typeof(PMAlias));
+                if (pmAlias != null)
+                {
+                    foreach (string alias in pmAlias.alias)
+                    {
+                        if (!allCommands.ContainsKey(alias) && !oldCommands.ContainsKey(alias))
+                        {
+                            allCommands.Add(alias, command);
+                        }
+                        else
+                        {
+                            Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {alias}");
+                        }
+                    }
+                }
+            }
+        }
         internal static bool TriggerCommand(CommandInfo cInfo)
         {
             if (!allCommands.ContainsKey(cInfo.commandName)) return false;
@@ -241,40 +276,67 @@ namespace PheggMod
             cmd.Invoke(instance, new object[] { cInfo });
             return true;
         }
-
-        internal static void AddCommands(Assembly assembly)
+        internal static bool TriggerConsoleCommand(CommandInfo cInfo)
         {
-            List<MethodInfo> commands = assembly.GetTypes().SelectMany(t => t.GetMethods()).Where(m => m.GetCustomAttributes().OfType<PMCommand>().Any()).ToList();
+            if (!allCommands.ContainsKey(cInfo.commandName)) return false;
 
-            foreach(MethodInfo command in commands)
+            MethodInfo cmd = allCommands[cInfo.commandName];
+            if (cmd == null || cmd.Equals(default(Type)))
+                return false;
+
+            PMConsoleRunnable cR = (PMConsoleRunnable)cmd.GetCustomAttribute(typeof(PMConsoleRunnable));
+            if (cR == null || !cR.consoleRunnable)
             {
-                PMCommand pmCommand = (PMCommand)command.GetCustomAttribute(typeof(PMCommand));
-
-                if (!allCommands.ContainsKey(pmCommand.name))
-                {
-                    allCommands.Add(pmCommand.name, command);
-                }
-                else
-                {
-                    Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {pmCommand.name}");
-                }
+                Base.Info($"{cInfo.commandName.ToUpper()} is not runnable via the server console");
+                return false;
+            }
                 
-                PMAlias pmAlias = (PMAlias)command.GetCustomAttribute(typeof(PMAlias));
-                if(pmAlias != null)
+            object instance;
+
+            if (commandInstances.ContainsKey(cmd))
+                instance = commandInstances[cmd];
+            else
+            {
+                instance = Activator.CreateInstance(cmd.DeclaringType);
+
+                commandInstances.Add(cmd, instance);
+            }
+
+            cmd.Invoke(instance, new object[] { cInfo });
+            return true;
+        }
+
+
+
+        [Obsolete("Use the newer attribute based command system. This was only (re)added for backwards compatability!")]
+        public static void AddCommand(Plugin plugin, ICommand command, string name, string[] alias)
+        {
+            Base.Info(name);
+
+            if (allCommands.ContainsKey(name) || oldCommands.ContainsKey(name))
+            {
+                Base.Error($"{plugin.Details.name} tried to register a pre-existing command: {name.ToUpper()}");
+            }
+            else
+            {
+                oldCommands.Add(name.ToUpper(), command);
+            }
+
+            if (alias != null)
+            {
+                foreach (string cmdalias in alias)
                 {
-                    foreach (string alias in pmAlias.alias)
+                    if (!allCommands.ContainsKey(cmdalias) && !oldCommands.ContainsKey(cmdalias))
                     {
-                        if (!allCommands.ContainsKey(alias))
-                        {
-                            allCommands.Add(alias, command);
-                        }
-                        else
-                        {
-                            Base.Warn($"Plugin {assembly.GetName().Name} tried to register pre-existing command {alias}");
-                        }
+                        oldCommands.Add(cmdalias.ToUpper(), command);
                     }
                 }
             }
+        }
+        [Obsolete("Use the newer attribute based command system. This was only (re)added for backwards compatability!")]
+        internal static void TriggerCommand(ICommand iCmd, string command, GameObject admin, CommandSender sender)
+        {
+            iCmd.HandleCommand(command, admin, sender);
         }
     }
 }

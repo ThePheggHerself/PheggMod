@@ -27,8 +27,24 @@ namespace PheggMod.EventTriggers
 
                 if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
 
-                if (Pstats.health - info.Amount < 1) PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
-                else PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
+                if (Pstats.health - info.Amount < 1)
+                    try
+                    {
+                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerDeathEvent: {e.ToString()}");
+                    }
+                else
+                    try
+                    {
+                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType()));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerHurtEvent: {e.ToString()}");
+                    }
             }
 
             orig_HurtPlayer(info, go);

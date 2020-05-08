@@ -28,7 +28,16 @@ namespace PheggMod.EventTriggers
 
             orig_CancelDetonation(disabler);
 
-            if (!(this.timeToDetonation <= 10f)) PluginManager.TriggerEvent<IEventHandlerWarheadCancel>(new WarheadCancelEvent(new PheggPlayer(disabler)));
+            if (!(this.timeToDetonation <= 10f))
+            {
+                try { 
+                    PluginManager.TriggerEvent<IEventHandlerWarheadCancel>(new WarheadCancelEvent(new PheggPlayer(disabler)));
+                }
+                catch (Exception e)
+                {
+                    Base.Error($"Error triggering WarheadCancelEvent: {e.ToString()}");
+                }
+            }
         }
 
         public extern void orig_StartDetonation();
@@ -43,8 +52,14 @@ namespace PheggMod.EventTriggers
                 InitialStart = true;
             else
                 InitialStart = false;
-
-            PluginManager.TriggerEvent<IEventHandlerWarheadStart>(new WarheadStartEvent(InitialStart, this.timeToDetonation));
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerWarheadStart>(new WarheadStartEvent(InitialStart, this.timeToDetonation));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering WarheadStartEvent: {e.ToString()}");
+            }
         }
 
         public extern void orig_Detonate();
@@ -52,8 +67,14 @@ namespace PheggMod.EventTriggers
         {
             orig_Detonate();
 
-            PluginManager.TriggerEvent<IEventHandlerWarheadDetonate>(new WarheadDetonateEvent());
+            try
+            {
+                PluginManager.TriggerEvent<IEventHandlerWarheadDetonate>(new WarheadDetonateEvent());
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering WarheadDetonateEvent: {e.ToString()}");
+            }
         }
     }
-
 }

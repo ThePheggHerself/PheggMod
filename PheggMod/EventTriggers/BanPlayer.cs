@@ -31,14 +31,35 @@ namespace PheggMod.EventTriggers
                 {
                     int index = PlayerManager.players.FindIndex(player => player.GetComponent<NicknameSync>().MyNick == issuer);
 
-                    if(index > -1)
+                    if (index > -1)
                     {
                         if (isGlobalBan)
-                            PluginManager.TriggerEvent<IEventHandlerGlobalBan>(new GlobalBanEvent(new PheggPlayer(user)));
+                            try
+                            {
+                                PluginManager.TriggerEvent<IEventHandlerGlobalBan>(new GlobalBanEvent(new PheggPlayer(user)));
+                            }
+                            catch (Exception e)
+                            {
+                                Base.Error($"Error triggering GlobalBanEvent: {e.ToString()}");
+                            }
                         else if (duration < 1)
-                            PluginManager.TriggerEvent<IEventHandlerPlayerKick>(new PlayerKickEvent(new PheggPlayer(user), new PheggPlayer(PlayerManager.players[index]), reason));
+                            try
+                            {
+                                PluginManager.TriggerEvent<IEventHandlerPlayerKick>(new PlayerKickEvent(new PheggPlayer(user), new PheggPlayer(PlayerManager.players[index]), reason));
+                            }
+                            catch (Exception e)
+                            {
+                                Base.Error($"Error triggering PlayerKickEvent: {e.ToString()}");
+                            }
                         else
-                            PluginManager.TriggerEvent<IEventHandlerPlayerBan>(new PlayerBanEvent(new PheggPlayer(user), duration, new PheggPlayer(PlayerManager.players[index]), reason));
+                            try
+                            {
+                                PluginManager.TriggerEvent<IEventHandlerPlayerBan>(new PlayerBanEvent(new PheggPlayer(user), duration, new PheggPlayer(PlayerManager.players[index]), reason));
+                            }
+                            catch (Exception e)
+                            {
+                                Base.Error($"Error triggering PlayerBanEvent: {e.ToString()}");
+                            }
                     }
 
 

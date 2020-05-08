@@ -5,6 +5,7 @@ using PheggMod.API.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -187,6 +188,25 @@ namespace PheggMod.Commands
             info.commandSender.RaReply(info.commandName + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
         }
 
+        [PMCommand("slay"), PMAlias("suicide"), PMParameters()]
+        public void cmd_slay(CommandInfo info)
+        {
+            CharacterClassManager cmm = info.gameObject.GetComponent<CharacterClassManager>();
+
+            if (cmm.CurClass == RoleType.Spectator)
+            {
+                cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You are already a spectator", "green");
+                return;
+            }
+            else
+            {
+                cmm.CallCmdSuicide(new PlayerStats.HitInfo(10000, "SERVER", DamageTypes.Nuke, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId));
+                cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You have been forced to spectator", "green");
+                return;
+
+            }
+        }
+
         [PMCommand("kill"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
         public void cmd_Kill(CommandInfo info)
         {
@@ -272,7 +292,7 @@ namespace PheggMod.Commands
             }
         }
 
-        [PMCommand("nevergonna"), PMParameters("give", "you", "up")]
+        [PMCommand("nevergonna"), PMParameters("give", "you", "up"), PMCommandSummary("Test command. Try it :)")]
         public void cmd_RickRoll(CommandInfo info)
         {
             info.commandSender.RaReply(info.commandName + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
@@ -303,6 +323,67 @@ namespace PheggMod.Commands
                     nodamageplayers.Remove(id);
                 }
             }
+        }
+
+        [PMCommand("status"), PMAlias("serverstatus", "serverinfo", "sinfo"), PMParameters(), PMConsoleRunnable(true)]
+        public void cmd_sinfo(CommandInfo info)
+        {
+
+            //(double)(new decimal(Time.realtimeSinceStartup))
+
+            string status = "Server status:"
+                    + $"\nPlayer count: {PlayerManager.players.Count} / {ConfigFile.ServerConfig.GetInt("max_players", 20)}"
+                    + $"\nRound count: {Base.roundCount}"
+                    + $"\nRound duration: {(RoundSummary.RoundInProgress() == true ? $"{TimeSpan.FromSeconds(RoundSummary.roundTime):HH:MM:ss}" : "Round not started")}"
+                    + $"\nTime since startup: {new DateTime(TimeSpan.FromSeconds((double)(new decimal(Time.realtimeSinceStartup))).Ticks):HH:MM:ss}"
+                    + $"\nCurrent PlayerID: {PlayerManager.localPlayer.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId}"
+                    + $"\nMemory usage: {((GC.GetTotalMemory(false)/1024)/1024)} MB"
+                    ;
+
+
+            if (info.gameObject != null)
+                info.commandSender.RaReply(info.commandArgs[0] + $"#{status}", true, false, "");
+            else 
+                Base.Info(status);
+
+            //+ $"\nMemory usage: {GC.GetTotalMemory(false)}"
+        }
+
+        [PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
+        public void cmd_help(CommandInfo info)
+        {
+            string msg;
+            string q = info.commandArgs[1];
+
+            if (!PluginManager.allCommands.ContainsKey(q))
+                msg = "No command found!";
+            else
+            {
+                MethodInfo cmd = PluginManager.allCommands[q];
+                if (cmd == null || cmd.Equals(default(Type)))
+                    msg = "No command found!";
+
+                else
+                {
+                    PMCommandSummary pmSummary = (PMCommandSummary)cmd.GetCustomAttribute(typeof(PMCommandSummary));
+                    PMParameters pmParams = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
+                    PMPermission pmPerms = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
+
+                    string usage = $"{q} {(pmParams != null? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
+                    string summary = pmSummary != null ? pmSummary.commandSummary : "No command summary found!";
+                    string permission = pmPerms != null ? pmPerms.perm.ToString() : "No specific permissions required";
+
+                    msg = $"Command info for: {q}"
+                        + $"\nUsage: {usage}"
+                        + $"\nSummary: {summary}"
+                        + $"\nPermission: {permission}";
+                }
+            }
+
+            if (info.gameObject != null)
+                info.commandSender.RaReply(info.commandArgs[0] + $"#{msg}", true, false, "");
+            else
+                Base.Info(msg);
         }
 
         /* //[PMCommand("endround"), PMAlias("forceend"), PMParameters(), PMPermission(PlayerPermissions.RoundEvents)]

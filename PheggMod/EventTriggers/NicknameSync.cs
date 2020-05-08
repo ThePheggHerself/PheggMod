@@ -3,6 +3,7 @@ using GameCore;
 using MonoMod;
 
 using PheggMod.API.Events;
+using System;
 using UnityEngine;
 
 namespace PheggMod.EventTriggers
@@ -18,14 +19,24 @@ namespace PheggMod.EventTriggers
             GameObject go = base.gameObject;
             CharacterClassManager ccm = go.GetComponent<CharacterClassManager>();
 
-            if (ConfigFile.ServerConfig.GetBool("smart_guard", true))
-            {
-                //SmartGuard.instance.SmartGuardDeepCheck(go);
-            }
+            if (ccm.isLocalPlayer)
+                return;
 
-            if (nick != null)
+            //if (ConfigFile.ServerConfig.GetBool("smart_guard", true))
+            //{
+            //    //SmartGuard.instance.SmartGuardDeepCheck(go);
+            //}
+
+            if (nick != null && !string.IsNullOrEmpty(nick))
             {
-                PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
+                try
+                {
+                    PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
+                }
+                catch (Exception e)
+                {
+                    Base.Error($"Error triggering PlayerJoinEvent: {e.ToString()}");
+                }
             }
         }
 

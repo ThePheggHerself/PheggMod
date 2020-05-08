@@ -34,7 +34,10 @@ namespace PheggMod.EventTriggers
                     PluginManager.TriggerEvent<IEventHandlerWaitingForPlayers>(new WaitingForPlayersEvent());
                     PMAlphaWarheadController.nukeLock = false;
                 }
-                catch (Exception e) { Base.Error(e.Message); }
+                catch (Exception e)
+                {
+                    Base.Error($"Error triggering WaitingForPlayersEvent: {e.ToString()}");
+                }
             }
 
             yield return 1f;
@@ -46,11 +49,16 @@ namespace PheggMod.EventTriggers
         {
             bool Bool = orig_ForceRoundStart();
 
+            Base.roundCount++;
+
             try
             {
                 PluginManager.TriggerEvent<IEventHandlerRoundStart>(new RoundStartEvent());
             }
-            catch (Exception e) { Base.Error(e.Message); }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering RoundStartEvent: {e.ToString()}");
+            }
 
             return Bool;
         }
@@ -67,8 +75,24 @@ namespace PheggMod.EventTriggers
 
             try
             {
-                if (!escape) PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
-                else PluginManager.TriggerEvent<IEventHandlerPlayerEscape>(new PlayerEscapeEvent(new PheggPlayer(this.gameObject), originalrole, this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+                if (!escape)
+                    try
+                    {
+                        PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerSpawnEvent: {e.ToString()}");
+                    }
+                else
+                    try
+                    {
+                        PluginManager.TriggerEvent<IEventHandlerPlayerEscape>(new PlayerEscapeEvent(new PheggPlayer(this.gameObject), originalrole, this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerEscapeEvent: {e.ToString()}");
+                    }
             }
             catch (Exception e) { Base.Error(e.Message); }
         }
