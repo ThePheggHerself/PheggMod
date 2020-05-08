@@ -35,6 +35,10 @@ These are the available custom commands that Pheggmod offers
 | lightsout | | FacilityManagement | Causes the lights to go out inside the facility (Due to the limitations of the game's code, this is quite buggy ATM) |
 | pluginreload (reloadplugins plreload) | | ServerConfigs | Reloads the server's plugins on the next round restart |
 | nevergonna | [Give] [You] [Up] | | See for yourself |
+| status | | | Shows some of the current stats for the server |
+| help | [CommandName] | | Shows available command information |
+| curpos | [PlayerID] | | Prints the player's current position into RA |
+| tower2 | | | Teleports the player into a different surface tower |
 
 
 # Events
