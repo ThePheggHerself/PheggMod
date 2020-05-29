@@ -23,7 +23,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RespawnEvent: {e.ToString()}");
+                Base.Error($"Error triggering RespawnEvent: {e.InnerException.ToString()}");
             }
 
             if (Commands.CustomInternalCommands.isLightsout)

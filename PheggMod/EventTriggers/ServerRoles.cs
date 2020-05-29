@@ -30,7 +30,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RefreshAdminPermsEvent: {e.ToString()}");
+                Base.Error($"Error triggering RefreshAdminPermsEvent: {e.InnerException.ToString()}");
             }
         }
     }

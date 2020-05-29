@@ -14,6 +14,7 @@ using MEC;
 using System.Threading;
 using System.Diagnostics;
 using GameCore;
+using UnityEngine.Networking;
 
 namespace PheggMod
 {
@@ -27,9 +28,33 @@ namespace PheggMod
         private int[] _restartTimeClean;
         public static int roundCount = 0;
         public static DateTime? roundStartTime = null;
+        public static readonly List<string> colours = new List<string>
+        {
+            "pink",
+            "red",
+            "brown",
+            "silver",
+            "light_green",
+            "crimson",
+            "cyan",
+            "aqua",
+            "deep_pink",
+            "tomato",
+            "yellow",
+            "magenta",
+            "blue_green",
+            "orange",
+            "lime",
+            "green",
+            "emerald",
+            "carmine",
+            "nickel",
+            "mint",
+            "army_green",
+            "pumpkin"
+        };
 
         private extern void orig_FixedUpdate();
-
         private new void FixedUpdate()
         {
             if (!_quitting && !string.IsNullOrEmpty(_restartTime))
@@ -89,20 +114,12 @@ namespace PheggMod
 
             ///This is the time that the server will check for with the auto-restarting system.
             ///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
-            ///Keeping as null will disable;
+            ///Set to 25:00 to disable;
             _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", "04:30");
 
             new Commands.CustomInternalCommands();
             PluginManager.PluginPreLoad();
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        }
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            Exception ex = (Exception)e.ExceptionObject;
-
-            Error($"{ex.Message}\n{ex.StackTrace}\n\n{new StackTrace(ex, true).GetFrame(0).GetFileLineNumber()}");
         }
 
         public static void Error(string m) => Base.AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));

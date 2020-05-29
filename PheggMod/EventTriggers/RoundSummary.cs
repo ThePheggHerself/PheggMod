@@ -25,7 +25,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RoundEndEvent: {e.ToString()}");
+                Base.Error($"Error triggering RoundEndEvent: {e.InnerException.ToString()}");
             }
 
             orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);

@@ -22,7 +22,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering PlayerThrowGrenadeEvent: {e.ToString()}");
+                Base.Error($"Error triggering PlayerThrowGrenadeEvent: {e.InnerException.ToString()}");
             }
 
             return @return;

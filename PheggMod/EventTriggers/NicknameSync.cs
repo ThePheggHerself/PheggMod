@@ -22,22 +22,30 @@ namespace PheggMod.EventTriggers
             if (ccm.isLocalPlayer)
                 return;
 
-            //if (ConfigFile.ServerConfig.GetBool("smart_guard", true))
-            //{
-            //    //SmartGuard.instance.SmartGuardDeepCheck(go);
-            //}
-
-            if (nick != null && !string.IsNullOrEmpty(nick))
+            try
             {
-                try
+                //if (ConfigFile.ServerConfig.GetBool("smart_guard", true))
+                //{
+                //    SmartGuard.instance.SmartGuardDeepCheck(go);
+                //}
+
+                if (nick != null && !string.IsNullOrEmpty(nick))
                 {
-                    Base.Debug("Triggering PlayerJoinEvent");
-                    PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
+                    try
+                    {
+                        Base.Debug("Triggering PlayerJoinEvent");
+                        PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerJoinEvent: {e.InnerException.ToString()}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Base.Error($"Error triggering PlayerJoinEvent: {e.ToString()}");
-                }
+
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error: {e.InnerException.ToString()}");
             }
         }
 

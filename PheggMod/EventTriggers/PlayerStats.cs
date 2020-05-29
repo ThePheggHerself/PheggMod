@@ -35,7 +35,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerDeathEvent: {e.ToString()}");
+                        Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException.ToString()}");
                     }
                 else
                     try
@@ -45,7 +45,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerHurtEvent: {e.ToString()}");
+                        Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException.ToString()}");
                     }
             }
 
@@ -62,7 +62,10 @@ namespace PheggMod.EventTriggers
                 Commands.CustomInternalCommands.nodamageplayers.Clear();
 
                 if (Commands.CustomInternalCommands.reloadPlugins)
+                {
                     Timing.RunCoroutine(TriggerPluginReload());
+                    Commands.CustomInternalCommands.reloadPlugins = false;
+                }
             }
             catch (Exception) { }
 

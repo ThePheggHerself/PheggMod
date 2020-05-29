@@ -36,7 +36,7 @@ namespace PheggMod.EventTriggers
                 }
                 catch (Exception e)
                 {
-                    Base.Error($"Error triggering WarheadCancelEvent: {e.ToString()}");
+                    Base.Error($"Error triggering WarheadCancelEvent: {e.InnerException.ToString()}");
                 }
             }
         }

@@ -46,8 +46,9 @@ namespace PheggMod.EventTriggers
             //NetDataWriter a = new NetDataWriter();
             //a.Reset();
             //a.Put(10);
-            //a.Put("Smelling badly");
+            //a.Put("Custom Smelling badly");
             //a.Put("Testing");
+            //request.RejectForce(a);
 
 
             ///// 1 = full server

@@ -7,18 +7,27 @@ using UnityEngine;
 
 using RemoteAdmin;
 using Telepathy;
+using Mirror;
+using PheggMod.API;
+using System.Text.RegularExpressions;
 
 namespace PheggMod
 {
     public class PheggPlayer
     {
+        private static Regex _filterNames = new Regex("[(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")]");
+
+        //Basic user info
         public string name { get; internal set; }
+        public string nameClean { get; internal set; }
         public string userId { get; internal set; }
         public string domain { get; internal set; }
         public string ipAddress { get; internal set; }
         public int playerId { get; internal set; }
-        public Components commonComponents;
 
+        //Components
+        public Components commonComponents;
+        #region components
         private CharacterClassManager _CharacterClassManager { get; set; }
         private ServerRoles _serverRoles { get; set; }
         private NicknameSync _nicknameSync { get; set; }
@@ -29,6 +38,9 @@ namespace PheggMod
         private Inventory _inventory { get; set; }
         private PlyMovementSync _plyMovementSync { get; set; }
         private BanPlayer _banPlayer { get; set; }
+        private NetworkConnection _networkConnection { get; set; }
+        private Broadcast _broadcast { get; set; }
+        #endregion
 
         public GameObject gameObject { get; internal set; }
 
@@ -37,6 +49,8 @@ namespace PheggMod
         {
             public RoleType role { get; internal set; }
             public Team team { get; internal set; }
+            public CleanTeam cleanTeam { get; internal set; }
+
         }
         public class Components
         {
@@ -50,8 +64,9 @@ namespace PheggMod
             public Inventory inv;
             public PlyMovementSync pms;
             public BanPlayer bp;
+            public NetworkConnection nc;
+            public Broadcast bc;
         }
-
 
         public PheggPlayer(GameObject player)
         {
@@ -77,9 +92,12 @@ namespace PheggMod
                     _inventory = player.GetComponent<Inventory>();
                     _plyMovementSync = player.GetComponent<PlyMovementSync>();
                     _banPlayer = player.GetComponent<BanPlayer>();
+                    _networkConnection = player.GetComponent<NetworkConnection>();
+                    _broadcast = player.GetComponent<Broadcast>();
                     #endregion
 
                     name = _nicknameSync.MyNick;
+                    nameClean = _filterNames.Replace(name, string.Empty);
                     userId = _CharacterClassManager.UserId;
                     domain = _CharacterClassManager.UserId.Split('@')[1].ToUpper();
                     ipAddress = _nicknameSync.connectionToClient.address;
@@ -98,7 +116,9 @@ namespace PheggMod
                         ab = _ammoBox,
                         inv = _inventory,
                         pms = _plyMovementSync,
-                        bp = _banPlayer
+                        bp = _banPlayer,
+                        nc = _networkConnection,
+                        bc = _broadcast
                     };
                 }
                 catch (Exception e)
@@ -110,7 +130,7 @@ namespace PheggMod
 
         public override string ToString()
         {
-            return $"{name} ({userId})".Replace("_", "\\_").Replace("*", "\\*").Replace("`", "\\`");
+            return $"{_filterNames.Replace(name, string.Empty)} ({userId})";
         }
 
         public bool GodMode()
@@ -151,7 +171,25 @@ namespace PheggMod
 
         public TeamClass Teamclass()
         {
-            return new TeamClass { role = _CharacterClassManager.CurClass, team = _CharacterClassManager.Classes.SafeGet(_CharacterClassManager.CurClass).team };
+            RoleType role = _CharacterClassManager.CurClass;
+            Team team = _CharacterClassManager.Classes.SafeGet(_CharacterClassManager.CurClass).team;
+            CleanTeam cTeam;
+
+            if (team == Team.MTF || team == Team.RSC)
+                cTeam = CleanTeam.NineTailedFox;
+            else if (team == Team.CHI || team == Team.CDP)
+                cTeam = CleanTeam.ChaosInsurgency;
+            else if (team == Team.SCP)
+                cTeam = CleanTeam.SCP;
+            else if (team == Team.TUT)
+                cTeam = CleanTeam.Tutorial;
+            else cTeam = CleanTeam.Spectator;
+
+            return new TeamClass { 
+                role = role,
+                team = team,
+                cleanTeam = cTeam
+            };
         }
         public void Teamclass(RoleType role)
         {
@@ -165,7 +203,7 @@ namespace PheggMod
 
         public void Kill()
         {
-            _playerStats.HurtPlayer(new PlayerStats.HitInfo(5555, "WORLD", DamageTypes.Nuke, playerId), gameObject);
+            _playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Nuke, playerId), gameObject);
         }
 
         public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
@@ -213,6 +251,23 @@ namespace PheggMod
         public void Teleport(Vector3 vector3, float rotation = 0, bool forcegound = true)
         {
             _plyMovementSync.OverridePosition(vector3, rotation, forcegound);
+        }
+
+        public void PersonalBroadcast(uint duration, string message, bool isMonoSpaced)
+        {
+            _broadcast.TargetAddElement(_networkConnection, message, duration, isMonoSpaced);
+        }
+
+        public void SendConsoleMessage(string message, string color = "green")
+        {
+            _CharacterClassManager.TargetConsolePrint(_networkConnection, message, color);
+        }
+
+        public void SetTag(string Text, TagColour colour, ulong permissions = 0)
+        {
+            _serverRoles.SetText(Text);
+            _serverRoles.SetColor(Base.colours[(int)colour]);
+            _serverRoles.Permissions = permissions;
         }
     }
 }

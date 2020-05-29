@@ -2,6 +2,7 @@
 using MEC;
 using Mirror;
 using PheggMod.API.Commands;
+using PheggMod.EventTriggers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking.Match;
+using Object = UnityEngine.Object;
 
 namespace PheggMod.Commands
 {
@@ -70,6 +72,45 @@ namespace PheggMod.Commands
 
             return playerList;
         }
+
+        [PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
+        public void cmd_help(CommandInfo info)
+        {
+            string msg;
+            string q = info.commandArgs[1];
+
+            if (!PluginManager.allCommands.ContainsKey(q))
+                msg = "No command found!";
+            else
+            {
+                MethodInfo cmd = PluginManager.allCommands[q];
+                if (cmd == null || cmd.Equals(default(Type)))
+                    msg = "No command found!";
+
+                else
+                {
+                    PMCommandSummary pmSummary = (PMCommandSummary)cmd.GetCustomAttribute(typeof(PMCommandSummary));
+                    PMParameters pmParams = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
+                    PMPermission pmPerms = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
+
+                    string usage = $"{q} {(pmParams != null ? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
+                    string summary = pmSummary != null ? pmSummary.commandSummary : "No command summary found!";
+                    string permission = pmPerms != null ? pmPerms.perm.ToString() : "No specific permissions required";
+
+                    msg = $"Command info for: {q}"
+                        + $"\nUsage: {usage}"
+                        + $"\nSummary: {summary}"
+                        + $"\nPermission: {permission}";
+                }
+            }
+
+            if (info.gameObject != null)
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{msg}", true, false, "");
+            else
+                Base.Info(msg);
+        }
+
+        #region RA-Only Commands
 
         [PMCommand("oban"), PMAlias("offlineban", "ltapban"), PMParameters("userid", "duration", "reason"), PMCanExtend(true), PMPermission(PlayerPermissions.BanningUpToDay)]
         public void cmd_oban(CommandInfo info)
@@ -173,42 +214,30 @@ namespace PheggMod.Commands
             sender.RaReply(arg[0].ToUpper() + "Broadcast sent!", true, true, "");
         }
 
-        [PMCommand("drop"), PMAlias("dropall", "dropinv"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
+        [PMCommand("drop"), PMAlias("dropall", "dropinv", "strip"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
         public void cmd_Drop(CommandInfo info)
         {
-            string[] arg = info.commandArgs;
-
-            if (!CustomInternalCommands.CheckPermissions(info.commandSender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[2]);
-
-            foreach (GameObject player in playerList)
-                player.GetComponent<Inventory>().ServerDropAll();
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
-        }
-
-        [PMCommand("slay"), PMAlias("suicide"), PMParameters()]
-        public void cmd_slay(CommandInfo info)
-        {
-            CharacterClassManager cmm = info.gameObject.GetComponent<CharacterClassManager>();
-
-            if (cmm.CurClass == RoleType.Spectator)
+            try
             {
-                cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You are already a spectator", "green");
-                return;
+                string[] arg = info.commandArgs;
+
+                if (!CustomInternalCommands.CheckPermissions(info.commandSender, arg[0], PlayerPermissions.PlayersManagement))
+                    return;
+
+                List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
+
+                foreach (GameObject p in playerList)
+                    p.GetComponent<Inventory>().ServerDropAll();
+
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
             }
-            else
+            catch(Exception e)
             {
-                cmm.CallCmdSuicide(new PlayerStats.HitInfo(10000, "SERVER", DamageTypes.Nuke, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId));
-                cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You have been forced to spectator", "green");
-                return;
-
+                Base.Error(e.ToString());
             }
         }
 
-        [PMCommand("kill"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
+        [PMCommand("slay"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
         public void cmd_Kill(CommandInfo info)
         {
             string[] arg = info.commandArgs;
@@ -276,6 +305,65 @@ namespace PheggMod.Commands
             }
         }
 
+        [PMCommand("race"), PMParameters(), PMPermission(PlayerPermissions.PlayersManagement), PMCommandSummary("Starts an escape race event")]
+        public void cmd_race(CommandInfo info)
+        {
+            if((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds > 30d)
+            {
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#You must run this command within the first 30 seconds of the round starting", false, true, "");
+                return;
+            }
+
+            Timing.RunCoroutine(RaceEvent(info));
+        } 
+        private IEnumerator<float> RaceEvent(CommandInfo info)
+        {
+            RoundSummary.RoundLock = true;
+
+            List<Door> doors = UnityEngine.Object.FindObjectsOfType<Door>().ToList();
+
+            foreach (Door d in doors)
+            {
+                d.lockdown = true;
+                d.isOpen = false;
+            }
+
+            List<GameObject> players = PlayerManager.players;
+
+            foreach (GameObject go in players)
+            {
+                go.GetComponent<CharacterClassManager>().SetClassID(RoleType.Scp173);
+
+                Broadcast bc = go.GetComponent<Broadcast>();
+                NetworkConnection nc = go.GetComponent<NetworkConnection>();
+
+
+
+                bc.TargetAddElement(nc, "Welcome to peanut race", 5, false);
+                bc.TargetAddElement(nc, "Your goal is to reach the surface before the nuke detonates", 6, false);
+                bc.TargetAddElement(nc, "The nuke has been locked, so you are unable to disable it", 6, false);
+            }
+
+            yield return Timing.WaitForSeconds(18);
+
+            PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().InstantPrepare();
+            PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().StartDetonation();
+
+
+            EventTriggers.PMAlphaWarheadController.nukeLock = true;
+
+            foreach (Door d in doors)
+            {
+                d.lockdown = false;
+            }
+
+            yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetInt("warhead_tminus_start_duration", 90) + 5);
+
+            RoundSummary.RoundLock = false;
+
+            yield return 0f;
+        }
+
         internal static bool reloadPlugins = false;
         [PMCommand("pluginreload"), PMAlias("reloadplugins", "plreload"), PMParameters(), PMPermission(PlayerPermissions.ServerConfigs)]
         public void cmd_ReloadPlugins(CommandInfo info)
@@ -296,7 +384,7 @@ namespace PheggMod.Commands
         [PMCommand("nevergonna"), PMParameters("give", "you", "up"), PMCommandSummary("Test command. Try it :)")]
         public void cmd_RickRoll(CommandInfo info)
         {
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nDesert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
         }
 
         public static Dictionary<int, GameObject> nodamageplayers { get; private set; }
@@ -325,6 +413,40 @@ namespace PheggMod.Commands
                 }
             }
         }
+
+        [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
+        public void cmd_pos(CommandInfo info)
+        {
+            Vector3 pos = info.gameObject.GetComponent<PlyMovementSync>().RealModelPosition;
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Current player position: x={pos.x} y={pos.y} z={pos.z}", true, true, "");
+        }
+
+        [PMCommand("tower2"), PMParameters("playerid"), PMCommandSummary("Teleports the player to a second tower on the surface")]
+        public void cmd_tower2(CommandInfo info)
+        {
+            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
+
+            foreach (GameObject plr in playerList)
+                plr.GetComponent<PlyMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to tower 2", true, true, "");
+        }
+
+        [PMCommand("pocket"), PMParameters("playerid"), PMCommandSummary("Teleports the player into the pocket dimention")]
+        public void cmd_pocket(CommandInfo info)
+        {
+            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
+
+            foreach(GameObject plr in playerList)
+                plr.GetComponent<PlyMovementSync>().OverridePosition(Vector3.down * 1998.5f, 0f, true);
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to the pocket dimension", true, true, "");
+        }
+
+        #endregion
+
+        #region Server Console Commands
 
         [PMCommand("status"), PMAlias("serverstatus", "serverinfo", "sinfo"), PMParameters(), PMConsoleRunnable(true)]
         public void cmd_sinfo(CommandInfo info)
@@ -357,99 +479,29 @@ namespace PheggMod.Commands
             //+ $"\nMemory usage: {GC.GetTotalMemory(false)}"
         }
 
-        [PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
-        public void cmd_help(CommandInfo info)
-        {
-            string msg;
-            string q = info.commandArgs[1];
+        #endregion
 
-            if (!PluginManager.allCommands.ContainsKey(q))
-                msg = "No command found!";
-            else
-            {
-                MethodInfo cmd = PluginManager.allCommands[q];
-                if (cmd == null || cmd.Equals(default(Type)))
-                    msg = "No command found!";
+        #region Client Console Commands
 
-                else
-                {
-                    PMCommandSummary pmSummary = (PMCommandSummary)cmd.GetCustomAttribute(typeof(PMCommandSummary));
-                    PMParameters pmParams = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
-                    PMPermission pmPerms = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
-
-                    string usage = $"{q} {(pmParams != null ? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
-                    string summary = pmSummary != null ? pmSummary.commandSummary : "No command summary found!";
-                    string permission = pmPerms != null ? pmPerms.perm.ToString() : "No specific permissions required";
-
-                    msg = $"Command info for: {q}"
-                        + $"\nUsage: {usage}"
-                        + $"\nSummary: {summary}"
-                        + $"\nPermission: {permission}";
-                }
-            }
-
-            if (info.gameObject != null)
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{msg}", true, false, "");
-            else
-                Base.Info(msg);
-        }
-
-        [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
-        public void cmd_pos(CommandInfo info)
-        {
-            Vector3 pos = info.gameObject.GetComponent<PlyMovementSync>().RealModelPosition;
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Current player position: x={pos.x} y={pos.y} z={pos.z}", true, true, "");
-        }
-
-        [PMCommand("tower2"), PMParameters(), PMCommandSummary("Teleports the user to a second tower on the surface")]
-        public void cmd_tower2(CommandInfo info)
-        {
-            info.gameObject.GetComponent<PlyMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#You have been teleported to the second surface tower", true, true, "");
-        }
-
-        /* //[PMCommand("endround"), PMAlias("forceend"), PMParameters(), PMPermission(PlayerPermissions.RoundEvents)]
-        //public void cmd_ForceEnd(CommandInfo info) => Timing.RunCoroutine(ForceEnd(info));
-        //private IEnumerator<float> ForceEnd(CommandInfo info)
+        //[PMCommand("kill"), PMAlias("suicide"), PMParameters()]
+        //public void cmd_slay(CommandInfo info)
         //{
-        //    RoundSummary rS = RoundSummary.singleton;
+        //    CharacterClassManager cmm = info.gameObject.GetComponent<CharacterClassManager>();
 
-        //    RoundSummary.SumInfo_ClassList newList = new RoundSummary.SumInfo_ClassList();
-        //    foreach (GameObject plr in PlayerManager.players)
+        //    if (cmm.CurClass == RoleType.Spectator)
         //    {
-        //        CharacterClassManager ccm = plr.GetComponent<CharacterClassManager>();
-
-        //        switch (ccm.Classes.SafeGet(ccm.CurClass).team)
-        //        {
-        //            case Team.CHI:
-        //                newList.chaos_insurgents++; break;
-        //            case Team.MTF:
-        //                newList.mtf_and_guards++; break;
-        //            case Team.CDP:
-        //                newList.class_ds++; break;
-        //            case Team.RSC:
-        //                newList.scientists++; break;
-        //            case Team.SCP:
-        //                if (ccm.CurClass == RoleType.Scp0492)
-        //                    newList.zombies++;
-        //                else
-        //                    newList.scps_except_zombies++;
-        //                break;
-        //            default:
-        //                break;
-        //        }
+        //        cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You are already a spectator", "green");
+        //        return;
         //    }
+        //    else
+        //    {
+        //        cmm.CallCmdSuicide(new PlayerStats.HitInfo(10000, "SERVER", DamageTypes.Nuke, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId));
+        //        cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You have been forced to spectator", "green");
+        //        return;
 
-        //    newList.warhead_kills = (AlphaWarheadController.Host.detonated ? AlphaWarheadController.Host.warheadKills : -1);
-        //    newList.time = TimeSpan.FromSeconds((int)Time.realtimeSinceStartup - DateTime.Now.Second).Seconds;
+        //    }
+        //}
 
-        //    int ttr = ConfigFile.ServerConfig.GetInt("auto_round_restart_time", 10);
-        //    EventTriggers.PMRoundSummary.singleton.CallRpcShowRoundSummary(rS.classlistStart, newList, RoundSummary.LeadingTeam.Draw, RoundSummary.escaped_ds, RoundSummary.escaped_scientists, RoundSummary.kills_by_scp, ttr);
-
-        //    yield return Timing.WaitForSeconds(ttr);
-
-        //    PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
-        //} */
+        #endregion
     }
 }

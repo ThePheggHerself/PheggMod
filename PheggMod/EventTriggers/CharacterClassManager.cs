@@ -37,7 +37,7 @@ namespace PheggMod.EventTriggers
                 }
                 catch (Exception e)
                 {
-                    Base.Error($"Error triggering WaitingForPlayersEvent: {e.ToString()}");
+                    Base.Error($"Error triggering WaitingForPlayersEvent: {e.InnerException.ToString()}");
                 }
             }
 
@@ -60,7 +60,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RoundStartEvent: {e.ToString()}");
+                Base.Error($"Error triggering RoundStartEvent: {e.InnerException.ToString()}");
             }
 
             return Bool;
@@ -86,7 +86,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerSpawnEvent: {e.ToString()}");
+                        Base.Error($"Error triggering PlayerSpawnEvent: {e.InnerException.ToString()}");
                     }
                 else
                     try
@@ -96,7 +96,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerEscapeEvent: {e.ToString()}");
+                        Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException.ToString()}");
                     }
             }
             catch (Exception e) { Base.Error(e.Message); }

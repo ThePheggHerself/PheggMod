@@ -27,7 +27,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering LczDecontaminateEvent: {e.ToString()}");
+                        Base.Error($"Error triggering LczDecontaminateEvent: {e.InnerException.ToString()}");
                     }
                 }
             }

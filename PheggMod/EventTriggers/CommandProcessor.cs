@@ -40,7 +40,7 @@ namespace PheggMod.EventTriggers
                         }
                         catch (Exception e)
                         {
-                            Base.Error($"Error triggering AdminQueryEvent: {e.ToString()}");
+                            Base.Error($"Error triggering AdminQueryEvent: {e.InnerException.ToString()}");
                         }
 
                         List<string> cmds = new List<string>();
@@ -66,7 +66,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"{e.Message}\n{e.StackTrace}");
+                Base.Error($"{e.Message}\n{e.StackTrace}\n{e.InnerException.Message}\n{e.InnerException.StackTrace}");
             }
         }
     }

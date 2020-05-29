@@ -27,7 +27,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerLeaveEvent: {e.ToString()}");
+                        Base.Error($"Error triggering PlayerLeaveEvent: {e.InnerException.ToString()}");
                     }
 
                 if (PlayerManager.players.Count - 1 < 1 && RoundSummary.RoundInProgress())

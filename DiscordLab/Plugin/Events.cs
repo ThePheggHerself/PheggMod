@@ -1,4 +1,5 @@
 ﻿using PheggMod.API.Events;
+using PheggMod.API.Plugin;
 using System;
 
 namespace DiscordLab
@@ -8,6 +9,7 @@ namespace DiscordLab
         IEventHandlerRoundStart, IEventHandlerWarheadCancel, IEventHandlerWarheadDetonate, IEventHandlerWarheadStart
     {
         internal static DateTime RoundEnded;
+        private DateTime? roundStart = null;
 
         public void OnAdminQuery(AdminQueryEvent ev) => DiscordLab.bot.NewMessage($"```yaml\nAdmin: {ev.Admin.name}\nExecuted: {ev.Query.ToUpper()}```");
 
@@ -20,31 +22,41 @@ namespace DiscordLab
 
         public void OnPlayerDie(PlayerDeathEvent ev)
         {
-            if (!RoundSummary.RoundInProgress() || ev.Attacker == null) return;
+            if (!RoundSummary.RoundInProgress() || ev.Player.Teamclass().role == RoleType.Spectator) return;
 
-            if (ev.Attacker.userId == ev.Player.userId)
+            if (ev.Attacker == null)
+                DiscordLab.bot.NewMessage($"World killed {ev.Player.name} using {ev.DamageType.name}");
+
+            else if (ev.Attacker.userId == ev.Player.userId)
                 DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide with {ev.DamageType.name}");
-            else if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
+
+            else if (ev.Attacker.Teamclass().cleanTeam == ev.Player.Teamclass().cleanTeam)
                 DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {ev.Attacker.Teamclass().role} {ev.Attacker.ToString()}"
-                    + $"\nKilled: {ev.Player.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+                                    + $"\nKilled: {ev.Player.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+
             else if (ev.Player.Disarmed() > 0 && !ev.Attacker.gameObject.GetComponent<CharacterClassManager>().IsAnyScp())
                 DiscordLab.bot.NewMessage($"__Disarmed Kill__\n```autohotkey\nPlayer: {ev.Attacker.Teamclass().role} {ev.Attacker.ToString()}"
-                    + $"\nKilled: {ev.Player    .Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+                                    + $"\nKilled: {ev.Player.Teamclass().role} {ev.Player.ToString()}\nUsing: {ev.DamageType.name}```");
+
             else
                 DiscordLab.bot.NewMessage($"{ev.Attacker.Teamclass().role} {ev.Attacker.name} killed {ev.Player.Teamclass().role} {ev.Player.name} with {ev.DamageType.name}");
-
         }
 
         public void OnPlayerEscape(PlayerEscapeEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.name} escaped the facility and became {ev.newRole}");
 
         public void OnPlayerHurt(PlayerHurtEvent ev)
         {
-            if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected) return;
+            if (!RoundSummary.RoundInProgress() || ev.Attacker == null || ev.Attacker.gameObject.GetComponent<CharacterClassManager>().SpawnProtected || ev.Player.Teamclass().role == RoleType.Spectator) return;
 
-            if (ev.Attacker.Teamclass().team == ev.Player.Teamclass().team)
+            if (ev.Attacker.userId == ev.Player.userId)
+                DiscordLab.bot.NewMessage($"{ev.Player.name} self-harmed for {Math.Round(ev.Damage)} with {ev.DamageType.name}");
+
+            else if (ev.Attacker.Teamclass().cleanTeam == ev.Player.Teamclass().cleanTeam)
                 DiscordLab.bot.NewMessage($"**{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} with {ev.DamageType.name}**");
+
             else if (ev.Player.Disarmed() > 0 && !ev.Attacker.gameObject.GetComponent<CharacterClassManager>().IsAnyScp())
                 DiscordLab.bot.NewMessage($"__{ev.Attacker.Teamclass().role} {ev.Attacker.ToString()} attacked {ev.Player.Teamclass().role} {ev.Player.ToString()} for {Math.Round(ev.Damage)} with {ev.DamageType.name}__");
+
             else
                 DiscordLab.bot.NewMessage($"{ev.Attacker.name} -> {ev.Player.name} -> {Math.Round(ev.Damage)} ({ev.DamageType.name})");
         }
@@ -69,22 +81,27 @@ namespace DiscordLab
 
         public void OnRoundEnd(RoundEndEvent ev)
         {
-            DiscordLab.bot.NewMessage($"**Round Ended**\n```Round Time: {ev.RoundTime}"
+            DiscordLab.bot.NewMessage($"**Round Ended**\n```Round Time: {new DateTime(TimeSpan.FromSeconds((DateTime.Now - (DateTime)roundStart).TotalSeconds).Ticks):HH:mm:ss}"
                 + $"\nEscaped Class-D: {ev.Class_D.Escaped_ClassD}/{ev.Class_D.Starting_ClassD}"
                 + $"\nRescued Scientists: {ev.Scientist.Escaped_Scientists}/{ev.Scientist.Starting_Scientists}"
                 + $"\nTerminated SCPs: {ev.SCP.Terminated_SCPs}/{ev.SCP.Starting_SCPs}"
                 + $"\nWarhead Status: {(AlphaWarheadController.Host.detonated == false ? "Not Detonated" : $"Detonated")}```");
 
+            roundStart = null;
             Events.RoundEnded = DateTime.Now;
         }
 
-        public void OnRoundStart(RoundStartEvent ev) => DiscordLab.bot.NewMessage($"**A new round has begun**");
+        public void OnRoundStart(RoundStartEvent ev)
+        {
+            roundStart = DateTime.Now;
+            DiscordLab.bot.NewMessage($"**A new round has begun**");
+        }
 
         public void OnThrowGrenade(PlayerThrowGrenadeEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.name} threw {ev.Grenade}");
 
         public void OnWaitingForPlayers(WaitingForPlayersEvent ev) => DiscordLab.bot.NewMessage("Waiting for players...");
 
-        public void OnWarheadCancel(WarheadCancelEvent ev) => DiscordLab.bot.NewMessage($"{ev.Disablier.name} canceled the warhead detonation");
+        public void OnWarheadCancel(WarheadCancelEvent ev) => DiscordLab.bot.NewMessage($"{ev.Disabler.name} canceled the warhead detonation");
 
         public void OnWarheadDetonate(WarheadDetonateEvent ev) => DiscordLab.bot.NewMessage("The alpha warhead has been detonated");
 

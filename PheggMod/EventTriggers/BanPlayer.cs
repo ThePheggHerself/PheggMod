@@ -41,7 +41,7 @@ namespace PheggMod.EventTriggers
                             }
                             catch (Exception e)
                             {
-                                Base.Error($"Error triggering GlobalBanEvent: {e.ToString()}");
+                                Base.Error($"Error triggering GlobalBanEvent: {e.InnerException.ToString()}");
                             }
                         else if (duration < 1)
                             try
@@ -51,7 +51,7 @@ namespace PheggMod.EventTriggers
                             }
                             catch (Exception e)
                             {
-                                Base.Error($"Error triggering PlayerKickEvent: {e.ToString()}");
+                                Base.Error($"Error triggering PlayerKickEvent: {e.InnerException.ToString()}");
                             }
                         else
                             try
@@ -61,7 +61,7 @@ namespace PheggMod.EventTriggers
                             }
                             catch (Exception e)
                             {
-                                Base.Error($"Error triggering PlayerBanEvent: {e.ToString()}");
+                                Base.Error($"Error triggering PlayerBanEvent: {e.InnerException.ToString()}");
                             }
                     }
 

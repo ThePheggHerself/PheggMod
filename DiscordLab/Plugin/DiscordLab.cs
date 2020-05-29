@@ -50,6 +50,7 @@ namespace DiscordLab
     public class Bot
     {
         private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)");
+        private static Regex _filterNames = new Regex("(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")");
 
         private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPAddress _ipAddress;
@@ -148,6 +149,8 @@ namespace DiscordLab
         public void NewMessage(string message, messageType type = messageType.MSG, JObject jObj = null)
         {
             if (string.IsNullOrEmpty(message)) return;
+
+            message.Replace("{", string.Empty).Replace("}", string.Empty);
 
             string json;
 
@@ -289,7 +292,7 @@ namespace DiscordLab
 
             List<string> players = new List<string>();
             foreach (GameObject go in PlayerManager.players)
-                players.Add(go.GetComponent<NicknameSync>().MyNick);
+                players.Add(_filterNames.Replace(go.GetComponent<NicknameSync>().MyNick, string.Empty));
 
             return $"**{PlayerManager.players.Count()}/{ConfigFile.ServerConfig.GetInt("max_players", 20)}**\n```\n{string.Join(", ", players)}```";
         }
@@ -327,7 +330,7 @@ namespace DiscordLab
             bool validUID = arg[2].Contains('@');
             bool validIP = IPAddress.TryParse(arg[2], out IPAddress ip);
 
-            BanDetails details;
+            //BanDetails details;
 
             if (!validIP && !validUID)
                 return $"```diff\n- Invalid UserID or IP given```";
