@@ -13,6 +13,7 @@ As always, these configs all go inside of the `config_gameplay` file
 
 | Config Option | Default value  | Description  |
 |:-------------:|:---------------:|:---------------:|
+| auto_restart_time | null | Specifies (on 24-hour format) when the server should automatically restart itself (E.g 05:30) |
 | pheggmod_debug | false | Enables debug mode for Pheggmod and supporting plugins |
 | universal_config_file | false | Specifies if the server should load plugins from your config location, or the plugins folder from the server's install directory |
 | announce_chaos_spawn | true | Announces Chaos respawn |
@@ -20,7 +21,9 @@ As always, these configs all go inside of the `config_gameplay` file
 | cassie_glitch | false | Disable's CASSIE's random glitching during (non-decontamination) announcements |
 | cassie_glitch_post_detonation | false | Limit's CASSIE's random glitching to post-warhead detonation |
 | fix_sticky_round | true | Fixes sticky rounds (Rounds that stay active despite no players being on the server) |
-| auto_restart_time | null | Specifies (on 24-hour format) when the server should automatically restart itself (E.g 05:30) |
+| report_message_content | string.empty | Message content (not from the embed) for the ingame report webhook on discord |
+| notify_096_target | true | sends a BC when a someone becomes a target of 096 |
+| scp173_door_cooldown | 25f | Cooldown in seconds until the 173 blastdoor can be opened |
 
 # Commands
 These are the available custom commands that Pheggmod offers
@@ -38,8 +41,9 @@ These are the available custom commands that Pheggmod offers
 | status | | | Shows some of the current stats for the server |
 | help | [CommandName] | | Shows available command information |
 | curpos | [PlayerID] | | Prints the player's current position into RA |
-| tower2 | | | Teleports the player into a different surface tower |
-
+| tower2 | [PlayerId] | | Teleports the player into a different surface tower |
+| pocket | [PlayerId] | | Teleports the player into the pocket dimension |
+| race | | PlayersManagement | Starts a Peanut race event |
 
 # Events
 These are the available events that Pheggmod offers
@@ -62,7 +66,8 @@ These are the available events that Pheggmod offers
 | PlayerEscapeEvent | Player (PheggPlayer), Role (Role), NewRole (Role), Team (Team)|
 | PlayerJoinEvent | Player (PheggPlayer), Name (String), UserId (String), IpAddress (String) |
 | PlayerLeaveEvent | Player (PheggPlayer), Name (String), UserId (String), IpAddress (String) |
-| PlayerThrowGrenadeEvent | Player (PheggPlayer), Name(String), Grenade (String) |
+| PlayerThrowGrenadeEvent | Player (PheggPlayer), Name (String), Grenade (String) |
+| PlayerReportEvent | Reporter (PheggPlayer), Target (PheggPlayer), Reason (String) |
 
 **Round Events**
 | Event | Parameters |
@@ -74,3 +79,8 @@ These are the available events that Pheggmod offers
 | WarheadCancelEvent | Disabler (PheggPlayer) |
 | WarheadDetonationEvent |  |
 | RespawnEvent | IsChaos (Bool) |
+
+**Misc. Events**
+| Event | Parameters |
+|:-----:|:----------:|
+| PreauthEvent | Endpoint (IPEndPoint), UserID (string) |
