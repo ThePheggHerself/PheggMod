@@ -28,6 +28,8 @@ namespace PheggMod.EventTriggers
 
         internal static bool targetAnnouncement;
 
+        internal static float doorCooldown173;
+
         #region SmartGuard;
         internal static bool enableSmartGuard;
         #endregion
@@ -56,6 +58,8 @@ namespace PheggMod.EventTriggers
             stickyRound = ServerConfig.GetBool("fix_sticky_round", true);
 
             targetAnnouncement = ServerConfig.GetBool("notify_096_target", true);
+
+            doorCooldown173 = ServerConfig.GetFloat("scp173_door_cooldown", 25f);
 
             #region SmartGuard
             enableSmartGuard = ServerConfig.GetBool("smart_guard", true);
