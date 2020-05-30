@@ -72,6 +72,17 @@ namespace PheggMod.EventTriggers
                     _client.Timeout = TimeSpan.FromSeconds(20.0);
 
                     _client.PostAsync(_webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+
+                    try
+                    {
+                        Base.Debug("Triggering PlayerReportEvent");
+                        PluginManager.TriggerEvent<IEventHandlerPlayerReport>(new PlayerReportEvent(new PheggPlayer(reporterGO), new PheggPlayer(reportedGO), reason));
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error($"Error triggering PlayerReportEvent {e.InnerException.ToString()}");
+                    }
+
                     if (!notifyGm)
                     {
                         reportedPlayers.Add(reportedId);

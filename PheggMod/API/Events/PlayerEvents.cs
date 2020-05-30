@@ -180,4 +180,28 @@ namespace PheggMod.API.Events
             ((IEventHandlerPlayerThrowGrenade)handler).OnThrowGrenade(this);
         }
     }
+
+    //Report event
+    public interface IEventHandlerPlayerReport : IEventHandler
+    {
+        void OnReport(PlayerReportEvent ev);
+    }
+    public class PlayerReportEvent : PlayerEvent
+    {
+        public PlayerReportEvent(PheggPlayer reporter, PheggPlayer target, string reason) : base(player)
+        {
+            Reporter = reporter;
+            Target = target;
+            Reason = reason;
+        }
+
+        public PheggPlayer Reporter { get; private set; }
+        public PheggPlayer Target { get; private set; }
+        public string Reason { get; private set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerPlayerReport)handler).OnReport(this);
+        }
+    }
 }
