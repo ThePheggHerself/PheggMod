@@ -18,7 +18,7 @@ namespace DiscordLab
         public void OnLczDecontaminate(LczDecontaminateEvent ev) => DiscordLab.bot.NewMessage($"Light containment zone decontamination has begun!");
 
         public void OnPlayerBan(PlayerBanEvent ev) =>
-            DiscordLab.bot.NewMessage($"**New Ban!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {ev.Admin.ToString()}\nDuration: {ev.Duration} {(ev.Duration > 1 ? "minutes" : "minute")}```");
+            DiscordLab.bot.NewMessage($"**New Ban!**```autohotkey\nUser: {ev.Player.ToString()}\nAdmin: {ev.Admin.ToString()}\nDuration: {ev.Duration / 60} {(ev.Duration > 1 ? "minutes" : "minute")}```");
 
         public void OnPlayerDie(PlayerDeathEvent ev)
         {

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::GameCore.ConfigFile")]
-    class PMConfigFile
+    public static class PMConfigFile
     {
         internal static string webhookUrl;
         internal static string webhookName;
@@ -36,26 +36,24 @@ namespace PheggMod.EventTriggers
 
 
 
-        public extern void orig_ReloadGameConfigs(bool firstTime = false);
-        public void ReloadGameConfigs(bool firstTime = false)
+        public static extern void orig_ReloadGameConfigs(bool firstTime = false);
+        public static void ReloadGameConfigs(bool firstTime = false)
         {
             orig_ReloadGameConfigs(firstTime);
 
             YamlConfig ServerConfig = GameCore.ConfigFile.ServerConfig;
+
+            announceChaos = ServerConfig.GetBool("announce_chaos_spawn", true);
+            chaosAnnouncement = ServerConfig.GetString("chaos_announcement", "PITCH_1 ATTENTION ALL PERSONNEL . CHAOS INSURGENCY BREACH IN PROGRESS");
+            cassieGlitch = ServerConfig.GetBool("cassie_glitch", false);
+            cassieGlitchDetonation = ServerConfig.GetBool("cassie_glitch_post_detonation", false);
+            stickyRound = ServerConfig.GetBool("fix_sticky_round", true);
 
             webhookUrl = ServerConfig.GetString("report_discord_webhook_url", string.Empty);
             webhookName = ServerConfig.GetString("report_username", "Player Report");
             webhookAvatar = ServerConfig.GetString("report_avatar_url", string.Empty);
             webhookMessage = ServerConfig.GetString("report_message_content", string.Empty);
             webhookColour = ServerConfig.GetInt("report_color", 14423100);
-
-            announceChaos = ServerConfig.GetBool("announce_chaos_spawn", true);
-            chaosAnnouncement = ServerConfig.GetString("chaos_announcement", "PITCH_1 ATTENTION ALL PERSONNEL . CHAOS INSURGENCY BREACH IN PROGRESS");
-
-            cassieGlitch = ServerConfig.GetBool("cassie_glitch", false);
-            cassieGlitchDetonation = ServerConfig.GetBool("cassie_glitch_post_detonation", false);
-
-            stickyRound = ServerConfig.GetBool("fix_sticky_round", true);
 
             targetAnnouncement = ServerConfig.GetBool("notify_096_target", true);
 

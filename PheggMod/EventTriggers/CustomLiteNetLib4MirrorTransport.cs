@@ -21,15 +21,15 @@ namespace PheggMod.EventTriggers
         {
             orig_ProcessConnectionRequest(request);
 
-            try
-            {
-                Base.Debug("Triggering PreauthEvent");
-                PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(request.RemoteEndPoint, UserIds[request.RemoteEndPoint].UserId));
-            }
-            catch (Exception e)
-            {
-                Base.Error($"Error triggering PreauthEvent: {e.InnerException.ToString()}");
-            }
+            //try
+            //{
+            //    Base.Debug("Triggering PreauthEvent");
+            //    PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(request.RemoteEndPoint, UserIds[request.RemoteEndPoint].UserId));
+            //}
+            //catch (Exception e)
+            //{
+            //    Base.Error($"Error triggering PreauthEvent: {e.InnerException.ToString()}");
+            //}
 
             //NetDataWriter a = new NetDataWriter();
             //a.Reset();
