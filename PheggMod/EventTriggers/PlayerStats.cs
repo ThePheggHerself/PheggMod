@@ -27,7 +27,7 @@ namespace PheggMod.EventTriggers
 
                 if (info.GetPlayerObject() != null) { pAttacker = new PheggPlayer(info.GetPlayerObject()); }
 
-                if (Pstats.health - info.Amount < 1)
+                if (Pstats.Health - info.Amount < 1)
                     try
                     {
                         Base.Debug("Triggering PlayerDeathEvent");

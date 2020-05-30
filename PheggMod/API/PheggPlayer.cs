@@ -36,7 +36,7 @@ namespace PheggMod
         private PlayerStats _playerStats { get; set; }
         private AmmoBox _ammoBox { get; set; }
         private Inventory _inventory { get; set; }
-        private PlyMovementSync _plyMovementSync { get; set; }
+        private PlayerMovementSync _plyMovementSync { get; set; }
         private BanPlayer _banPlayer { get; set; }
         private NetworkConnection _networkConnection { get; set; }
         private Broadcast _broadcast { get; set; }
@@ -62,7 +62,7 @@ namespace PheggMod
             public PlayerStats ps;
             public AmmoBox ab;
             public Inventory inv;
-            public PlyMovementSync pms;
+            public PlayerMovementSync pms;
             public BanPlayer bp;
             public NetworkConnection nc;
             public Broadcast bc;
@@ -90,7 +90,7 @@ namespace PheggMod
                     _playerStats = player.GetComponent<PlayerStats>();
                     _ammoBox = player.GetComponent<AmmoBox>();
                     _inventory = player.GetComponent<Inventory>();
-                    _plyMovementSync = player.GetComponent<PlyMovementSync>();
+                    _plyMovementSync = player.GetComponent<PlayerMovementSync>();
                     _banPlayer = player.GetComponent<BanPlayer>();
                     _networkConnection = player.GetComponent<NetworkConnection>();
                     _broadcast = player.GetComponent<Broadcast>();
@@ -162,11 +162,11 @@ namespace PheggMod
 
         public float Health()
         {
-            return _playerStats.health;
+            return _playerStats.Health;
         }
         public void Health(float hp)
         {
-            _playerStats.health = hp;
+            _playerStats.Health = hp;
         }
 
         public TeamClass Teamclass()
@@ -196,10 +196,10 @@ namespace PheggMod
             _CharacterClassManager.SetClassID(role);
         }
 
-        public void SetAmmo(int type, int ammount)
-        {
-            _ammoBox.SetOneAmount(type, ammount.ToString());
-        }
+        //public void SetAmmo(int type, int ammount)
+        //{
+        //    _ammoBox.SetOneAmount(type, ammount.ToString());
+        //}
 
         public void Kill()
         {
@@ -253,9 +253,9 @@ namespace PheggMod
             _plyMovementSync.OverridePosition(vector3, rotation, forcegound);
         }
 
-        public void PersonalBroadcast(uint duration, string message, bool isMonoSpaced)
+        public void PersonalBroadcast(ushort duration, string message, Broadcast.BroadcastFlags flag = Broadcast.BroadcastFlags.Normal)
         {
-            _broadcast.TargetAddElement(_networkConnection, message, duration, isMonoSpaced);
+            _broadcast.TargetAddElement(_networkConnection, message, duration, flag);
         }
 
         public void SendConsoleMessage(string message, string color = "green")

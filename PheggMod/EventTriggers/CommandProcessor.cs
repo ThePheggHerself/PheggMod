@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace PheggMod.EventTriggers
 {
-    [MonoModPatch("global::RemoteAdmin.CommandProcessor")]
+    //[MonoModPatch("global::RemoteAdmin.CommandProcessor")]
     class PMCommandProcessor
     {
         internal static string lastCommand;
