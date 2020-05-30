@@ -188,7 +188,7 @@ namespace PheggMod.API.Events
     }
     public class PlayerReportEvent : PlayerEvent
     {
-        public PlayerReportEvent(PheggPlayer reporter, PheggPlayer target, string reason) : base(player)
+        public PlayerReportEvent(PheggPlayer reporter, PheggPlayer target, string reason) : base(reporter)
         {
             Reporter = reporter;
             Target = target;

@@ -24,7 +24,7 @@ namespace PheggMod.EventTriggers
 
             try
             {
-                //if (ConfigFile.ServerConfig.GetBool("smart_guard", true))
+                //if (PMConfigFile.enableSmartGuard)
                 //{
                 //    SmartGuard.instance.SmartGuardDeepCheck(go);
                 //}

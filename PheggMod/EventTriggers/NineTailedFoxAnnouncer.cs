@@ -23,7 +23,7 @@ namespace PheggMod.EventTriggers
                 this.newWords.Add(array[i]);
                 if (i < array.Length - 1)
                 {
-                    if (ConfigFile.ServerConfig.GetBool("cassie_glitch", false) || (ConfigFile.ServerConfig.GetBool("cassie_glitch_post_detonation", false) && AlphaWarheadController.Host.detonated))
+                    if (PMConfigFile.cassieGlitch || PMConfigFile.cassieGlitchDetonation && AlphaWarheadController.Host.detonated)
                     {
 
                         if (UnityEngine.Random.value < glitchChance * 2)

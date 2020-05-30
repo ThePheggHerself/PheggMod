@@ -101,6 +101,7 @@ namespace PheggMod
             //new SmartGuard();
 
             _debug = ConfigFile.ServerConfig.GetBool("pheggmod_debug", false);
+            _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", "04:30");
 
             if (_debug)
             {
@@ -115,7 +116,7 @@ namespace PheggMod
             ///This is the time that the server will check for with the auto-restarting system.
             ///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
             ///Set to 25:00 to disable;
-            _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", "04:30");
+
 
             new Commands.CustomInternalCommands();
             PluginManager.PluginPreLoad();

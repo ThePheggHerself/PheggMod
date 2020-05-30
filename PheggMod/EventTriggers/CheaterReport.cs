@@ -16,27 +16,14 @@ namespace PheggMod.EventTriggers
     class PMCheaterReport : CheaterReport
     {
         private bool _hasLoaded = false;
-        private string _webhookUrl;
-        private string _webhookName;
-        private string _webhookAvatar;
-        private string _webhookMessage;
-        private int _webhookColour;
         private HashSet<int> reportedPlayers;
         private string _serverAddress;
 
         private extern void orig_LogReport(GameConsoleTransmission reporter, string reporterUserId, string reportedUserId, ref string reason, int reportedId, bool notifyGm);
         public void LogReport(GameConsoleTransmission reporter, string reporterUserId, string reportedUserId, ref string reason, int reportedId, bool notifyGm)
         {
-            if (string.IsNullOrEmpty(_webhookUrl) && !_hasLoaded)
+            if (string.IsNullOrEmpty(_serverAddress) && !_hasLoaded)
             {
-                YamlConfig ServerConfig = ConfigFile.ServerConfig;
-
-                _webhookUrl = ServerConfig.GetString("report_discord_webhook_url", string.Empty);
-                _webhookName = ServerConfig.GetString("report_username", "Player Report");
-                _webhookAvatar = ServerConfig.GetString("report_avatar_url", string.Empty);
-                _webhookMessage = ServerConfig.GetString("report_message_content", string.Empty);
-                _webhookColour = ServerConfig.GetInt("report_color", 14423100);
-
                 reportedPlayers = typeof(CheaterReport).GetField("reportedPlayers",
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(PlayerManager.localPlayer.GetComponent<CheaterReport>()) as HashSet<int> ?? new HashSet<int>();
 
@@ -52,9 +39,9 @@ namespace PheggMod.EventTriggers
 
                 if (reportedGO != null && reporterGO != null)
                 {
-                    string json = JsonSerializer.ToJsonString(new DiscordWebhook($"{_webhookMessage}", _webhookName, _webhookAvatar, tts: false, new DiscordEmbed[1]
+                    string json = JsonSerializer.ToJsonString(new DiscordWebhook($"{PMConfigFile.webhookMessage}", PMConfigFile.webhookName, PMConfigFile.webhookAvatar, tts: false, new DiscordEmbed[1]
                     {
-                            new DiscordEmbed("Ingame player report", "rich", "Player has just been reported.", _webhookColour, new DiscordEmbedField[5]
+                            new DiscordEmbed("Ingame player report", "rich", "Player has just been reported.", PMConfigFile.webhookColour, new DiscordEmbedField[5]
                             {
                                 new DiscordEmbedField("Reported User", $"{reportedGO.GetComponent<NicknameSync>().MyNick} ({reportedUserId})", inline: false),
                                 new DiscordEmbedField("Reporter", $"{reporterGO.GetComponent<NicknameSync>().MyNick} ({reporterUserId})", inline: false),
@@ -71,7 +58,7 @@ namespace PheggMod.EventTriggers
                     _client.DefaultRequestHeaders.Add("Game-Version", CustomNetworkManager.CompatibleVersions[0]);
                     _client.Timeout = TimeSpan.FromSeconds(20.0);
 
-                    _client.PostAsync(_webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+                    _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
 
                     try
                     {

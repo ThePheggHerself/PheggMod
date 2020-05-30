@@ -24,7 +24,7 @@ namespace PheggMod.EventTriggers
             try
             {
                 Base.Debug("Triggering PreauthEvent");
-                PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(request.RemoteEndPoint, UserIds[request.RemoteEndPoint].UserId, ));
+                PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(request.RemoteEndPoint, UserIds[request.RemoteEndPoint].UserId));
             }
             catch (Exception e)
             {

@@ -23,16 +23,14 @@ namespace PheggMod.API.Events
     }
     public class PreauthEvent : Event
     {
-        public PreauthEvent(IPEndPoint endpoint, string userId, CentralAuthPreauthFlags flags)
+        public PreauthEvent(IPEndPoint endpoint, string userId)
         {
             Endpoint = endpoint;
             UserID = userId;
-            Flags = flags;
         }
 
         public EndPoint Endpoint { get; private set; }
         public string UserID { get; private set; }
-        public CentralAuthPreauthFlags Flags { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {
