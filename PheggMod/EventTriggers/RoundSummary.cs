@@ -39,7 +39,7 @@ namespace PheggMod.EventTriggers
 
         internal static void RoundFix()
         {
-            if (!ConfigFile.ServerConfig.GetBool("fix_sticky_round", true)) return;
+            if (!PMConfigFile.stickyRound) return;
 
             Base.Info("The server's player count has reached 0, so the round will be ended");
             PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();

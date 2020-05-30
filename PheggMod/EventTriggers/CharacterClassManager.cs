@@ -101,5 +101,22 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e) { Base.Error(e.Message); }
         }
+
+        [ServerCallback]
+        private void CmdStartRound()
+        {
+            if (NetworkServer.active)
+            {
+                try
+                {
+                    GameObject.Find("MeshDoor173").GetComponentInChildren<Door>().ForceCooldown(PMConfigFile.doorCooldown173);
+                    UnityEngine.Object.FindObjectOfType<ChopperAutostart>().SetState(b: false);
+                }
+                catch
+                {
+                }
+                NetworkRoundStarted = true;
+            }
+        }
     }
 }

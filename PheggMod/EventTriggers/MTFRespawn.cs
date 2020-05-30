@@ -35,9 +35,9 @@ namespace PheggMod.EventTriggers
                 }
             }
 
-            if (nextWaveIsCI && ConfigFile.ServerConfig.GetBool("announce_chaos_spawn", true))
+            if (nextWaveIsCI && PMConfigFile.announceChaos)
             {
-                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(ConfigFile.ServerConfig.GetString("chaos_announcement", "PITCH_1 ATTENTION ALL PERSONNEL . CHAOS INSURGENCY BREACH IN PROGRESS"), false, true);
+                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(PMConfigFile.chaosAnnouncement, false, true);
             }
         }
     }

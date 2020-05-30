@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -177,6 +178,30 @@ namespace PheggMod.API.Events
         public override void ExecuteHandler(IEventHandler handler)
         {
             ((IEventHandlerPlayerThrowGrenade)handler).OnThrowGrenade(this);
+        }
+    }
+
+    //Report event
+    public interface IEventHandlerPlayerReport : IEventHandler
+    {
+        void OnReport(PlayerReportEvent ev);
+    }
+    public class PlayerReportEvent : PlayerEvent
+    {
+        public PlayerReportEvent(PheggPlayer reporter, PheggPlayer target, string reason) : base(reporter)
+        {
+            Reporter = reporter;
+            Target = target;
+            Reason = reason;
+        }
+
+        public PheggPlayer Reporter { get; private set; }
+        public PheggPlayer Target { get; private set; }
+        public string Reason { get; private set; }
+
+        public override void ExecuteHandler(IEventHandler handler)
+        {
+            ((IEventHandlerPlayerReport)handler).OnReport(this);
         }
     }
 }

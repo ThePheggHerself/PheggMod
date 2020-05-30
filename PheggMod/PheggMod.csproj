@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+      <HintPath>bin\Build\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -96,7 +96,9 @@
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
+    <Compile Include="EventTriggers\CheaterReport.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
+    <Compile Include="EventTriggers\ConfigFile.cs" />
     <Compile Include="EventTriggers\CustomLiteNetLib4MirrorTransport.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
     <Compile Include="EventTriggers\GrenadeManager.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\QueryProcessor.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
+    <Compile Include="EventTriggers\Scp096.cs" />
     <Compile Include="EventTriggers\ServerRoles.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />

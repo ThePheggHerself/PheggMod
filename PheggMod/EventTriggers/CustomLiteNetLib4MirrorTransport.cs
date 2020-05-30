@@ -3,6 +3,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using MonoMod;
+using PheggMod.API.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,23 +19,44 @@ namespace PheggMod.EventTriggers
 
         protected override void ProcessConnectionRequest(ConnectionRequest request)
         {
-            KeyValuePair<BanDetails, BanDetails> pair = BanHandler.QueryBan(null, request.RemoteEndPoint.Address.ToString());
+            orig_ProcessConnectionRequest(request);
 
-            if (pair.Value == null)
-                Base.Debug("Endpoint is NOT banned");
-
-            else
+            try
             {
-                Base.Debug("Endpoint IS banned");
-
-                NetDataWriter writer = new NetDataWriter();
-
-                writer.Reset();
-                writer.Put(6);
-                writer.Put(pair.Value.Expires);
-
-                request.RejectForce(writer);
+                Base.Debug("Triggering PreauthEvent");
+                PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(request.RemoteEndPoint, UserIds[request.RemoteEndPoint].UserId));
             }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering PreauthEvent: {e.InnerException.ToString()}");
+            }
+
+            //NetDataWriter a = new NetDataWriter();
+            //a.Reset();
+            //a.Put(10);
+            //a.Put("Custom Smelling badly");
+            //a.Put("Testing");
+            //request.Reject(a);
+
+            //orig_ProcessConnectionRequest(request);
+
+            //KeyValuePair<BanDetails, BanDetails> pair = BanHandler.QueryBan(null, request.RemoteEndPoint.Address.ToString());
+
+            //if (pair.Value == null)
+            //    Base.Debug("Endpoint is NOT banned");
+
+            //else
+            //{
+            //    Base.Debug("Endpoint IS banned");
+
+            //    NetDataWriter writer = new NetDataWriter();
+
+            //    writer.Reset();
+            //    writer.Put(6);
+            //    writer.Put(pair.Value.Expires);
+
+            //    request.RejectForce(writer);
+            //}
 
 
             //Code used for testing integration of SmartGuard into the pre-authentication system (allowing for SmartGuard to trigger faster). Ignore it for now
@@ -69,7 +91,6 @@ namespace PheggMod.EventTriggers
             #endregion
 
 
-            orig_ProcessConnectionRequest(request);
         }
     }
 }

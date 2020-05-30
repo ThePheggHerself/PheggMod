@@ -106,7 +106,7 @@ namespace DiscordLab
         public void OnWarheadDetonate(WarheadDetonateEvent ev) => DiscordLab.bot.NewMessage("The alpha warhead has been detonated");
 
         public void OnWarheadStart(WarheadStartEvent ev) => DiscordLab.bot.NewMessage(
-            ev.InitialStart ? $"**Alpha warhead detonation sequence engaged! The underground ection of the facility will be detonated in T-minus {ev.TimeToDetonation} seconds!**" :
+            ev.InitialStart ? $"**Alpha warhead detonation sequence engaged! The underground section of the facility will be detonated in T-minus {ev.TimeToDetonation} seconds!**" :
             $"**Alpha warhead detonation sequence resumed! {ev.TimeToDetonation} seconds to detonation!**");
     }
 }

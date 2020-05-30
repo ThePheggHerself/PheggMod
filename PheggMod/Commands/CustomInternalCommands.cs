@@ -191,7 +191,7 @@ namespace PheggMod.Commands
             if (!CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.Broadcasting))
                 return;
 
-            bool success = uint.TryParse(arg[2], out uint duration);
+            bool success = ushort.TryParse(arg[2], out ushort duration);
 
             if (arg.Count() < 4)
             {
@@ -209,7 +209,7 @@ namespace PheggMod.Commands
             string message = string.Join(" ", arg.Skip(3));
 
             foreach (GameObject player in playerList)
-                player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, false);
+                player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, Broadcast.BroadcastFlags.Normal);
 
             sender.RaReply(arg[0].ToUpper() + "Broadcast sent!", true, true, "");
         }
@@ -266,7 +266,7 @@ namespace PheggMod.Commands
                 info.commandSender.RaReply(info.commandName + $"#Facility lights have been disabled!", true, true, "");
 
                 foreach (GameObject player in PlayerManager.players)
-                    player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), $"Lightsout has been enabled. This will cause occasional rapid flickering of lights throughout HCZ and LCZ", 20, false);
+                    player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), $"Lightsout has been enabled. This will cause occasional rapid flickering of lights throughout HCZ and LCZ", 20, Broadcast.BroadcastFlags.Normal);
 
                 yield return Timing.WaitForSeconds(9f);
 
@@ -339,9 +339,9 @@ namespace PheggMod.Commands
 
 
 
-                bc.TargetAddElement(nc, "Welcome to peanut race", 5, false);
-                bc.TargetAddElement(nc, "Your goal is to reach the surface before the nuke detonates", 6, false);
-                bc.TargetAddElement(nc, "The nuke has been locked, so you are unable to disable it", 6, false);
+                bc.TargetAddElement(nc, "Welcome to peanut race", 5, Broadcast.BroadcastFlags.Normal);
+                bc.TargetAddElement(nc, "Your goal is to reach the surface before the nuke detonates", 6, Broadcast.BroadcastFlags.Normal);
+                bc.TargetAddElement(nc, "The nuke has been locked, so you are unable to disable it", 6, Broadcast.BroadcastFlags.Normal);
             }
 
             yield return Timing.WaitForSeconds(18);
@@ -417,7 +417,7 @@ namespace PheggMod.Commands
         [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
         public void cmd_pos(CommandInfo info)
         {
-            Vector3 pos = info.gameObject.GetComponent<PlyMovementSync>().RealModelPosition;
+            Vector3 pos = info.gameObject.GetComponent<PlayerMovementSync>().RealModelPosition;
 
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Current player position: x={pos.x} y={pos.y} z={pos.z}", true, true, "");
         }
@@ -428,7 +428,7 @@ namespace PheggMod.Commands
             List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
 
             foreach (GameObject plr in playerList)
-                plr.GetComponent<PlyMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
+                plr.GetComponent<PlayerMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
 
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to tower 2", true, true, "");
         }
@@ -439,7 +439,7 @@ namespace PheggMod.Commands
             List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
 
             foreach(GameObject plr in playerList)
-                plr.GetComponent<PlyMovementSync>().OverridePosition(Vector3.down * 1998.5f, 0f, true);
+                plr.GetComponent<PlayerMovementSync>().OverridePosition(Vector3.down * 1998.5f, 0f, true);
 
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to the pocket dimension", true, true, "");
         }
