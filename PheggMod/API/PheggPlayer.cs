@@ -185,7 +185,8 @@ namespace PheggMod
                 cTeam = CleanTeam.Tutorial;
             else cTeam = CleanTeam.Spectator;
 
-            return new TeamClass { 
+            return new TeamClass
+            {
                 role = role,
                 team = team,
                 cleanTeam = cTeam
@@ -263,10 +264,11 @@ namespace PheggMod
             _CharacterClassManager.TargetConsolePrint(_networkConnection, message, color);
         }
 
-        public void SetTag(string Text, TagColour colour, ulong permissions = 0)
+        public void SetTag(string Text, TagColour colour = TagColour.DEFAULT, ulong permissions = 0)
         {
             _serverRoles.SetText(Text);
-            _serverRoles.SetColor(Base.colours[(int)colour]);
+            if (colour != TagColour.DEFAULT)
+                _serverRoles.SetColor(Base.colours[(int)colour]);
             _serverRoles.Permissions = permissions;
         }
     }

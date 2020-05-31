@@ -30,6 +30,7 @@ namespace PheggMod
         public static DateTime? roundStartTime = null;
         public static readonly List<string> colours = new List<string>
         {
+            "RANDOMSTUPIDTEXTTOFORCEDEFAULT",
             "pink",
             "red",
             "brown",
@@ -101,6 +102,10 @@ namespace PheggMod
             //new SmartGuard();
 
             _debug = ConfigFile.ServerConfig.GetBool("pheggmod_debug", false);
+
+            ///This is the time that the server will check for with the auto-restarting system.
+            ///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
+            ///Set to 25:00 to disable;
             _restartTime = ConfigFile.ServerConfig.GetString("auto_restart_time", "04:30");
 
             if (_debug)
@@ -113,14 +118,8 @@ namespace PheggMod
                     + $"\nUserIdReservedSlots.txt: {ConfigSharing.Paths[3] + "UserIDReservedSlots.txt"}");
             }
 
-            ///This is the time that the server will check for with the auto-restarting system.
-            ///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
-            ///Set to 25:00 to disable;
-
-
             new Commands.CustomInternalCommands();
             PluginManager.PluginPreLoad();
-
         }
 
         public static void Error(string m) => Base.AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));

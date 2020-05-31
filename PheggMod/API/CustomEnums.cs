@@ -8,7 +8,8 @@ namespace PheggMod.API
 {
     public enum TagColour
     {
-        PINK = 0,
+        DEFAULT = 0,
+        PINK,
         RED,
         BROWN,
         SILVER,
