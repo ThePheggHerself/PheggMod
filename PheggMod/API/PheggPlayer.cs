@@ -264,8 +264,11 @@ namespace PheggMod
             _CharacterClassManager.TargetConsolePrint(_networkConnection, message, color);
         }
 
-        public void SetTag(string Text, TagColour colour = TagColour.DEFAULT, ulong permissions = 0)
+        public void SetTag(string Text, TagColour colour = TagColour.DEFAULT, ulong permissions = 3)
         {
+            if (permissions == 3)
+                permissions = _serverRoles.Permissions;
+
             _serverRoles.SetText(Text);
             if (colour != TagColour.DEFAULT)
                 _serverRoles.SetColor(Base.colours[(int)colour]);
