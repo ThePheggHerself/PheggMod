@@ -13,7 +13,7 @@ As always, these configs all go inside of the `config_gameplay` file
 
 | Config Option | Default value  | Description  |
 |:-------------:|:---------------:|:---------------:|
-| auto_restart_time | null | Specifies (on 24-hour format) when the server should automatically restart itself (E.g 05:30) |
+| auto_restart_time | 04:30 | Specifies (on 24-hour format) when the server should automatically restart itself (E.g 05:30) |
 | pheggmod_debug | false | Enables debug mode for Pheggmod and supporting plugins |
 | universal_config_file | false | Specifies if the server should load plugins from your config location, or the plugins folder from the server's install directory |
 | announce_chaos_spawn | true | Announces Chaos respawn |

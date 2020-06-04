@@ -73,7 +73,7 @@ namespace PheggMod.Commands
             return playerList;
         }
 
-        [PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
+        //[PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
         public void cmd_help(CommandInfo info)
         {
             string msg;
