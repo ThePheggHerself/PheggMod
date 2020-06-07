@@ -41,7 +41,6 @@ namespace PheggMod.EventTriggers
                 if (HasTarget(hub) && !warnedTargets.Contains(id))
                 {
                     target.GetComponent<HintDisplay>().Show(new TextHint("You are now a target for 096!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 8));
-                    //new PheggPlayer(target).PersonalBroadcast(5, "You are now a target for 096!");
                     warnedTargets.Add(id);
                 }
             }
