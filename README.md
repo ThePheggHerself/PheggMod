@@ -43,7 +43,9 @@ These are the available custom commands that Pheggmod offers
 | curpos | [PlayerID] | | Prints the player's current position into RA |
 | tower2 | [PlayerId] | | Teleports the player into a different surface tower |
 | pocket | [PlayerId] | | Teleports the player into the pocket dimension |
-| race | | PlayersManagement | Starts a Peanut race event |
+| grenade |[PlayerId] | | Spawns a grenade at a player |
+| flash | [PlayerId] | | Spawns a flashbang at a player |
+| ball | [PlayerId] | | Spawns 018 at a player |
 
 # Events
 These are the available events that Pheggmod offers
