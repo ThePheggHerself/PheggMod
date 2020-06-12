@@ -1,4 +1,5 @@
 ﻿using GameCore;
+using Grenades;
 using MEC;
 using Mirror;
 using PheggMod.API.Commands;
@@ -57,12 +58,16 @@ namespace PheggMod.Commands
         }
         public static List<GameObject> GetPlayersFromString(string users)
         {
+            if (users.ToLower() == "*")
+                return PlayerManager.players;
+
             string[] playerStrings = users.Split('.');
             List<GameObject> playerList = new List<GameObject>();
 
             foreach (string player in playerStrings)
             {
-                GameObject go = PlayerManager.players.Where(p => p.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString() == player || p.GetComponent<NicknameSync>().MyNick == player).FirstOrDefault();
+                GameObject go = PlayerManager.players.Where(p => p.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString() == player 
+                || p.GetComponent<NicknameSync>().MyNick.ToLower() == player || p.GetComponent<CharacterClassManager>().UserId2 == player).FirstOrDefault();
                 if (go.Equals(default(GameObject)) || go == null) continue;
                 else
                 {
@@ -231,7 +236,7 @@ namespace PheggMod.Commands
 
                 info.commandSender.RaReply(info.commandName.ToUpper() + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Base.Error(e.ToString());
             }
@@ -308,14 +313,14 @@ namespace PheggMod.Commands
         [PMCommand("race"), PMParameters(), PMPermission(PlayerPermissions.PlayersManagement), PMCommandSummary("Starts an escape race event")]
         public void cmd_race(CommandInfo info)
         {
-            if((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds > 30d)
+            if ((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds > 30d)
             {
                 info.commandSender.RaReply(info.commandName.ToUpper() + $"#You must run this command within the first 30 seconds of the round starting", false, true, "");
                 return;
             }
 
             Timing.RunCoroutine(RaceEvent(info));
-        } 
+        }
         private IEnumerator<float> RaceEvent(CommandInfo info)
         {
             RoundSummary.RoundLock = true;
@@ -436,12 +441,80 @@ namespace PheggMod.Commands
         [PMCommand("pocket"), PMParameters("playerid"), PMCommandSummary("Teleports the player into the pocket dimention")]
         public void cmd_pocket(CommandInfo info)
         {
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
+            List<GameObject> playerList = GetPlayersFromString(info.commandArgs[1]);
 
-            foreach(GameObject plr in playerList)
+            foreach (GameObject plr in playerList)
                 plr.GetComponent<PlayerMovementSync>().OverridePosition(Vector3.down * 1998.5f, 0f, true);
 
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to the pocket dimension", true, true, "");
+        }
+
+        
+        // The code for the 3 commands was kindly donated to PheggMod by KrypTheBear#3301
+        // Many thanks for the code <3
+
+        [PMCommand("grenade"), PMParameters("player"), PMCommandSummary("Spawns a grenade at a player")]
+        public void cmd_grenade(CommandInfo info)
+        {
+            Vector3 NULL_VECTOR = new Vector3(0, 0, 0);
+
+            List<GameObject> playerList = GetPlayersFromString(info.commandArgs[1]);
+
+            foreach (GameObject plr in playerList)
+            {
+                PheggPlayer pp = new PheggPlayer(plr);
+
+                // Initialization
+                GrenadeManager gm = pp.gameObject.GetComponent<GrenadeManager>();
+
+                // Finalize creation & Spawn
+                Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[0].grenadeInstance).GetComponent<Grenade>();
+                (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
+                NetworkServer.Spawn(nade.gameObject);
+
+            }
+        }
+        [PMCommand("flash"), PMParameters("player"), PMCommandSummary("Spawns a flashbang at a player")]
+        public void cmd_flash(CommandInfo info)
+        {
+            Vector3 NULL_VECTOR = new Vector3(0, 0, 0);
+
+            List<GameObject> playerList = GetPlayersFromString(info.commandArgs[1]);
+
+            foreach (GameObject plr in playerList)
+            {
+                PheggPlayer pp = new PheggPlayer(plr);
+
+                // Initialization
+                GrenadeManager gm = pp.gameObject.GetComponent<GrenadeManager>();
+
+                // Finalize creation & Spawn
+                Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[1].grenadeInstance).GetComponent<Grenade>();
+                (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
+                NetworkServer.Spawn(nade.gameObject);
+
+            }
+        }
+        [PMCommand("ball"), PMParameters("player"), PMCommandSummary("Spawns 018 at a player")]
+        public void cmd_ball(CommandInfo info)
+        {
+            Vector3 NULL_VECTOR = new Vector3(0, 0, 0);
+
+            List<GameObject> playerList = GetPlayersFromString(info.commandArgs[1]);
+
+            foreach (GameObject plr in playerList)
+            {
+                PheggPlayer pp = new PheggPlayer(plr);
+
+                // Initialization
+                GrenadeManager gm = pp.gameObject.GetComponent<GrenadeManager>();
+
+                // Finalize creation & Spawn
+                Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[2].grenadeInstance).GetComponent<Grenade>();
+                (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
+                NetworkServer.Spawn(nade.gameObject);
+
+            }
         }
 
         #endregion
