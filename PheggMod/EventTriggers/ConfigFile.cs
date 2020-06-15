@@ -12,21 +12,11 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::GameCore.ConfigFile")]
     public static class PMConfigFile
     {
-        internal static string webhookUrl;
-        internal static string webhookName;
-        internal static string webhookAvatar;
-        internal static string webhookMessage;
+        internal static string webhookUrl, webhookName, webhookAvatar, webhookMessage;
         internal static int webhookColour;
 
-        internal static bool announceChaos;
+        internal static bool announceChaos, cassieGlitch, cassieGlitchDetonation, stickyRound, targetAnnouncement, mockCommand;
         internal static string chaosAnnouncement;
-
-        internal static bool cassieGlitch;
-        internal static bool cassieGlitchDetonation;
-
-        internal static bool stickyRound;
-
-        internal static bool targetAnnouncement;
 
         internal static float doorCooldown173;
 
@@ -48,6 +38,7 @@ namespace PheggMod.EventTriggers
             cassieGlitch = ServerConfig.GetBool("cassie_glitch", false);
             cassieGlitchDetonation = ServerConfig.GetBool("cassie_glitch_post_detonation", false);
             stickyRound = ServerConfig.GetBool("fix_sticky_round", true);
+            mockCommand = ServerConfig.GetBool("enable_mock_command", true);
 
             webhookUrl = ServerConfig.GetString("report_discord_webhook_url", string.Empty);
             webhookName = ServerConfig.GetString("report_username", "Player Report");

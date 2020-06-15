@@ -216,7 +216,7 @@ namespace PheggMod.Commands
             foreach (GameObject player in playerList)
                 player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, Broadcast.BroadcastFlags.Normal);
 
-            sender.RaReply(arg[0].ToUpper() + "Broadcast sent!", true, true, "");
+            sender.RaReply(arg[0].ToUpper() + "#Broadcast sent!", true, true, "");
         }
 
         [PMCommand("drop"), PMAlias("dropall", "dropinv", "strip"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
@@ -472,6 +472,7 @@ namespace PheggMod.Commands
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
 
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned grenade on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
         }
         [PMCommand("flash"), PMParameters("player"), PMCommandSummary("Spawns a flashbang at a player")]
@@ -493,6 +494,7 @@ namespace PheggMod.Commands
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
 
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned flash on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
         }
         [PMCommand("ball"), PMParameters("player"), PMCommandSummary("Spawns 018 at a player")]
@@ -514,6 +516,7 @@ namespace PheggMod.Commands
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
 
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned 018 on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
         }
 

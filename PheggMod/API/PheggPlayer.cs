@@ -71,7 +71,7 @@ namespace PheggMod
         public PheggPlayer(GameObject player)
         {
             if (player == null)
-                throw new Exception("Cannot create PheggPlayer from null game object");
+                return;
             else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
             {
                 Base.Debug("Cannot create PheggPlayer for server");

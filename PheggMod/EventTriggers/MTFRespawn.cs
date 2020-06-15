@@ -16,8 +16,6 @@ namespace PheggMod.EventTriggers
         {
             orig_RespawnDeadPlayers();
 
-            Base.Debug($"CITickets: {this.ChaosRespawnTickets} NTFTickets: {this.MtfRespawnTickets} RespawnTickets: {NextWaveRespawnTickets}");
-
             try
             {
                 Base.Debug("Triggering RespawnEvent");

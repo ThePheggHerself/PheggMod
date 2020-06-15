@@ -2,6 +2,7 @@
 using MonoMod;
 using PheggMod.API.Commands;
 using PheggMod.API.Events;
+using PheggMod.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,43 @@ namespace PheggMod.EventTriggers
                             Base.Error($"Error triggering AdminQueryEvent: {e.InnerException.ToString()}");
                         }
 
-                        List<string> cmds = new List<string>();
+                        try
+                        {
+
+                            if (query[0].ToLower() == "mock")
+                            {
+                                if (!PMConfigFile.mockCommand)
+                                {
+                                    sender.RaReply(query[0].ToUpper() + "#This command is disabled on this server!", false, true, "");
+                                    return;
+                                }
+
+
+                                Base.Info("TESTING");
+
+
+
+                                List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(query[1]);
+
+                                if (playerList.Count < 1)
+                                {
+                                    sender.RaReply(query[0].ToUpper() + "#That player could not be found!", false, true, "");
+
+                                }
+                                else
+                                {
+                                    ProcessQuery(string.Join(" ", q.Skip(2)), playerList[0].GetComponent<CommandSender>());
+
+                                }
+
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Base.Error(e.ToString() + "\n" + e.InnerException.ToString());
+                        }
+
 
                         if (PluginManager.oldCommands.ContainsKey(query[0]))
                         {
@@ -54,7 +91,7 @@ namespace PheggMod.EventTriggers
                         }
                         else
                         {
-                            if(PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
+                            if (PluginManager.TriggerCommand(new CommandInfo(sender, pheggPlayer.gameObject, query[0], query))) return;
                         }
                     }
                     else
