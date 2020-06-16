@@ -41,4 +41,13 @@ namespace PheggMod.API
         Spectator,
         Tutorial,
     }
+
+    public enum KillType
+    {
+        Normal = 0,
+        TeamKill,
+        DisarmedKill,
+        WorldKill,
+        AntiCheat
+    }
 }

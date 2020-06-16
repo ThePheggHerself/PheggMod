@@ -37,6 +37,22 @@ namespace PheggMod.EventTriggers
                 GameObject reporterGO = PlayerManager.players.Find(p => p.GetComponent<CharacterClassManager>().UserId == reporterUserId);
                 GameObject reportedGO = PlayerManager.players.Find(p => p.GetComponent<CharacterClassManager>().UserId == reportedUserId);
 
+                try
+                {
+                    Base.Debug("Triggering PlayerReportEvent");
+                    PluginManager.TriggerEvent<IEventHandlerPlayerReport>(new PlayerReportEvent(new PheggPlayer(reporterGO), new PheggPlayer(reportedGO), reason));
+                }
+                catch (Exception e)
+                {
+                    Base.Error($"Error triggering PlayerReportEvent {e.InnerException}");
+                }
+
+                if (!notifyGm)
+                {
+                    reportedPlayers.Add(reportedId);
+                    reporter.SendToClient(base.connectionToClient, "[REPORTING] Player report successfully sent to local administrators by webhooks.", "green");
+                }
+
                 if (reportedGO != null && reporterGO != null)
                 {
                     string json = JsonSerializer.ToJsonString(new DiscordWebhook($"{PMConfigFile.webhookMessage}", PMConfigFile.webhookName, PMConfigFile.webhookAvatar, tts: false, new DiscordEmbed[1]
@@ -59,22 +75,6 @@ namespace PheggMod.EventTriggers
                     _client.Timeout = TimeSpan.FromSeconds(20.0);
 
                     _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
-
-                    try
-                    {
-                        Base.Debug("Triggering PlayerReportEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerReport>(new PlayerReportEvent(new PheggPlayer(reporterGO), new PheggPlayer(reportedGO), reason));
-                    }
-                    catch (Exception e)
-                    {
-                        Base.Error($"Error triggering PlayerReportEvent {e.InnerException.ToString()}");
-                    }
-
-                    if (!notifyGm)
-                    {
-                        reportedPlayers.Add(reportedId);
-                        reporter.SendToClient(base.connectionToClient, "[REPORTING] Player report successfully sent to local administrators by webhooks.", "green");
-                    }
                 }
             }
             catch (Exception ex)

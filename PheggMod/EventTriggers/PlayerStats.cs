@@ -18,9 +18,6 @@ namespace PheggMod.EventTriggers
         {
             if (!go.GetComponent<CharacterClassManager>().isLocalPlayer && info.GetDamageType() != DamageTypes.None && !go.GetComponent<CharacterClassManager>().GodMode)
             {
-                //if (Commands.CustomInternalCommands.nodamageplayers.ContainsKey(go.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId))
-                //    info.Amount = 0;
-
                 PheggPlayer pPlayer = new PheggPlayer(go);
                 PlayerStats Pstats = go.GetComponent<PlayerStats>();
                 PheggPlayer pAttacker = null;
