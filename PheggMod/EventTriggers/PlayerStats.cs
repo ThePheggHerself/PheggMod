@@ -19,52 +19,42 @@ namespace PheggMod.EventTriggers
         public extern bool orig_HurtPlayer(HitInfo info, GameObject go);
         public new bool HurtPlayer(HitInfo info, GameObject go)
         {
-            if(isLocalPlayer || !NetworkServer.active || info.Attacker.ToUpper() == "DISCONNECT")
-                return orig_HurtPlayer(info, go);
-
-            PheggPlayer pPlayer = new PheggPlayer(go);
-            Role playerRole = pPlayer.role;
-
-            PheggPlayer pAttacker = null;
-            Role attackerRole = null;
-
-            if (info.GetPlayerObject() != null)
+            try
             {
-                pAttacker = new PheggPlayer(info.GetPlayerObject());
-                attackerRole = pAttacker.role;
-            }
+                if (isLocalPlayer || !NetworkServer.active)
+                    return orig_HurtPlayer(info, go);
 
-            PMDamageType kT;
-            if (info.GetDamageType() == DamageTypes.Flying)
-                kT = PMDamageType.AntiCheat;
-            else if (pAttacker == null)
-                kT = PMDamageType.WorldKill;
-            else if (go.GetComponent<Handcuffs>().CufferId > -1 && pAttacker.refHub.characterClassManager.IsAnyScp())
-                kT = PMDamageType.DisarmedKill;
-            else if (IsTeamDamage(playerRole.team, attackerRole.team))
-                kT = PMDamageType.TeamKill;
-            else
-                kT = PMDamageType.Normal;
+                PheggPlayer player = new PheggPlayer(go);
+                PheggPlayer attacker = null;
+                try { attacker = new PheggPlayer(info.GetPlayerObject()); }
+                catch { }
 
-            PlayerHurtCache pHC = new PlayerHurtCache
-            {
-                PlayerOriginalRole = pPlayer.roleType,
-                AttackerOriginalRole = pAttacker == null ? RoleType.None : pAttacker.roleType,
-                PMDamageType = kT,
-                HitInfo = info
-            };
+                PMDamageType kT;
 
-            bool result = orig_HurtPlayer(info, go);
+                if (info.GetDamageType() == DamageTypes.Flying)
+                    kT = PMDamageType.AntiCheat;
+                else if (attacker == null || attacker.isEmpty)
+                    kT = PMDamageType.WorldKill;
 
-            if (!pPlayer.refHub.characterClassManager.isLocalPlayer && info.GetDamageType() != DamageTypes.None && !pPlayer.refHub.characterClassManager.GodMode)
-            {
-                bool IsKill = pPlayer.roleType == RoleType.Spectator && pHC.PlayerOriginalRole != RoleType.Spectator;
+                else if (player.refHub.handcuffs.CufferId > -1 && attacker.refHub.characterClassManager.IsAnyScp())
+                    kT = PMDamageType.DisarmedKill;
+                else if (IsTeamDamage(player.role.team, attacker.role.team))
+                    kT = PMDamageType.TeamKill;
+                else
+                    kT = PMDamageType.Normal;
 
+                PlayerHurtCache pHC = new PlayerHurtCache { PlayerOriginalRole = player.roleType, AttackerOriginalRole = attacker?.roleType, PMDamageType = kT, HitInfo = info };
+
+                bool result = orig_HurtPlayer(info, go);
+                if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
+                    return result;
+
+                bool IsKill = player.roleType == RoleType.Spectator && pHC.PlayerOriginalRole != RoleType.Spectator;
                 if (IsKill)
                     try
                     {
                         Base.Debug("Triggering PlayerDeathEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType(), pHC));
+                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.GetDamageType(), pHC));
                     }
                     catch (Exception e)
                     {
@@ -74,34 +64,37 @@ namespace PheggMod.EventTriggers
                     try
                     {
                         Base.Debug("Triggering PlayerHurtEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(pPlayer, pAttacker, info.Amount, info.GetDamageType(), pHC));
+                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.GetDamageType(), pHC));
                     }
                     catch (Exception e)
                     {
                         Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
                     }
 
-                if (PMConfigFile.enable008 && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
+                if (PMConfigFile.enable008)
                 {
-                    if (IsKill)
+                    if (IsKill && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
+                        player.roleType = RoleType.Scp0492;
+
+                    else if (attacker != null && attacker.roleType == RoleType.Scp0492)
                     {
-                        pPlayer.roleType = RoleType.Scp0492;
+                        CustomEffects.SCP008 effect = player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>();
 
-                        Ragdoll rd = pPlayer.gameObject.GetComponent<Ragdoll>();
-                        Base.Info(rd.transform.position.ToString());
-                    }
+                        if (effect == null || !effect.Enabled)
+                            player.gameObject.GetComponent<PlayerEffectsController>().EnableEffect<CustomEffects.SCP008>(300f, false);
 
-                    Base.Info("AMA");
-
-                    if (pAttacker.roleType == RoleType.Scp0492)
-                    {
-                        pPlayer.gameObject.GetComponent<PlayerEffectsController>().EnableEffect<CustomEffects.SCP008>(300f, false);
-                        pPlayer.gameObject.GetComponent<HintDisplay>().Show(new TextHint("You have been infected!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 8));
+                        else
+                            player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>().intensity++;
                     }
                 }
-            }
 
-            return result;
+                return result;
+            }
+            catch (Exception e)
+            {
+                Base.Info(e.ToString());
+                return orig_HurtPlayer(info, go);
+            }
         }
 
         public extern void orig_Roundrestart();

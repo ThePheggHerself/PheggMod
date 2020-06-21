@@ -12,6 +12,7 @@ namespace PheggMod
         private readonly static Regex _filterNames = new Regex("[(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")]");
 
         public ReferenceHub refHub { get; internal set; }
+        public bool isEmpty = true;
 
         //Basic user info
         public string name { get; internal set; }
@@ -47,16 +48,16 @@ namespace PheggMod
         public PheggPlayer(GameObject player)
         {
             if (player == null)
-                return;
+                throw new ArgumentNullException("Can't make PheggPlayer from null");
             else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
             {
-                Base.Debug("Cannot create PheggPlayer for server");
-                return;
+                throw new ArgumentNullException("Can't make PheggPlayer from server");
             }
             else
             {
-                refHub = player.GetComponent<ReferenceHub>();
+                isEmpty = false;
 
+                refHub = player.GetComponent<ReferenceHub>();
 
                 _banPlayer = player.GetComponent<BanPlayer>();
                 _networkConnection = player.GetComponent<NetworkConnection>();
@@ -156,10 +157,8 @@ namespace PheggMod
         {
             return $"{_filterNames.Replace(name, string.Empty)} ({userId})";
         }
-        public void Kill()
-        {
-            refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Nuke, playerId), gameObject);
-        }
+        public void Kill() => refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Wall, playerId), gameObject);
+        
 
         public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
         {
@@ -193,19 +192,15 @@ namespace PheggMod
             _banPlayer.KickUser(gameObject, reason, issuer, false);
         }
 
-        public void GiveItem(ItemType type)
-        {
-            refHub.inventory.AddNewItem(type);
-        }
+     
         public void GiveItems(ItemType[] items)
         {
             foreach (ItemType item in items)
                 refHub.inventory.AddNewItem(item);
         }
-        public void ClearItems()
-        {
-            refHub.inventory.Clear();
-        }
+        public void GiveItem(ItemType type) => refHub.inventory.AddNewItem(type);
+        public void ClearItems() => refHub.inventory.Clear();
+        
 
 
 
