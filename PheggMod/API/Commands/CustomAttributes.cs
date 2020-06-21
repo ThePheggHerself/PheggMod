@@ -12,6 +12,12 @@ namespace PheggMod.Commands
         All
     }
 
+    public class PMDisabled : Attribute
+    {
+        public bool disabled;
+        public PMDisabled(bool disabled = true) => this.disabled = disabled;
+    }
+
     public class PMConsoleRunnable : Attribute
     {
         public bool consoleRunnable;

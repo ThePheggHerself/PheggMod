@@ -1,9 +1,6 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using CustomPlayerEffects;
-using GameCore;
 using Hints;
 using MonoMod;
-using PheggMod.API.Events;
 using PlayableScps;
 using System;
 using System.Collections.Generic;
@@ -16,6 +13,16 @@ namespace PheggMod.EventTriggers
     class PMScp096 : Scp096
     {
         List<int> warnedTargets;
+
+        public extern void orig_ParseVisionInformation(VisionInformation info);
+        public new void ParseVisionInformation(VisionInformation info)
+        {
+            if (info.Source.GetComponent<CharacterClassManager>().CurClass == RoleType.Tutorial && !PMConfigFile.tutorialTrigger096)
+                return;
+            else
+                orig_ParseVisionInformation(info);
+        }
+
 
         public extern void orig_AddTarget(GameObject target);
         public new void AddTarget(GameObject target)

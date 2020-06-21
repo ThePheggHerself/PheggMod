@@ -13,19 +13,19 @@ namespace PheggMod.EventTriggers
         private extern IEnumerator<float> orig__ServerThrowGrenade(GrenadeSettings settings, float forceMultiplier, int itemIndex, float delay);
         private IEnumerator<float> _ServerThrowGrenade(GrenadeSettings settings, float forceMultiplier, int itemIndex, float delay)
         {
-            IEnumerator<float> @return = orig__ServerThrowGrenade(settings, forceMultiplier, itemIndex, delay);
+            IEnumerator<float> result = orig__ServerThrowGrenade(settings, forceMultiplier, itemIndex, delay);
 
             try
             {
                 Base.Debug("Triggering PlayerThrowGrenadeEvent");
-                PluginManager.TriggerEvent<IEventHandlerPlayerThrowGrenade>(new PlayerThrowGrenadeEvent(new PheggPlayer(base.gameObject), settings));
+                PluginManager.TriggerEvent<IEventHandlerPlayerThrowGrenade>(new PlayerThrowGrenadeEvent(new PheggPlayer(gameObject), settings));
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering PlayerThrowGrenadeEvent: {e.InnerException.ToString()}");
+                Base.Error($"Error triggering PlayerThrowGrenadeEvent: {e.InnerException}");
             }
 
-            return @return;
+            return result;
         }
     }
 }

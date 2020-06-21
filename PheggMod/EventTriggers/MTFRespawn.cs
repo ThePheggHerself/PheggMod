@@ -1,9 +1,7 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using GameCore;
 using MonoMod;
 using PheggMod.API.Events;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PheggMod.EventTriggers
@@ -23,7 +21,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RespawnEvent: {e.InnerException.ToString()}");
+                Base.Error($"Error triggering RespawnEvent: {e.InnerException}");
             }
 
             if (Commands.CustomInternalCommands.isLightsout)

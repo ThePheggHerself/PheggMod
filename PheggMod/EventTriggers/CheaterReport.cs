@@ -1,5 +1,4 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using GameCore;
 using MonoMod;
 using Utf8Json;
 using PheggMod.API.Events;
@@ -19,7 +18,6 @@ namespace PheggMod.EventTriggers
         private HashSet<int> reportedPlayers;
         private string _serverAddress;
 
-        private extern void orig_LogReport(GameConsoleTransmission reporter, string reporterUserId, string reportedUserId, ref string reason, int reportedId, bool notifyGm);
         public void LogReport(GameConsoleTransmission reporter, string reporterUserId, string reportedUserId, ref string reason, int reportedId, bool notifyGm)
         {
             if (string.IsNullOrEmpty(_serverAddress) && !_hasLoaded)

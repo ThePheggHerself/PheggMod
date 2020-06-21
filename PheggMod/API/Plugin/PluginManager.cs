@@ -48,6 +48,8 @@ namespace PheggMod
 
             AddCommands(Assembly.GetExecutingAssembly());
 
+            Base.Info("APPLES0");
+
             LoadDependencies(pluginsFolder + "/Dependencies");
             LoadPlugins(pluginsFolder);
         }
@@ -67,7 +69,6 @@ namespace PheggMod
                         Base.Info("DEPENDENCY LOADER | Loading dependency " + asm.GetName().Name);
                     }
                 }
-
                 Base.Info("Dependancies loaded!");
             }
         }
@@ -79,7 +80,6 @@ namespace PheggMod
                 Base.Info("Loading plugins...");
 
                 List<string> files = Directory.GetFiles(pluginsFolder).ToList<string>();
-                List<string> nondll = new List<string>();
 
                 foreach (string dllfile in files)
                 {
@@ -105,11 +105,15 @@ namespace PheggMod
 
                                         AddCommands(asm);
                                     }
-                                    catch (Exception) { };
+                                    catch (Exception e) {
+                                        Base.Error("PLUGIN LOADER | Failed to load file: " + asm.GetName().Name);
+                                        Base.Error($"PLUGIN LOADER | {e.Message}");
+                                        Base.Error($"PLUGIN LOADER | {e.InnerException}");
+                                    };
                                 }
                             }
                         }
-                        catch (TargetInvocationException e)
+                        catch (Exception e)
                         {
                             Base.Error("PLUGIN LOADER | Failed to load file: " + asm.GetName().Name);
                             Base.Error($"PLUGIN LOADER | {e.Message}");
@@ -163,6 +167,9 @@ namespace PheggMod
 
             foreach (MethodInfo command in commands)
             {
+                if (((PMDisabled)command.GetCustomAttribute(typeof(PMDisabled))) != null && ((PMDisabled)command.GetCustomAttribute(typeof(PMDisabled))).disabled)
+                    continue;
+
                 PMCommand pmCommand = (PMCommand)command.GetCustomAttribute(typeof(PMCommand));
 
                 if (allCommands.ContainsKey(pmCommand.name) || oldCommands.ContainsKey(pmCommand.name))

@@ -42,7 +42,7 @@ namespace PheggMod.API
         Tutorial,
     }
 
-    public enum KillType
+    public enum PMDamageType
     {
         Normal = 0,
         TeamKill,

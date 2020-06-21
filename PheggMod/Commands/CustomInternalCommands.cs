@@ -1,4 +1,5 @@
-﻿using GameCore;
+﻿using CustomPlayerEffects;
+using GameCore;
 using Grenades;
 using MEC;
 using Mirror;
@@ -18,11 +19,6 @@ namespace PheggMod.Commands
 {
     public class CustomInternalCommands
     {
-        public CustomInternalCommands()
-        {
-            nodamageplayers = new Dictionary<int, GameObject>();
-        }
-
         internal static char[] validUnits = { 'm', 'h', 'd', 'w', 'M', 'y' };
         internal static TimeSpan GetBanDuration(char unit, int amount)
         {
@@ -66,7 +62,7 @@ namespace PheggMod.Commands
 
             foreach (string player in playerStrings)
             {
-                GameObject go = PlayerManager.players.Where(p => p.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString() == player 
+                GameObject go = PlayerManager.players.Where(p => p.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId.ToString() == player
                 || p.GetComponent<NicknameSync>().MyNick.ToLower() == player || p.GetComponent<CharacterClassManager>().UserId2 == player).FirstOrDefault();
                 if (go.Equals(default(GameObject)) || go == null) continue;
                 else
@@ -77,6 +73,8 @@ namespace PheggMod.Commands
 
             return playerList;
         }
+
+        readonly BindingFlags flags = BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public;
 
         //[PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
         public void cmd_help(CommandInfo info)
@@ -310,65 +308,6 @@ namespace PheggMod.Commands
             }
         }
 
-        [PMCommand("race"), PMParameters(), PMPermission(PlayerPermissions.PlayersManagement), PMCommandSummary("Starts an escape race event")]
-        public void cmd_race(CommandInfo info)
-        {
-            if ((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds > 30d)
-            {
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#You must run this command within the first 30 seconds of the round starting", false, true, "");
-                return;
-            }
-
-            Timing.RunCoroutine(RaceEvent(info));
-        }
-        private IEnumerator<float> RaceEvent(CommandInfo info)
-        {
-            RoundSummary.RoundLock = true;
-
-            List<Door> doors = UnityEngine.Object.FindObjectsOfType<Door>().ToList();
-
-            foreach (Door d in doors)
-            {
-                d.lockdown = true;
-                d.isOpen = false;
-            }
-
-            List<GameObject> players = PlayerManager.players;
-
-            foreach (GameObject go in players)
-            {
-                go.GetComponent<CharacterClassManager>().SetClassID(RoleType.Scp173);
-
-                Broadcast bc = go.GetComponent<Broadcast>();
-                NetworkConnection nc = go.GetComponent<NetworkConnection>();
-
-
-
-                bc.TargetAddElement(nc, "Welcome to peanut race", 5, Broadcast.BroadcastFlags.Normal);
-                bc.TargetAddElement(nc, "Your goal is to reach the surface before the nuke detonates", 6, Broadcast.BroadcastFlags.Normal);
-                bc.TargetAddElement(nc, "The nuke has been locked, so you are unable to disable it", 6, Broadcast.BroadcastFlags.Normal);
-            }
-
-            yield return Timing.WaitForSeconds(18);
-
-            PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().InstantPrepare();
-            PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().StartDetonation();
-
-
-            EventTriggers.PMAlphaWarheadController.nukeLock = true;
-
-            foreach (Door d in doors)
-            {
-                d.lockdown = false;
-            }
-
-            yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetInt("warhead_tminus_start_duration", 90) + 5);
-
-            RoundSummary.RoundLock = false;
-
-            yield return 0f;
-        }
-
         internal static bool reloadPlugins = false;
         [PMCommand("pluginreload"), PMAlias("reloadplugins", "plreload"), PMParameters(), PMPermission(PlayerPermissions.ServerConfigs)]
         public void cmd_ReloadPlugins(CommandInfo info)
@@ -390,33 +329,6 @@ namespace PheggMod.Commands
         public void cmd_RickRoll(CommandInfo info)
         {
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
-        }
-
-        public static Dictionary<int, GameObject> nodamageplayers { get; private set; }
-        [PMCommand("nodamage"), PMParameters("playerid")]
-        public void cmd_nodamage(CommandInfo info)
-        {
-            string[] arg = info.commandArgs;
-            CommandSender sender = info.commandSender;
-
-            if (!CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
-
-            foreach (GameObject player in playerList)
-            {
-                int id = player.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId;
-
-                if (!nodamageplayers.ContainsKey(id))
-                {
-                    nodamageplayers.Add(id, player);
-                }
-                else
-                {
-                    nodamageplayers.Remove(id);
-                }
-            }
         }
 
         [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
@@ -449,7 +361,64 @@ namespace PheggMod.Commands
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to the pocket dimension", true, true, "");
         }
 
-        
+        [PMCommand("size"), PMAlias("scale"), PMParameters("playerid", "scale"), PMCommandSummary("Sets the scale of a player"), PMPermission(PlayerPermissions.PlayersManagement), /*PMDisabled(true)*/]
+        public void cmd_size(CommandInfo info)
+        {
+            List<GameObject> pList = GetPlayersFromString(info.commandArgs[1]);
+            List<GameObject> lobbyPlayers = PlayerManager.players;
+
+            if (!float.TryParse(info.commandArgs[2], out float scale))
+            {
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Invalid scale given (Use numbers)", false, true, "");
+                return;
+            }
+
+            for (var p = 0; p < pList.Count; p++)
+            {
+                NetworkIdentity nId = pList[p].GetComponent<NetworkIdentity>();
+
+                pList[p].transform.localScale = new Vector3(1 * scale, 1 * scale, 1 * scale);
+
+                ObjectDestroyMessage dMsg = new ObjectDestroyMessage{netId = nId.netId};
+
+                for (var q = 0; q < lobbyPlayers.Count; q++)
+                {
+                    NetworkConnection conn = lobbyPlayers[q].GetComponent<NetworkIdentity>().connectionToClient;
+
+                    if (lobbyPlayers[q] != pList[p])
+                        conn.Send(dMsg, 0);
+
+                    typeof(NetworkServer).GetMethod("SendSpawnMessage", flags).Invoke(null, new object[] { nId, conn });
+                }
+            }
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Scale of {(info.commandArgs[1] == "*" ? "All" : pList.Count.ToString())} players has been set to {scale}", true, true, "");
+        }
+
+        [PMCommand("getsize"), PMAlias("getscale"), PMParameters("playerid"), PMCommandSummary("Sets the scale of a player"), PMPermission(PlayerPermissions.PlayersManagement), /*PMDisabled(true)*/]
+        public void cmd_getsize(CommandInfo info)
+        {
+            List<GameObject> pList = GetPlayersFromString(info.commandArgs[1]);
+            if (pList.Count < 1)
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#No player found", false, true, "");
+
+            else
+                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Scale of {pList[0].GetComponent<NicknameSync>().MyNick} is {pList[0].transform.localScale}", true, true, "");
+        }
+
+        [PMCommand("clearup"), PMAlias("cleanup"), PMParameters(), PMCommandSummary("Cleans up all ragdolls"), PMPermission(PlayerPermissions.FacilityManagement)]
+        public void cmd_clearup(CommandInfo info)
+        {
+            List<Ragdoll> rDs = Object.FindObjectsOfType<Ragdoll>().ToList();
+
+            for (var p = 0; p < rDs.Count; p++)
+            {
+                NetworkServer.Destroy(rDs[p].gameObject);
+            }
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Cleaned up all ragdolls", true, true, "");
+        }
+
         // The code for the 3 commands was kindly donated to PheggMod by KrypTheBear#3301
         // Many thanks for the code <3
 
@@ -471,9 +440,9 @@ namespace PheggMod.Commands
                 Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[0].grenadeInstance).GetComponent<Grenade>();
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
-
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned grenade on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned grenade on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
         }
         [PMCommand("flash"), PMParameters("player"), PMCommandSummary("Spawns a flashbang at a player")]
         public void cmd_flash(CommandInfo info)
@@ -493,9 +462,9 @@ namespace PheggMod.Commands
                 Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[1].grenadeInstance).GetComponent<Grenade>();
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
-
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned flash on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned flash on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
         }
         [PMCommand("ball"), PMParameters("player"), PMCommandSummary("Spawns 018 at a player")]
         public void cmd_ball(CommandInfo info)
@@ -515,9 +484,9 @@ namespace PheggMod.Commands
                 Grenade nade = Object.Instantiate<GameObject>(gm.availableGrenades[2].grenadeInstance).GetComponent<Grenade>();
                 (nade).InitData(gm, NULL_VECTOR, NULL_VECTOR);
                 NetworkServer.Spawn(nade.gameObject);
-
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned 018 on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
             }
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Spawned 018 on {(info.commandArgs[1] == "*" ? "All" : playerList.Count.ToString())} players", true, true, "");
         }
 
         #endregion
@@ -557,27 +526,67 @@ namespace PheggMod.Commands
 
         #endregion
 
-        #region Client Console Commands
 
-        //[PMCommand("kill"), PMAlias("suicide"), PMParameters()]
-        //public void cmd_slay(CommandInfo info)
+
+
+        //[PMCommand("race"), PMParameters(), PMPermission(PlayerPermissions.PlayersManagement), PMCommandSummary("Starts an escape race event")]
+        //public void cmd_race(CommandInfo info)
         //{
-        //    CharacterClassManager cmm = info.gameObject.GetComponent<CharacterClassManager>();
-
-        //    if (cmm.CurClass == RoleType.Spectator)
+        //    if ((DateTime.Now - (DateTime)Base.roundStartTime).TotalSeconds > 30d)
         //    {
-        //        cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You are already a spectator", "green");
+        //        info.commandSender.RaReply(info.commandName.ToUpper() + $"#You must run this command within the first 30 seconds of the round starting", false, true, "");
         //        return;
         //    }
-        //    else
-        //    {
-        //        cmm.CallCmdSuicide(new PlayerStats.HitInfo(10000, "SERVER", DamageTypes.Nuke, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId));
-        //        cmm.TargetConsolePrint(info.gameObject.GetComponent<NetworkConnection>(), "You have been forced to spectator", "green");
-        //        return;
 
+        //    Timing.RunCoroutine(RaceEvent(info));
+        //}
+        //private IEnumerator<float> RaceEvent(CommandInfo info)
+        //{
+        //    RoundSummary.RoundLock = true;
+
+        //    List<Door> doors = Object.FindObjectsOfType<Door>().ToList();
+
+        //    foreach (Door d in doors)
+        //    {
+        //        d.lockdown = true;
+        //        d.isOpen = false;
         //    }
+
+        //    List<GameObject> players = PlayerManager.players;
+
+        //    foreach (GameObject go in players)
+        //    {
+        //        go.GetComponent<CharacterClassManager>().SetClassID(RoleType.Scp173);
+
+        //        Broadcast bc = go.GetComponent<Broadcast>();
+        //        NetworkConnection nc = go.GetComponent<NetworkConnection>();
+
+
+
+        //        bc.TargetAddElement(nc, "Welcome to peanut race", 5, Broadcast.BroadcastFlags.Normal);
+        //        bc.TargetAddElement(nc, "Your goal is to reach the surface before the nuke detonates", 6, Broadcast.BroadcastFlags.Normal);
+        //        bc.TargetAddElement(nc, "The nuke has been locked, so you are unable to disable it", 6, Broadcast.BroadcastFlags.Normal);
+        //    }
+
+        //    yield return Timing.WaitForSeconds(18);
+
+        //    PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().InstantPrepare();
+        //    PlayerManager.localPlayer.GetComponent<PMAlphaWarheadController>().StartDetonation();
+
+
+        //    EventTriggers.PMAlphaWarheadController.nukeLock = true;
+
+        //    foreach (Door d in doors)
+        //    {
+        //        d.lockdown = false;
+        //    }
+
+        //    yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetInt("warhead_tminus_start_duration", 90) + 5);
+
+        //    RoundSummary.RoundLock = false;
+
+        //    yield return 0f;
         //}
 
-        #endregion
     }
 }

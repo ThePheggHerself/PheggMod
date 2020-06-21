@@ -1,7 +1,5 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using GameCore;
 using MonoMod;
-
 using PheggMod.API.Events;
 using System;
 using UnityEngine;
@@ -16,7 +14,7 @@ namespace PheggMod.EventTriggers
         {
             orig_SetNick(nick);
 
-            GameObject go = base.gameObject;
+            GameObject go = gameObject;
             CharacterClassManager ccm = go.GetComponent<CharacterClassManager>();
 
             if (ccm.isLocalPlayer)
@@ -24,34 +22,24 @@ namespace PheggMod.EventTriggers
 
             try
             {
-                //if (PMConfigFile.enableSmartGuard)
-                //{
-                //    SmartGuard.instance.SmartGuardDeepCheck(go);
-                //}
-
                 if (nick != null && !string.IsNullOrEmpty(nick))
                 {
                     try
                     {
                         Base.Debug("Triggering PlayerJoinEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(base.gameObject)));
+                        PluginManager.TriggerEvent<IEventHandlerPlayerJoin>(new PlayerJoinEvent(new PheggPlayer(gameObject)));
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerJoinEvent: {e.InnerException.ToString()}");
+                        Base.Error($"Error triggering PlayerJoinEvent: {e.InnerException}");
                     }
                 }
 
             }
             catch (Exception e)
             {
-                Base.Error($"Error: {e.InnerException.ToString()}");
+                Base.Error($"Error: {e.InnerException}");
             }
-        }
-
-        private void SkipUserCheck(string msg)
-        {
-            Base.Info($"{msg}. Skipping user check...");
         }
     }
 }

@@ -41,46 +41,8 @@ namespace PheggMod.EventTriggers
                         }
                         catch (Exception e)
                         {
-                            Base.Error($"Error triggering AdminQueryEvent: {e.InnerException.ToString()}");
+                            Base.Error($"Error triggering AdminQueryEvent: {e.InnerException}");
                         }
-
-                        try
-                        {
-
-                            if (query[0].ToLower() == "mock")
-                            {
-                                if (!PMConfigFile.mockCommand)
-                                {
-                                    sender.RaReply(query[0].ToUpper() + "#This command is disabled on this server!", false, true, "");
-                                    return;
-                                }
-
-
-                                Base.Info("TESTING");
-
-
-
-                                List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(query[1]);
-
-                                if (playerList.Count < 1)
-                                {
-                                    sender.RaReply(query[0].ToUpper() + "#That player could not be found!", false, true, "");
-
-                                }
-                                else
-                                {
-                                    ProcessQuery(string.Join(" ", q.Skip(2)), playerList[0].GetComponent<CommandSender>());
-
-                                }
-
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            Base.Error(e.ToString() + "\n" + e.InnerException.ToString());
-                        }
-
 
                         if (PluginManager.oldCommands.ContainsKey(query[0]))
                         {

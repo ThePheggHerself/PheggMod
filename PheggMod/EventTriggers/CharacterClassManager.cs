@@ -1,26 +1,16 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoMod;
-using System.IO;
-using System.Reflection;
 using UnityEngine;
 using Mirror;
-using System.Net;
-using MEC;
-
 using PheggMod.API.Events;
+using PheggMod.API;
 
 namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::CharacterClassManager")]
     class PMCharacterClassManager : CharacterClassManager
     {
-        internal ServerRoles SrvRoles { get; private set; }
-
         //WaitingForPlayers
         public extern System.Collections.IEnumerator orig_Init();
         public System.Collections.IEnumerator Init()
@@ -37,7 +27,7 @@ namespace PheggMod.EventTriggers
                 }
                 catch (Exception e)
                 {
-                    Base.Error($"Error triggering WaitingForPlayersEvent: {e.InnerException.ToString()}");
+                    Base.Error($"Error triggering WaitingForPlayersEvent: {e.InnerException}");
                 }
             }
 
@@ -60,7 +50,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering RoundStartEvent: {e.InnerException.ToString()}");
+                Base.Error($"Error triggering RoundStartEvent: {e.InnerException}");
             }
 
             return Bool;
@@ -71,12 +61,11 @@ namespace PheggMod.EventTriggers
         public new void ApplyProperties(bool lite = false, bool escape = false)
         {
             RoleType originalrole = this.CurClass;
-
             orig_ApplyProperties(lite, escape);
 
-            if (isLocalPlayer || (int)this.CurClass == 2) return;
+            if (isLocalPlayer || (int)this.CurClass == 2 || isServer) return;
 
-            try
+            if (CurClass != RoleType.Spectator)
             {
                 if (!escape)
                     try
@@ -86,7 +75,7 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerSpawnEvent: {e.InnerException.ToString()}");
+                        Base.Error($"Error triggering PlayerSpawnEvent: {e.InnerException}");
                     }
                 else
                     try
@@ -96,10 +85,47 @@ namespace PheggMod.EventTriggers
                     }
                     catch (Exception e)
                     {
-                        Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException.ToString()}");
+                        Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException}");
                     }
             }
-            catch (Exception e) { Base.Error(e.Message); }
+
+
+            if (PMConfigFile.randomSizes)
+            {
+                if (CurClass != RoleType.Spectator && CurClass != RoleType.Tutorial)
+                {
+
+                    Scale.scaleObject sObject;
+                    if (Scale.lastScales.ContainsKey(UserId))
+                        sObject = Scale.lastScales[UserId];
+                    else
+                    {
+                        sObject = new Scale.scaleObject { lastMultiplier = 1f, respawnCount = 0 };
+
+                        Scale.lastScales.Add(UserId, sObject);
+                    }
+
+                    sObject.respawnCount++;
+
+                    if (sObject.respawnCount % 2 != 0 || sObject.respawnCount == 2)
+                        return;
+
+                    float scale;
+
+                    if (CurClass == RoleType.Scp93989)
+                        scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
+                    else if (CurClass == RoleType.Scp0492)
+                        scale = Scale.lastScales.ContainsKey(UserId) ? Scale.lastScales[UserId].lastMultiplier : (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
+                    else if (IsScpButNotZombie())
+                        scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
+                    else
+                        scale = (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
+
+                    Scale.lastScales[UserId].lastMultiplier = scale;
+
+                    Scale.SetSize(scale, gameObject);
+                }
+            }
         }
 
         [ServerCallback]
@@ -110,11 +136,9 @@ namespace PheggMod.EventTriggers
                 try
                 {
                     GameObject.Find("MeshDoor173").GetComponentInChildren<Door>().ForceCooldown(PMConfigFile.doorCooldown173);
-                    UnityEngine.Object.FindObjectOfType<ChopperAutostart>().SetState(b: false);
+                    FindObjectOfType<ChopperAutostart>().SetState(b: false);
                 }
-                catch
-                {
-                }
+                catch (Exception) { }
                 NetworkRoundStarted = true;
             }
         }

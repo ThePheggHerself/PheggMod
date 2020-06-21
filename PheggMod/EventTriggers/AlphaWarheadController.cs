@@ -21,6 +21,11 @@ namespace PheggMod.EventTriggers
     {
         public static bool nukeLock = false;
 
+        public bool initialStart
+        {
+            get { return timeToDetonation >= PMConfigFile.detonationTimer; }
+        }
+
         public extern void orig_CancelDetonation(GameObject disabler);
         public new void CancelDetonation(GameObject disabler)
         {
@@ -30,13 +35,14 @@ namespace PheggMod.EventTriggers
 
             if (!(this.timeToDetonation <= 10f))
             {
-                try {
+                try
+                {
                     Base.Debug("Triggering WarheadCancelEvent");
                     PluginManager.TriggerEvent<IEventHandlerWarheadCancel>(new WarheadCancelEvent(new PheggPlayer(disabler)));
                 }
                 catch (Exception e)
                 {
-                    Base.Error($"Error triggering WarheadCancelEvent: {e.InnerException.ToString()}");
+                    Base.Error($"Error triggering WarheadCancelEvent: {e.InnerException}");
                 }
             }
         }
@@ -44,23 +50,21 @@ namespace PheggMod.EventTriggers
         public extern void orig_StartDetonation();
         public new void StartDetonation()
         {
-            if (nukeLock && !PMCommandProcessor.lastCommand.ToUpper().Contains("DETONATION_START")) return;
+            if (nukeLock && !PMCommandProcessor.lastCommand.ToUpper().Contains("DETONATION_START"))
+                return;
 
             orig_StartDetonation();
+            if (!inProgress)
+                return;
 
-            bool InitialStart;
-            if (this.timeToDetonation >= ConfigFile.ServerConfig.GetInt("warhead_tminus_start_duration", 90))
-                InitialStart = true;
-            else
-                InitialStart = false;
             try
             {
                 Base.Debug("Triggering WarheadStartEvent");
-                PluginManager.TriggerEvent<IEventHandlerWarheadStart>(new WarheadStartEvent(InitialStart, this.timeToDetonation));
+                PluginManager.TriggerEvent<IEventHandlerWarheadStart>(new WarheadStartEvent(initialStart, this.timeToDetonation));
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering WarheadStartEvent: {e.ToString()}");
+                Base.Error($"Error triggering WarheadStartEvent: {e}");
             }
         }
 
@@ -76,7 +80,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"Error triggering WarheadDetonateEvent: {e.ToString()}");
+                Base.Error($"Error triggering WarheadDetonateEvent: {e}");
             }
         }
     }

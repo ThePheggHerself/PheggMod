@@ -26,16 +26,18 @@ namespace PheggMod.API.Events
     }
     public class PlayerHurtEvent : PlayerEvent
     {
-        public PlayerHurtEvent(PheggPlayer player, PheggPlayer attacker, float damage, DamageTypes.DamageType damageType) : base(player)
+        public PlayerHurtEvent(PheggPlayer player, PheggPlayer attacker, float damage, DamageTypes.DamageType damageType, PlayerHurtCache playerHurtCache) : base(player)
         {
             Attacker = attacker;
             Damage = damage;
             DamageType = damageType;
+            PlayerHurtCache = playerHurtCache;
         }
 
         public PheggPlayer Attacker { get; private set; }
         public float Damage { get; private set; }
         public DamageTypes.DamageType DamageType { get; private set; }
+        public PlayerHurtCache PlayerHurtCache { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {
@@ -50,16 +52,18 @@ namespace PheggMod.API.Events
     }
     public class PlayerDeathEvent : PlayerEvent
     {
-        public PlayerDeathEvent(PheggPlayer player, PheggPlayer attacker, float damage, DamageTypes.DamageType damageType) : base(player)
+        public PlayerDeathEvent(PheggPlayer player, PheggPlayer attacker, float damage, DamageTypes.DamageType damageType, PlayerHurtCache playerHurtCache) : base(player)
         {
             Attacker = attacker;
             Damage = damage;
             DamageType = damageType;
+            PlayerHurtCache = playerHurtCache;
         }
 
         public PheggPlayer Attacker { get; private set; }
         public float Damage { get; private set; }
         public DamageTypes.DamageType DamageType { get; private set; }
+        public PlayerHurtCache PlayerHurtCache { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {
