@@ -28,15 +28,6 @@ namespace PheggMod.EventTriggers
                     Base.Error($"Error triggering PlayerLeaveEvent: {e.InnerException}");
                 }
 
-            foreach (var hub in ReferenceHub.GetAllHubs().Values)
-            {
-                if(hub.characterClassManager.UserId == hub.characterClassManager.UserId)
-                {
-                    Base.Info("DUPE PLAYER DETECTED");
-                    hub.gameObject.GetComponent<CustomNetworkManager>().DisconnectConnection(hub.gameObject.GetComponent<NetworkConnection>());
-                }
-            }
-
             if (PlayerManager.players.Count - 1 < 1 && RoundSummary.RoundInProgress())
                 PMRoundSummary.RoundFix();
         }

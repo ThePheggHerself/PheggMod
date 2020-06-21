@@ -33,7 +33,7 @@ namespace PheggMod.EventTriggers
             mockCommand = ServerConfig.GetBool("enable_mock_command", true);
             targetAnnouncement = ServerConfig.GetBool("notify_096_target", true);
             tutorialTrigger096 = ServerConfig.GetBool("tutorial_triggers_096", false);
-            enable008 = ServerConfig.GetBool("scp_008", false);
+            enable008 = ServerConfig.GetBool("scp_008", true);
             detonationTimer = ServerConfig.GetInt("warhead_tminus_start_duration", 90);
 
             webhookUrl = ServerConfig.GetString("report_discord_webhook_url", string.Empty);

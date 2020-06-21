@@ -19,7 +19,7 @@ namespace PheggMod.EventTriggers
         public extern bool orig_HurtPlayer(HitInfo info, GameObject go);
         public new bool HurtPlayer(HitInfo info, GameObject go)
         {
-            if(isLocalPlayer || !NetworkServer.active)
+            if(isLocalPlayer || !NetworkServer.active || info.Attacker.ToUpper() == "DISCONNECT")
                 return orig_HurtPlayer(info, go);
 
             PheggPlayer pPlayer = new PheggPlayer(go);
@@ -27,6 +27,7 @@ namespace PheggMod.EventTriggers
 
             PheggPlayer pAttacker = null;
             Role attackerRole = null;
+
             if (info.GetPlayerObject() != null)
             {
                 pAttacker = new PheggPlayer(info.GetPlayerObject());
@@ -36,7 +37,7 @@ namespace PheggMod.EventTriggers
             PMDamageType kT;
             if (info.GetDamageType() == DamageTypes.Flying)
                 kT = PMDamageType.AntiCheat;
-            else if (info.GetPlayerObject() == null)
+            else if (pAttacker == null)
                 kT = PMDamageType.WorldKill;
             else if (go.GetComponent<Handcuffs>().CufferId > -1 && pAttacker.refHub.characterClassManager.IsAnyScp())
                 kT = PMDamageType.DisarmedKill;
@@ -53,10 +54,9 @@ namespace PheggMod.EventTriggers
                 HitInfo = info
             };
 
-
             bool result = orig_HurtPlayer(info, go);
 
-            if (!go.GetComponent<CharacterClassManager>().isLocalPlayer && info.GetDamageType() != DamageTypes.None && !go.GetComponent<CharacterClassManager>().GodMode)
+            if (!pPlayer.refHub.characterClassManager.isLocalPlayer && info.GetDamageType() != DamageTypes.None && !pPlayer.refHub.characterClassManager.GodMode)
             {
                 bool IsKill = pPlayer.roleType == RoleType.Spectator && pHC.PlayerOriginalRole != RoleType.Spectator;
 
@@ -70,7 +70,6 @@ namespace PheggMod.EventTriggers
                     {
                         Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
                     }
-
                 else
                     try
                     {
@@ -82,16 +81,17 @@ namespace PheggMod.EventTriggers
                         Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
                     }
 
-
-                if (PMConfigFile.enable008)
+                if (PMConfigFile.enable008 && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
                 {
-                    if (IsKill && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
+                    if (IsKill)
                     {
                         pPlayer.roleType = RoleType.Scp0492;
 
                         Ragdoll rd = pPlayer.gameObject.GetComponent<Ragdoll>();
                         Base.Info(rd.transform.position.ToString());
                     }
+
+                    Base.Info("AMA");
 
                     if (pAttacker.roleType == RoleType.Scp0492)
                     {

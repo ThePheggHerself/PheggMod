@@ -43,6 +43,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Build\CommandSystem.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DissonanceVoip, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Build\DissonanceVoip.dll</HintPath>
+    </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Mirror.dll</HintPath>
@@ -108,6 +112,7 @@
     <Compile Include="EventTriggers\CheaterReport.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\ConfigFile.cs" />
+    <Compile Include="EventTriggers\CustomNetworkManager.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
     <Compile Include="EventTriggers\GrenadeManager.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />

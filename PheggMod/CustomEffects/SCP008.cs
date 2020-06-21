@@ -12,7 +12,6 @@ namespace PheggMod.CustomEffects
 {
     public class SCP008 : PlayerEffect, IHealablePlayerEffect
     {
-		private float _damagePerTick = 2f;
 		public SCP008(ReferenceHub hub)
 		{
 			Hub = hub;
@@ -34,13 +33,11 @@ namespace PheggMod.CustomEffects
 					return;
 				TimeLeft += TimeBetweenTicks;
 
-				Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(_damagePerTick, "INFECTION", DamageTypes.Poison, 0), Hub.gameObject);
-				_damagePerTick += 2f;
+				Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2f, "INFECTION", DamageTypes.Poison, 0), Hub.gameObject);
 			}
 			else
 			{
 				TimeLeft = TimeBetweenTicks;
-				_damagePerTick = 2f;
 			}
 		}
 	}
