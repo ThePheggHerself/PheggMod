@@ -60,71 +60,79 @@ namespace PheggMod.EventTriggers
         public extern void orig_ApplyProperties(bool lite = false, bool escape = false);
         public new void ApplyProperties(bool lite = false, bool escape = false)
         {
-            RoleType originalrole = this.CurClass;
-            orig_ApplyProperties(lite, escape);
-
-            if (isLocalPlayer || (int)this.CurClass == 2 || isServer) return;
-
-            if (CurClass != RoleType.Spectator)
+            try
             {
-                if (!escape)
-                    try
-                    {
-                        Base.Debug("Triggering PlayerSpawnEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
-                    }
-                    catch (Exception e)
-                    {
-                        Base.Error($"Error triggering PlayerSpawnEvent: {e.InnerException}");
-                    }
-                else
-                    try
-                    {
-                        Base.Debug("Triggering PlayerEscapeEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerEscape>(new PlayerEscapeEvent(new PheggPlayer(this.gameObject), originalrole, this.CurClass, this.Classes.SafeGet(this.CurClass).team));
-                    }
-                    catch (Exception e)
-                    {
-                        Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException}");
-                    }
-            }
+                RoleType originalrole = this.CurClass;
+                orig_ApplyProperties(lite, escape);
 
+                if (isLocalPlayer || (int)this.CurClass == 2) return;
 
-            if (PMConfigFile.randomSizes)
-            {
-                if (CurClass != RoleType.Spectator && CurClass != RoleType.Tutorial)
+                if (CurClass != RoleType.Spectator)
                 {
-
-                    Scale.scaleObject sObject;
-                    if (Scale.lastScales.ContainsKey(UserId))
-                        sObject = Scale.lastScales[UserId];
+                    if (!escape)
+                        try
+                        {
+                            Base.Debug("Triggering PlayerSpawnEvent");
+                            PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+                        }
+                        catch (Exception e)
+                        {
+                            Base.Error($"Error triggering PlayerSpawnEvent: {e.InnerException}");
+                        }
                     else
-                    {
-                        sObject = new Scale.scaleObject { lastMultiplier = 1f, respawnCount = 0 };
-
-                        Scale.lastScales.Add(UserId, sObject);
-                    }
-
-                    sObject.respawnCount++;
-
-                    if (sObject.respawnCount % 2 != 0 || sObject.respawnCount == 2)
-                        return;
-
-                    float scale;
-
-                    if (CurClass == RoleType.Scp93989)
-                        scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
-                    else if (CurClass == RoleType.Scp0492)
-                        scale = Scale.lastScales.ContainsKey(UserId) ? Scale.lastScales[UserId].lastMultiplier : (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
-                    else if (IsScpButNotZombie())
-                        scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
-                    else
-                        scale = (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
-
-                    Scale.lastScales[UserId].lastMultiplier = scale;
-
-                    Scale.SetSize(scale, gameObject);
+                        try
+                        {
+                            Base.Debug("Triggering PlayerEscapeEvent");
+                            PluginManager.TriggerEvent<IEventHandlerPlayerEscape>(new PlayerEscapeEvent(new PheggPlayer(this.gameObject), originalrole, this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+                        }
+                        catch (Exception e)
+                        {
+                            Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException}");
+                        }
                 }
+
+
+                if (PMConfigFile.randomSizes)
+                {
+                    if (CurClass != RoleType.Spectator && CurClass != RoleType.Tutorial)
+                    {
+
+                        Scale.scaleObject sObject;
+                        if (Scale.lastScales.ContainsKey(UserId))
+                            sObject = Scale.lastScales[UserId];
+                        else
+                        {
+                            sObject = new Scale.scaleObject { lastMultiplier = 1f, respawnCount = 0 };
+
+                            Scale.lastScales.Add(UserId, sObject);
+                        }
+
+                        sObject.respawnCount++;
+
+                        if (sObject.respawnCount % 2 != 0 || sObject.respawnCount == 2)
+                            return;
+
+                        float scale;
+
+                        if (CurClass == RoleType.Scp93989)
+                            scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
+                        else if (CurClass == RoleType.Scp0492)
+                            scale = Scale.lastScales.ContainsKey(UserId) ? Scale.lastScales[UserId].lastMultiplier : (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
+                        else if (IsScpButNotZombie())
+                            scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
+                        else
+                            scale = (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
+
+                        Scale.lastScales[UserId].lastMultiplier = scale;
+
+                        Scale.SetSize(scale, gameObject);
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Base.Error(e.ToString());
             }
         }
 

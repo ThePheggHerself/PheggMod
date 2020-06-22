@@ -58,43 +58,50 @@ namespace DiscordLab
 
         public void OnPlayerHurt(PlayerHurtEvent ev)
         {
-            if (!RoundSummary.RoundInProgress() || ev.PlayerHurtCache.PlayerOriginalRole == RoleType.Spectator) return;
+            if (!RoundSummary.RoundInProgress() || ev.Player.roleType == RoleType.Spectator) return;
 
-            PlayerHurtCache pHC = ev.PlayerHurtCache;
-
-            if (pHC.PMDamageType == PMDamageType.WorldKill)
-                DiscordLab.bot.NewMessage($"{ev.DamageType.name} -> {ev.Player.name} -> {Math.Round(ev.Damage)}");
+            if (ev.Attacker == null || ev.Attacker.isEmpty)
+                return;
             else if (ev.Attacker.userId == ev.Player.userId)
                 DiscordLab.bot.NewMessage($"{ev.Player.name} self-harmed for {Math.Round(ev.Damage)} with {ev.DamageType.name}");
-            else if (pHC.PMDamageType == PMDamageType.TeamKill)
-                DiscordLab.bot.NewMessage($"**{pHC.AttackerOriginalRole} {ev.Attacker} attacked {pHC.PlayerOriginalRole} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}**");
-            else if (pHC.PMDamageType == PMDamageType.DisarmedKill)
-                DiscordLab.bot.NewMessage($"__{pHC.AttackerOriginalRole} {ev.Attacker} attacked {pHC.PlayerOriginalRole} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}__");
+            else if (IsTeamDamage(ev.Player.team, ev.Attacker.team))
+                DiscordLab.bot.NewMessage($"**{ev.Attacker.roleType} {ev.Attacker} attacked {ev.Player.roleType} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}**");
+            else if (ev.Player.disarmed > -1 && ev.Attacker.refHub.characterClassManager.IsAnyScp())
+                DiscordLab.bot.NewMessage($"__{ev.Attacker.roleType} {ev.Attacker} attacked {ev.Player.roleType} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}__");
             else
                 DiscordLab.bot.NewMessage($"{ev.Attacker.name} -> {ev.Player.name} -> {Math.Round(ev.Damage)} ({ev.DamageType.name})");
         }
 
         public void OnPlayerDie(PlayerDeathEvent ev)
         {
-            if (!RoundSummary.RoundInProgress() || ev.PlayerHurtCache.PlayerOriginalRole == RoleType.Spectator) return;
+            if (!RoundSummary.RoundInProgress() || ev.Player.roleType == RoleType.Spectator) return;
 
-            PlayerHurtCache pHC = ev.PlayerHurtCache;
-
-            if (pHC.PMDamageType == PMDamageType.WorldKill)
+            if (ev.Attacker == null || ev.Attacker.isEmpty)
                 DiscordLab.bot.NewMessage($"WORLD killed {ev.Player.name} using {ev.DamageType.name}");
             else if (ev.Attacker.userId == ev.Player.userId)
                 DiscordLab.bot.NewMessage($"{ev.Player.name} committed suicide with {ev.DamageType.name}");
-            else if (pHC.PMDamageType == PMDamageType.TeamKill)
-                DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {pHC.AttackerOriginalRole} {ev.Attacker}"
-                                    + $"\nKilled: {pHC.PlayerOriginalRole} {ev.Player}\nUsing: {ev.DamageType.name}```");
-            else if (pHC.PMDamageType == PMDamageType.DisarmedKill)
-                DiscordLab.bot.NewMessage($"__Disarmed Kill__\n```autohotkey\nPlayer: {pHC.AttackerOriginalRole} {ev.Attacker}"
-                                    + $"\nKilled: {pHC.PlayerOriginalRole} {ev.Player}\nUsing: {ev.DamageType.name}```");
-            else if(pHC.PMDamageType == PMDamageType.AntiCheat)
-                DiscordLab.bot.NewMessage($"ANTICHEAT killed {ev.Attacker} with code {pHC.HitInfo.Attacker}");
+            else if (IsTeamDamage(ev.Player.team, ev.Attacker.team))
+                DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {ev.Attacker.roleType} {ev.Attacker}"
+                                    + $"\nKilled: {ev.Player.roleType} {ev.Player}\nUsing: {ev.DamageType.name}```");
+            else if (ev.Player.disarmed > -1 && ev.Attacker.refHub.characterClassManager.IsAnyScp())
+                DiscordLab.bot.NewMessage($"__Disarmed Kill__\n```autohotkey\nPlayer: {ev.Attacker.roleType} {ev.Attacker}"
+                                    + $"\nKilled: {ev.Player.roleType} {ev.Player}\nUsing: {ev.DamageType.name}```");
+            else if(ev.DamageType == DamageTypes.Flying)
+                DiscordLab.bot.NewMessage($"ANTICHEAT killed {ev.Attacker} with code {ev.HitInfo.Attacker}");
 
             else
-                DiscordLab.bot.NewMessage($"{pHC.AttackerOriginalRole} {ev.Attacker.name} killed {pHC.PlayerOriginalRole} {ev.Player.name} with {ev.DamageType.name}");
+                DiscordLab.bot.NewMessage($"{ev.Attacker.roleType} {ev.Attacker.name} killed {ev.Player.roleType} {ev.Player.name} with {ev.DamageType.name}");
+        }
+
+        public static bool IsTeamDamage(Team player, Team attacker)
+        {
+            if (player == attacker)
+                return true;
+            else if ((player == Team.CDP || player == Team.CHI) && (attacker == Team.CDP || attacker == Team.CHI))
+                return true;
+            else if ((player == Team.MTF || player == Team.MTF) && (attacker == Team.RSC || attacker == Team.MTF))
+                return true;
+            else return false;
         }
     }
 }

@@ -4,6 +4,7 @@ using RemoteAdmin;
 using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Hints;
 
 namespace PheggMod
 {
@@ -159,7 +160,6 @@ namespace PheggMod
         }
         public void Kill() => refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Wall, playerId), gameObject);
         
-
         public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
         {
             if (duration < 1)
@@ -191,8 +191,7 @@ namespace PheggMod
         {
             _banPlayer.KickUser(gameObject, reason, issuer, false);
         }
-
-     
+  
         public void GiveItems(ItemType[] items)
         {
             foreach (ItemType item in items)
@@ -200,20 +199,15 @@ namespace PheggMod
         }
         public void GiveItem(ItemType type) => refHub.inventory.AddNewItem(type);
         public void ClearItems() => refHub.inventory.Clear();
-        
-
-
 
         public void PersonalBroadcast(ushort duration, string message, Broadcast.BroadcastFlags flag = Broadcast.BroadcastFlags.Normal)
         {
             _broadcast.TargetAddElement(_networkConnection, message, duration, flag);
         }
-
         public void SendConsoleMessage(string message, string color = "green")
         {
             refHub.characterClassManager.TargetConsolePrint(_networkConnection, message, color);
         }
-
         public void SetTag(string Text, TagColour colour = TagColour.DEFAULT, ulong permissions = 3)
         {
             if (permissions == 3)
@@ -224,6 +218,8 @@ namespace PheggMod
                 refHub.serverRoles.SetColor(Base.colours[(int)colour]);
             refHub.serverRoles.Permissions = permissions;
         }
+
+        public void SendHintMessage(string message, float duration = 5) => refHub.hints.Show(new TextHint(message, new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), duration));
 
 
 

@@ -25,36 +25,20 @@ namespace PheggMod.EventTriggers
                     return orig_HurtPlayer(info, go);
 
                 PheggPlayer player = new PheggPlayer(go);
+
+                if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
+                    return orig_HurtPlayer(info, go);
+
                 PheggPlayer attacker = null;
                 try { attacker = new PheggPlayer(info.GetPlayerObject()); }
                 catch { }
 
-                PMDamageType kT;
-
-                if (info.GetDamageType() == DamageTypes.Flying)
-                    kT = PMDamageType.AntiCheat;
-                else if (attacker == null || attacker.isEmpty)
-                    kT = PMDamageType.WorldKill;
-
-                else if (player.refHub.handcuffs.CufferId > -1 && attacker.refHub.characterClassManager.IsAnyScp())
-                    kT = PMDamageType.DisarmedKill;
-                else if (IsTeamDamage(player.role.team, attacker.role.team))
-                    kT = PMDamageType.TeamKill;
-                else
-                    kT = PMDamageType.Normal;
-
-                PlayerHurtCache pHC = new PlayerHurtCache { PlayerOriginalRole = player.roleType, AttackerOriginalRole = attacker?.roleType, PMDamageType = kT, HitInfo = info };
-
-                bool result = orig_HurtPlayer(info, go);
-                if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
-                    return result;
-
-                bool IsKill = player.roleType == RoleType.Spectator && pHC.PlayerOriginalRole != RoleType.Spectator;
+                bool IsKill = info.Amount >= player.health;
                 if (IsKill)
                     try
                     {
                         Base.Debug("Triggering PlayerDeathEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.GetDamageType(), pHC));
+                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.GetDamageType(), info));
                     }
                     catch (Exception e)
                     {
@@ -64,19 +48,20 @@ namespace PheggMod.EventTriggers
                     try
                     {
                         Base.Debug("Triggering PlayerHurtEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.GetDamageType(), pHC));
+                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.GetDamageType(), info));
                     }
                     catch (Exception e)
                     {
                         Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
                     }
 
-                if (PMConfigFile.enable008)
+                bool result = orig_HurtPlayer(info, go);
+                if (PMConfigFile.enable008 && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
                 {
-                    if (IsKill && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
+                    if (IsKill)
                         player.roleType = RoleType.Scp0492;
 
-                    else if (attacker != null && attacker.roleType == RoleType.Scp0492)
+                    else if (info.GetDamageType() == DamageTypes.Scp0492)
                     {
                         CustomEffects.SCP008 effect = player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>();
 
@@ -92,7 +77,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Info(e.ToString());
+                Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().ToString()}\n{e.ToString()}");
                 return orig_HurtPlayer(info, go);
             }
         }
@@ -121,17 +106,6 @@ namespace PheggMod.EventTriggers
             yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetFloat("auto_round_restart_time", 10) + 1f);
 
             PluginManager.Reload();
-        }
-
-        public static bool IsTeamDamage(Team player, Team attacker)
-        {
-            if (player == attacker)
-                return true;
-            else if ((player == Team.CDP || player == Team.CHI) && (attacker == Team.CDP || attacker == Team.CHI))
-                return true;
-            else if ((player == Team.MTF || player == Team.MTF) && (attacker == Team.RSC || attacker == Team.MTF))
-                return true;
-            else return false;
         }
     }
 }
