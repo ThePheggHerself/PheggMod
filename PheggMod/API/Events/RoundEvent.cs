@@ -43,7 +43,7 @@ namespace PheggMod.API.Events
     }
     public class RoundEndEvent : RoundEvent
     {
-        public RoundEndEvent(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, RoundSummary.LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd, string Roundtime)
+        public RoundEndEvent(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd, string Roundtime)
         {
             SCP = new SCPs { SCP_Kills = scp_kills, Starting_SCPs = list_start.scps_except_zombies, Ending_SCPs = list_finish.scps_except_zombies, Terminated_SCPs = list_start.scps_except_zombies - list_finish.scps_except_zombies };
             Class_D = new ClassD { Starting_ClassD = list_start.class_ds, Escaped_ClassD = e_ds };
@@ -76,7 +76,7 @@ namespace PheggMod.API.Events
         public ClassD Class_D { get; private set; }
         public Scientists Scientist { get; private set; }
         public string RoundTime { get; private set; }
-        public RoundSummary.LeadingTeam LeadingTeam { get; private set; }
+        public LeadingTeam LeadingTeam { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {

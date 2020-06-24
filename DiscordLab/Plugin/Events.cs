@@ -83,7 +83,7 @@ namespace DiscordLab
             else if (IsTeamDamage(ev.Player.team, ev.Attacker.team))
                 DiscordLab.bot.NewMessage($"**Teamkill** \n```autohotkey\nPlayer: {ev.Attacker.roleType} {ev.Attacker}"
                                     + $"\nKilled: {ev.Player.roleType} {ev.Player}\nUsing: {ev.DamageType.name}```");
-            else if (ev.Player.disarmed > -1 && ev.Attacker.refHub.characterClassManager.IsAnyScp())
+            else if (ev.Player.disarmed > -1 && !ev.Attacker.refHub.characterClassManager.IsAnyScp())
                 DiscordLab.bot.NewMessage($"__Disarmed Kill__\n```autohotkey\nPlayer: {ev.Attacker.roleType} {ev.Attacker}"
                                     + $"\nKilled: {ev.Player.roleType} {ev.Player}\nUsing: {ev.DamageType.name}```");
             else if(ev.DamageType == DamageTypes.Flying)

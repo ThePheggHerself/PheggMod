@@ -1,11 +1,13 @@
 ﻿using CommandSystem;
 using CommandSystem.Commands.Config;
 using PheggMod.EventTriggers;
+using RemoteAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PheggMod.Commands
 {
@@ -40,6 +42,11 @@ namespace PheggMod.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            //if(sender is ReferenceHub hub)
+            //{
+            //    if(PermissionsHandler.IsPermitted(hub.serverRoles.Permissions, PlayerPermissions.WarheadEvents))
+            //}
+
             //This would be where a permission check for PlayerPermissions.WarheadEvents would go
 
             PMAlphaWarheadNukesitePanel.Enable();
