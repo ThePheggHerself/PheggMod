@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PheggMod.EventTriggers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,7 @@ namespace PheggMod.API.Events
     }
     public class RoundEndEvent : RoundEvent
     {
-        public RoundEndEvent(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd, string Roundtime)
+        public RoundEndEvent(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, PMRoundSummary.LeadingTeam LeadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd, string Roundtime)
         {
             SCP = new SCPs { SCP_Kills = scp_kills, Starting_SCPs = list_start.scps_except_zombies, Ending_SCPs = list_finish.scps_except_zombies, Terminated_SCPs = list_start.scps_except_zombies - list_finish.scps_except_zombies };
             Class_D = new ClassD { Starting_ClassD = list_start.class_ds, Escaped_ClassD = e_ds };
@@ -51,7 +52,7 @@ namespace PheggMod.API.Events
 
             TimeSpan tspan = TimeSpan.FromSeconds(list_finish.time - list_start.time);
             Roundtime = string.Format("{0} minutes and {1} seconds", (int)tspan.TotalMinutes, tspan.Seconds);
-            LeadingTeam = leadingTeam;
+            LeadingTeam = LeadingTeam;
         }
 
         public class SCPs
@@ -76,7 +77,7 @@ namespace PheggMod.API.Events
         public ClassD Class_D { get; private set; }
         public Scientists Scientist { get; private set; }
         public string RoundTime { get; private set; }
-        public LeadingTeam LeadingTeam { get; private set; }
+        public PMRoundSummary.LeadingTeam LeadingTeam { get; private set; }
 
         public override void ExecuteHandler(IEventHandler handler)
         {

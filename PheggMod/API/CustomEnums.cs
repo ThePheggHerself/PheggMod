@@ -50,12 +50,4 @@ namespace PheggMod.API
         WorldKill,
         AntiCheat
     }
-
-    public enum LeadingTeam
-    {
-        FacilityForces,
-        ChaosInsurgency,
-        Anomalies,
-        Draw
-    }
 }
