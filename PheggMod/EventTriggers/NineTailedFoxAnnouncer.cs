@@ -6,6 +6,7 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::NineTailedFoxAnnouncer")]
     class PMNineTailedFoxAnnouncer : NineTailedFoxAnnouncer
     {
+        [MonoModReplace]
         public new void ServerOnlyAddGlitchyPhrase(string tts, float glitchChance, float jamChance)
         {
             if (PMConfigFile.cassieGlitch || (PMConfigFile.cassieGlitchDetonation && AlphaWarheadController.Host.detonated))

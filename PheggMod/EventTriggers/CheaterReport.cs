@@ -18,6 +18,7 @@ namespace PheggMod.EventTriggers
         private HashSet<int> reportedPlayers;
         private string _serverAddress;
 
+        [MonoModReplace]
         public void LogReport(GameConsoleTransmission reporter, string reporterUserId, string reportedUserId, ref string reason, int reportedId, bool notifyGm)
         {
             if (string.IsNullOrEmpty(_serverAddress) && !_hasLoaded)
