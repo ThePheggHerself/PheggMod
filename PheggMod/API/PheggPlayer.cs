@@ -224,52 +224,52 @@ namespace PheggMod
 
 
         //Obsolete stuff
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.godmode")]
         public bool GodMode()
         {
             return _characterClassManager.GodMode;
         }
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.godmode")]
         public void GodMode(bool godmode)
         {
             _characterClassManager.GodMode = (bool)godmode;
         }
 
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.bypass")]
         public bool Bypass()
         {
             return gameObject.GetComponent<ServerRoles>().BypassMode;
         }
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.bypass")]
         public void Bypass(bool bypass)
         {
             gameObject.GetComponent<ServerRoles>().BypassMode = bypass;
         }
 
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.disarmed")]
         public int Disarmed()
         {
             return _handcuffs.CufferId;
         }
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.disarmed")]
         public void Disarmed(int playerid)
         {
             _handcuffs.CufferId = this.playerId;
         }
 
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.health")]
         public float Health()
         {
             return _playerStats.Health;
         }
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.health")]
         public void Health(float hp)
         {
             _playerStats.Health = hp;
         }
 
 
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.team")]
         public TeamClass Teamclass()
         {
             RoleType role = _characterClassManager.CurClass;
@@ -293,7 +293,7 @@ namespace PheggMod
                 cleanTeam = cTeam
             };
         }
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.team")]
         public void Teamclass(RoleType role)
         {
             _characterClassManager.SetClassID(role);
@@ -332,14 +332,10 @@ namespace PheggMod
 
         }
 
-        [Obsolete]
+        [Obsolete("Use PheggPlayer.position")]
         public void Teleport(Vector3 vector3, float rotation = 0, bool forcegound = true)
         {
             _plyMovementSync.OverridePosition(vector3, rotation, forcegound);
         }
-
-
-
-
     }
 }
