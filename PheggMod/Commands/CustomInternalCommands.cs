@@ -115,76 +115,6 @@ namespace PheggMod.Commands
 
         #region RA-Only Commands
 
-        [PMCommand("oban"), PMAlias("offlineban", "ltapban"), PMParameters("userid", "duration", "reason"), PMCanExtend(true), PMPermission(PlayerPermissions.BanningUpToDay)]
-        public void cmd_oban(CommandInfo info)
-        {
-            CommandSender sender = info.commandSender;
-            string[] arg = info.commandArgs;
-
-            if (arg.Count() < 4)
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([UserID], [Minutes], [Reason])", false, true, "");
-                return;
-            }
-            else if (!arg[1].Contains('@'))
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid UserID given", false, true, "");
-                return;
-            }
-
-            char unit = arg[2].ToString().Where(Char.IsLetter).ToArray()[0];
-            if (!int.TryParse(new string(arg[2].Where(Char.IsDigit).ToArray()), out int amount) || !CustomInternalCommands.validUnits.Contains(unit) || amount < 1)
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid duration", false, true, "");
-                return;
-            }
-
-            TimeSpan duration = CustomInternalCommands.GetBanDuration(unit, amount);
-            string reason = string.Join(" ", arg.Skip(3));
-
-            if (duration.Minutes > 60 && !CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.KickingAndShortTermBanning))
-                return;
-            else if (duration.Minutes > 1440 && !CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.BanningUpToDay))
-                return;
-
-            BanHandler.IssueBan(new BanDetails
-            {
-                OriginalName = "Offline player",
-                Id = arg[1],
-                Issuer = sender.Nickname,
-                IssuanceTime = DateTime.UtcNow.Ticks,
-                Expires = DateTime.UtcNow.Add(duration).Ticks,
-                Reason = reason.Replace(Environment.NewLine, "")
-            }, BanHandler.BanType.UserId);
-
-            sender.RaReply(arg[0].ToUpper() + $"#{arg[1]} was offline banned for {arg[2]}", true, true, "");
-        }
-
-        [PMCommand("nukelock"), PMAlias("nlock", "nukel", "locknuke"), PMParameters(), PMPermission(PlayerPermissions.WarheadEvents)]
-        public void cmd_NukeLock(CommandInfo info)
-        {
-            EventTriggers.PMAlphaWarheadController.nukeLock = !EventTriggers.PMAlphaWarheadController.nukeLock;
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead lock has been {(EventTriggers.PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}", true, true, "");
-        }
-
-        [PMCommand("nuke"), PMParameters("enable/disable"), PMPermission(PlayerPermissions.WarheadEvents)]
-        public void cmd_Nuke(CommandInfo info)
-        {
-            switch (info.commandArgs[1].ToLower())
-            {
-                case "enable":
-                case "on":
-                    EventTriggers.PMAlphaWarheadNukesitePanel.Enable();
-                    info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead has been enabled", true, true, "");
-                    break;
-                default:
-                    EventTriggers.PMAlphaWarheadNukesitePanel.Disable();
-                    info.commandSender.RaReply(info.commandName.ToUpper() + $"#Warhead has been disabled", true, true, "");
-                    break;
-            }
-        }
-
         [PMCommand("pbc"), PMAlias("personalbroadcast", "privatebroadcast"), PMParameters("playerid", "seconds", "message"), PMCanExtend(true)]
         public void cmd_PBC(CommandInfo info)
         {
@@ -431,6 +361,9 @@ namespace PheggMod.Commands
 
             foreach (GameObject plr in playerList)
             {
+                if (plr.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator)
+                    continue;
+
                 PheggPlayer pp = new PheggPlayer(plr);
 
                 // Initialization
@@ -453,6 +386,9 @@ namespace PheggMod.Commands
 
             foreach (GameObject plr in playerList)
             {
+                if (plr.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator)
+                    continue;
+
                 PheggPlayer pp = new PheggPlayer(plr);
 
                 // Initialization
@@ -475,6 +411,9 @@ namespace PheggMod.Commands
 
             foreach (GameObject plr in playerList)
             {
+                if (plr.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator)
+                    continue;
+
                 PheggPlayer pp = new PheggPlayer(plr);
 
                 // Initialization

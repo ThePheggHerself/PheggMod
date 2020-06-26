@@ -22,7 +22,15 @@ namespace PheggMod.EventTriggers
             try
             {
                 if (isLocalPlayer || !NetworkServer.active)
-                    return orig_HurtPlayer(info, go);
+                    try
+                    {
+                        return orig_HurtPlayer(info, go);
+                    }
+                catch(Exception e)
+                    {
+                        Base.Error(e.ToString());
+                    }
+                return orig_HurtPlayer(info, go);
 
                 PheggPlayer player = new PheggPlayer(go);
 
@@ -77,7 +85,7 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception e)
             {
-                Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().ToString()}\n{e.ToString()}");
+                Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().name}\n{e}");
                 return orig_HurtPlayer(info, go);
             }
         }

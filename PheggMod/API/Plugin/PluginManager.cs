@@ -47,8 +47,7 @@ namespace PheggMod
             string pluginsFolder = universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
 
             AddCommands(Assembly.GetExecutingAssembly());
-
-            Base.Info("APPLES0");
+            new CommandManager();
 
             LoadDependencies(pluginsFolder + "/Dependencies");
             LoadPlugins(pluginsFolder);
@@ -311,6 +310,9 @@ namespace PheggMod
             cmd.Invoke(instance, new object[] { cInfo });
             return true;
         }
+
+        public static void AddCommand(CommandSystem.ICommand command) =>  RemoteAdmin.CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(command);
+        
 
 
 

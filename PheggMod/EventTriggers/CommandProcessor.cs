@@ -1,8 +1,10 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
+using CommandSystem;
 using MonoMod;
 using PheggMod.API.Commands;
 using PheggMod.API.Events;
 using PheggMod.Commands;
+using RemoteAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::RemoteAdmin.CommandProcessor")]
     class PMCommandProcessor
-    {
+    {   
         internal static string lastCommand;
 
         public static extern void orig_ProcessQuery(string q, CommandSender sender);

@@ -15,6 +15,7 @@ using System.Threading;
 using System.Diagnostics;
 using GameCore;
 using UnityEngine.Networking;
+using CommandSystem;
 
 namespace PheggMod
 {
@@ -110,8 +111,8 @@ namespace PheggMod
 
             if (_debug)
             {
-                Base.Debug("Debug mode enabled!");
-                Base.Debug("Printing file paths:"
+                Debug("Debug mode enabled!");
+                Debug("Printing file paths:"
                     + $"\nUserIdBans.txt: {BanHandler.GetPath(BanHandler.BanType.UserId)}"
                     + $"\nIpBans.txt: {BanHandler.GetPath(BanHandler.BanType.IP)}"
                     + $"\nUserIdWhitelist.txt: {ConfigSharing.Paths[2] + "UserIDWhitelist.txt"}"
@@ -122,14 +123,14 @@ namespace PheggMod
             PluginManager.PluginPreLoad();
         }
 
-        public static void Error(string m) => Base.AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
+        public static void Error(string m) => AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
         public static void Debug(string m)
         {
             if(_debug)
-                Base.AddLog(string.Format("[{0}] {1}", "DEBUG", m));
+                AddLog(string.Format("[{0}] {1}", "DEBUG", m));
         }
-        public static void Warn(string m) => Base.AddLog(string.Format("[{0}] {1}", "WARN", m));
-        public static void Info(string m) => Base.AddLog(string.Format("[{0}] {1}", "INFO", m));
-        public static void SmartGuard(string m) => Base.AddLog(string.Format("[{0}] {1}", "SMART GUARD", m));
+        public static void Warn(string m) => AddLog(string.Format("[{0}] {1}", "WARN", m));
+        public static void Info(string m) => AddLog(string.Format("[{0}] {1}", "INFO", m));
+        public static void SmartGuard(string m) => AddLog(string.Format("[{0}] {1}", "SMART GUARD", m));
     }
 }

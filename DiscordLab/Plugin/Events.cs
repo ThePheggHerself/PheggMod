@@ -66,7 +66,7 @@ namespace DiscordLab
                 DiscordLab.bot.NewMessage($"{ev.Player.name} self-harmed for {Math.Round(ev.Damage)} with {ev.DamageType.name}");
             else if (IsTeamDamage(ev.Player.team, ev.Attacker.team))
                 DiscordLab.bot.NewMessage($"**{ev.Attacker.roleType} {ev.Attacker} attacked {ev.Player.roleType} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}**");
-            else if (ev.Player.disarmed > -1 && ev.Attacker.refHub.characterClassManager.IsAnyScp())
+            else if (ev.Player.disarmed > -1 && !ev.Attacker.refHub.characterClassManager.IsAnyScp())
                 DiscordLab.bot.NewMessage($"__{ev.Attacker.roleType} {ev.Attacker} attacked {ev.Player.roleType} {ev.Player} for {Math.Round(ev.Damage)} with {ev.DamageType.name}__");
             else
                 DiscordLab.bot.NewMessage($"{ev.Attacker.name} -> {ev.Player.name} -> {Math.Round(ev.Damage)} ({ev.DamageType.name})");

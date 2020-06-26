@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="CloudflareSolverRe, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Build\CloudflareSolverRe.dll</HintPath>
+    </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Build\CommandSystem.Core.dll</HintPath>
@@ -102,8 +106,13 @@
     <Compile Include="API\Plugin\Plugin.cs" />
     <Compile Include="API\Commands\CustomAttributes.cs" />
     <Compile Include="API\Scale.cs" />
+    <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\CustomInternalCommands.cs" />
-    <Compile Include="Commands\PMNukeCommand.cs" />
+    <Compile Include="Commands\NukeCommand\NukeDisableCommand.cs" />
+    <Compile Include="Commands\NukeCommand\NukeEnableCommand.cs" />
+    <Compile Include="Commands\NukeCommand\NukeLockCommand.cs" />
+    <Compile Include="Commands\NukeCommand\NukeParentCommand.cs" />
+    <Compile Include="Commands\NukeCommand\PersonalBroadcastCommand.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
     <Compile Include="CustomEffects\SCP008.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
@@ -115,6 +124,7 @@
     <Compile Include="EventTriggers\CustomNetworkManager.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
     <Compile Include="EventTriggers\GrenadeManager.cs" />
+    <Compile Include="EventTriggers\HttpQuery.cs" />
     <Compile Include="EventTriggers\MTFRespawn.cs" />
     <Compile Include="EventTriggers\NicknameSync.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
