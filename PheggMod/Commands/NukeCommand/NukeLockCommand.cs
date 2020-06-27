@@ -4,7 +4,6 @@ using System;
 
 namespace PheggMod.Commands.NukeCommand
 {
-    [CommandHandler(typeof(NukeParentCommand))]
     public class NukeLockCommand : ICommand
     {
         public string Command => "lock";
@@ -15,20 +14,13 @@ namespace PheggMod.Commands.NukeCommand
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            bool success = CommandManager.CheckPermission(sender, PlayerPermissions.WarheadEvents, out bool isSender, out bool hasPerm);
+            bool success = CommandManager.CanRun(sender, PlayerPermissions.WarheadEvents, out response);
+            if (!success)
+                return false;
 
-            if (!isSender)        
-                response = "No CommandSender found";
+            PMAlphaWarheadController.nukeLock = !PMAlphaWarheadController.nukeLock;
+            response = $"Warhead lock has been {(PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}";
 
-            else if (!hasPerm)     
-                response = $"You don't have permission to execute this command.\nMissing permission: " + PlayerPermissions.WarheadEvents;
-
-            else
-            {
-                PMAlphaWarheadController.nukeLock = !PMAlphaWarheadController.nukeLock;
-                response = $"Warhead lock has been {(PMAlphaWarheadController.nukeLock ? "enabled" : "disabled")}";
-                
-            }
             return success;
         }
     }

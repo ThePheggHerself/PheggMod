@@ -115,61 +115,6 @@ namespace PheggMod.Commands
 
         #region RA-Only Commands
 
-        [PMCommand("pbc"), PMAlias("personalbroadcast", "privatebroadcast"), PMParameters("playerid", "seconds", "message"), PMCanExtend(true)]
-        public void cmd_PBC(CommandInfo info)
-        {
-            string[] arg = info.commandArgs;
-            CommandSender sender = info.commandSender;
-
-            if (!CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.Broadcasting))
-                return;
-
-            bool success = ushort.TryParse(arg[2], out ushort duration);
-
-            if (arg.Count() < 4)
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Command expects 3 or more arguments ([Players], [Seconds], [Message])", false, true, "");
-                return;
-            }
-            else if (!success || duration < 1 || duration > 255)
-            {
-                sender.RaReply(arg[0].ToUpper() + "#Invalid duration given", false, true, "");
-                return;
-            }
-
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
-
-            string message = string.Join(" ", arg.Skip(3));
-
-            foreach (GameObject player in playerList)
-                player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), message, duration, Broadcast.BroadcastFlags.Normal);
-
-            sender.RaReply(arg[0].ToUpper() + "#Broadcast sent!", true, true, "");
-        }
-
-        [PMCommand("drop"), PMAlias("dropall", "dropinv", "strip"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
-        public void cmd_Drop(CommandInfo info)
-        {
-            try
-            {
-                string[] arg = info.commandArgs;
-
-                if (!CustomInternalCommands.CheckPermissions(info.commandSender, arg[0], PlayerPermissions.PlayersManagement))
-                    return;
-
-                List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
-
-                foreach (GameObject p in playerList)
-                    p.GetComponent<Inventory>().ServerDropAll();
-
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Player {(playerList.Count > 1 ? "inventories" : "inventory")} dropped", true, true, "");
-            }
-            catch (Exception e)
-            {
-                Base.Error(e.ToString());
-            }
-        }
-
         [PMCommand("slay"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
         public void cmd_Kill(CommandInfo info)
         {

@@ -3,8 +3,6 @@ using System;
 
 namespace PheggMod.Commands.NukeCommand
 {
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class NukeParentCommand : ParentCommand
     {
         public override string Command => "nuke";

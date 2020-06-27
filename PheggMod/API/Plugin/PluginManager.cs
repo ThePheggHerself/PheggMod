@@ -47,7 +47,7 @@ namespace PheggMod
             string pluginsFolder = universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
 
             AddCommands(Assembly.GetExecutingAssembly());
-            new CommandManager();
+            CommandManager.RegisterInternalCommands();
 
             LoadDependencies(pluginsFolder + "/Dependencies");
             LoadPlugins(pluginsFolder);

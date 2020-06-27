@@ -29,9 +29,9 @@ namespace PheggMod.EventTriggers
                 catch(Exception e)
                     {
                         Base.Error(e.ToString());
+                        return orig_HurtPlayer(info, go);
                     }
-                return orig_HurtPlayer(info, go);
-
+                
                 PheggPlayer player = new PheggPlayer(go);
 
                 if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
@@ -64,6 +64,10 @@ namespace PheggMod.EventTriggers
                     }
 
                 bool result = orig_HurtPlayer(info, go);
+
+                if (player == null)
+                    return result;
+
                 if (PMConfigFile.enable008 && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
                 {
                     if (IsKill)
@@ -93,27 +97,20 @@ namespace PheggMod.EventTriggers
         public extern void orig_Roundrestart();
         public new void Roundrestart()
         {
-            try
-            {
-                Commands.CustomInternalCommands.isLightsout = false;
-                PMAlphaWarheadController.nukeLock = false;
+            //try
+            //{
+            //    Commands.CustomInternalCommands.isLightsout = false;
+            //    PMAlphaWarheadController.nukeLock = false;
 
-                if (Commands.CustomInternalCommands.reloadPlugins)
-                {
-                    Timing.RunCoroutine(TriggerPluginReload());
-                    Commands.CustomInternalCommands.reloadPlugins = false;
-                }
-            }
-            catch (Exception) { }
+            //    if (Commands.CustomInternalCommands.reloadPlugins)
+            //    {
+            //        Timing.RunCoroutine(TriggerPluginReload());
+            //        Commands.CustomInternalCommands.reloadPlugins = false;
+            //    }
+            //}
+            //catch (Exception) { }
 
             orig_Roundrestart();
-        }
-
-        private IEnumerator<float> TriggerPluginReload()
-        {
-            yield return Timing.WaitForSeconds(ConfigFile.ServerConfig.GetFloat("auto_round_restart_time", 10) + 1f);
-
-            PluginManager.Reload();
         }
     }
 }

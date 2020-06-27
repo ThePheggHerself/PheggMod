@@ -6,7 +6,7 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::GameCore.ConfigFile")]
     public static class PMConfigFile
     {
-        internal static string webhookUrl, webhookName, webhookAvatar, webhookMessage;
+        internal static string webhookUrl, webhookName, webhookAvatar, webhookMessage, reportHeader, reportContent, reportServerName;
         internal static int webhookColour, detonationTimer;
 
         internal static bool announceChaos, cassieGlitch, cassieGlitchDetonation, stickyRound, targetAnnouncement, mockCommand, randomSizes, tutorialTrigger096, enable008;
@@ -38,6 +38,9 @@ namespace PheggMod.EventTriggers
 
             webhookUrl = ServerConfig.GetString("report_discord_webhook_url", string.Empty);
             webhookName = ServerConfig.GetString("report_username", "Player Report");
+            reportServerName = ServerConfig.GetString("report_server_name", "My SCP:SL Server");
+            reportHeader = ServerConfig.GetString("report_header", "Player Report");
+            reportContent = ServerConfig.GetString("report_content", "Player has just been reported.");
             webhookAvatar = ServerConfig.GetString("report_avatar_url", string.Empty);
             webhookMessage = ServerConfig.GetString("report_message_content", string.Empty);
             webhookColour = ServerConfig.GetInt("report_color", 14423100);

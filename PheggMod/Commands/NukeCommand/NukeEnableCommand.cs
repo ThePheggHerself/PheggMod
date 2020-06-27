@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace PheggMod.Commands.NukeCommand
 {
-    [CommandHandler(typeof(NukeParentCommand))]
     public class NukeEnableCommand : ICommand
     {
         public string Command => "on";
@@ -16,19 +15,14 @@ namespace PheggMod.Commands.NukeCommand
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            bool success = CommandManager.CheckPermission(sender, PlayerPermissions.WarheadEvents, out bool isSender, out bool hasPerm);
+            bool success = CommandManager.CanRun(sender, PlayerPermissions.WarheadEvents, out response);
+            if (!success)
+                return false;
 
-            if (!isSender)
-                response = "No CommandSender found";
 
-            else if (!hasPerm)
-                response = $"You don't have permission to execute this command.\nMissing permission: " + PlayerPermissions.WarheadEvents;
+            PMAlphaWarheadNukesitePanel.Enable();
+            response = $"Warhead has been enabled";
 
-            else
-            {
-                PMAlphaWarheadNukesitePanel.Enable();
-                response = $"Warhead has been enabled";
-            }
             return success;
         }
     }

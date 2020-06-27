@@ -65,6 +65,7 @@ namespace PheggMod
                 _broadcast = player.GetComponent<Broadcast>();
 
                 name = refHub.nicknameSync.MyNick;
+                nameClean = _filterNames.Replace(name, string.Empty);
                 userId = refHub.characterClassManager.UserId;
                 domain = refHub.characterClassManager.UserId.Split('@')[1].ToUpper();
                 ipAddress = refHub.nicknameSync.connectionToClient.address;
