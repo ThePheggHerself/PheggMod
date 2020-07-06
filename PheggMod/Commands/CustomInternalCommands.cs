@@ -115,23 +115,6 @@ namespace PheggMod.Commands
 
         #region RA-Only Commands
 
-        [PMCommand("slay"), PMParameters("playerid"), PMPermission(PlayerPermissions.PlayersManagement)]
-        public void cmd_Kill(CommandInfo info)
-        {
-            string[] arg = info.commandArgs;
-            CommandSender sender = info.commandSender;
-
-            if (!CustomInternalCommands.CheckPermissions(sender, arg[0], PlayerPermissions.PlayersManagement))
-                return;
-
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(arg[1]);
-
-            foreach (GameObject player in playerList)
-                player.GetComponent<PlayerStats>().HurtPlayer(new PlayerStats.HitInfo(9999f, sender.Nickname, DamageTypes.None, info.gameObject.GetComponent<RemoteAdmin.QueryProcessor>().PlayerId), player);
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Killed {playerList.Count} {(playerList.Count > 1 ? "players" : "player")}", true, true, "");
-        }
-
         internal static bool isLightsout = false;
         [PMCommand("lightsout"), PMParameters(), PMPermission(PlayerPermissions.FacilityManagement)]
         public void cmd_Lightsout(CommandInfo info) => Timing.RunCoroutine(Lightsout(info));
@@ -200,74 +183,12 @@ namespace PheggMod.Commands
             }
         }
 
-        [PMCommand("nevergonna"), PMParameters("give", "you", "up"), PMCommandSummary("Test command. Try it :)")]
-        public void cmd_RickRoll(CommandInfo info)
-        {
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.", true, true, "");
-        }
-
         [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
         public void cmd_pos(CommandInfo info)
         {
             Vector3 pos = info.gameObject.GetComponent<PlayerMovementSync>().RealModelPosition;
 
             info.commandSender.RaReply(info.commandName.ToUpper() + $"#Current player position: x={pos.x} y={pos.y} z={pos.z}", true, true, "");
-        }
-
-        [PMCommand("tower2"), PMParameters("playerid"), PMCommandSummary("Teleports the player to a second tower on the surface")]
-        public void cmd_tower2(CommandInfo info)
-        {
-            List<GameObject> playerList = CustomInternalCommands.GetPlayersFromString(info.commandArgs[1]);
-
-            foreach (GameObject plr in playerList)
-                plr.GetComponent<PlayerMovementSync>().OverridePosition(new Vector3(223, 1026, -18), 0);
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to tower 2", true, true, "");
-        }
-
-        [PMCommand("pocket"), PMParameters("playerid"), PMCommandSummary("Teleports the player into the pocket dimention")]
-        public void cmd_pocket(CommandInfo info)
-        {
-            List<GameObject> playerList = GetPlayersFromString(info.commandArgs[1]);
-
-            foreach (GameObject plr in playerList)
-                plr.GetComponent<PlayerMovementSync>().OverridePosition(Vector3.down * 1998.5f, 0f, true);
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Teleported {playerList.Count} {(playerList.Count == 1 ? "player" : "players")} to the pocket dimension", true, true, "");
-        }
-
-        [PMCommand("size"), PMAlias("scale"), PMParameters("playerid", "scale"), PMCommandSummary("Sets the scale of a player"), PMPermission(PlayerPermissions.PlayersManagement), /*PMDisabled(true)*/]
-        public void cmd_size(CommandInfo info)
-        {
-            List<GameObject> pList = GetPlayersFromString(info.commandArgs[1]);
-            List<GameObject> lobbyPlayers = PlayerManager.players;
-
-            if (!float.TryParse(info.commandArgs[2], out float scale))
-            {
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Invalid scale given (Use numbers)", false, true, "");
-                return;
-            }
-
-            for (var p = 0; p < pList.Count; p++)
-            {
-                NetworkIdentity nId = pList[p].GetComponent<NetworkIdentity>();
-
-                pList[p].transform.localScale = new Vector3(1 * scale, 1 * scale, 1 * scale);
-
-                ObjectDestroyMessage dMsg = new ObjectDestroyMessage{netId = nId.netId};
-
-                for (var q = 0; q < lobbyPlayers.Count; q++)
-                {
-                    NetworkConnection conn = lobbyPlayers[q].GetComponent<NetworkIdentity>().connectionToClient;
-
-                    if (lobbyPlayers[q] != pList[p])
-                        conn.Send(dMsg, 0);
-
-                    typeof(NetworkServer).GetMethod("SendSpawnMessage", flags).Invoke(null, new object[] { nId, conn });
-                }
-            }
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Scale of {(info.commandArgs[1] == "*" ? "All" : pList.Count.ToString())} players has been set to {scale}", true, true, "");
         }
 
         [PMCommand("getsize"), PMAlias("getscale"), PMParameters("playerid"), PMCommandSummary("Sets the scale of a player"), PMPermission(PlayerPermissions.PlayersManagement), /*PMDisabled(true)*/]
@@ -279,19 +200,6 @@ namespace PheggMod.Commands
 
             else
                 info.commandSender.RaReply(info.commandName.ToUpper() + $"#Scale of {pList[0].GetComponent<NicknameSync>().MyNick} is {pList[0].transform.localScale}", true, true, "");
-        }
-
-        [PMCommand("clearup"), PMAlias("cleanup"), PMParameters(), PMCommandSummary("Cleans up all ragdolls"), PMPermission(PlayerPermissions.FacilityManagement)]
-        public void cmd_clearup(CommandInfo info)
-        {
-            List<Ragdoll> rDs = Object.FindObjectsOfType<Ragdoll>().ToList();
-
-            for (var p = 0; p < rDs.Count; p++)
-            {
-                NetworkServer.Destroy(rDs[p].gameObject);
-            }
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Cleaned up all ragdolls", true, true, "");
         }
 
         // The code for the 3 commands was kindly donated to PheggMod by KrypTheBear#3301

@@ -16,7 +16,7 @@ namespace DiscordLab
         public void OnGlobalBan(GlobalBanEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player} was globally banned for cheating");
         public void OnLczDecontaminate(LczDecontaminateEvent ev) => DiscordLab.bot.NewMessage($"Light containment zone decontamination has begun!");
         public void OnPlayerBan(PlayerBanEvent ev) =>
-            DiscordLab.bot.NewMessage($"**New Ban!**```autohotkey\nUser: {ev.Player}\nAdmin: {ev.Admin}\nDuration: {ev.Duration} {(ev.Duration > 1 ? "minutes" : "minute")}\nReason: {ev.Reason}```");
+            DiscordLab.bot.NewMessage($"**New Ban!**```autohotkey\nUser: {ev.Player}\nAdmin: {ev.Admin}\nDuration: {ev.Duration / 60} {(ev.Duration > 1 ? "minutes" : "minute")}\nReason: {ev.Reason}```");
         public void OnPlayerEscape(PlayerEscapeEvent ev) => DiscordLab.bot.NewMessage($"{ev.Player.name} escaped the facility and became {ev.newRole}");
         public void OnPlayerJoin(PlayerJoinEvent ev) => DiscordLab.bot.NewMessage($"**{ev.Player.name} ({ev.Player.userId} from ||~~{ev.Player.ipAddress}~~||) has joined the server**");
         public void OnPlayerKick(PlayerKickEvent ev) => DiscordLab.bot.NewMessage($"**Player kicked!**```autohotkey\nUser: {ev.Player}\nAdmin: {(ev.Admin.ToString() == " ()" ? "Server console" : ev.Admin.ToString())}```");
@@ -99,7 +99,7 @@ namespace DiscordLab
                 return true;
             else if ((player == Team.CDP || player == Team.CHI) && (attacker == Team.CDP || attacker == Team.CHI))
                 return true;
-            else if ((player == Team.MTF || player == Team.MTF) && (attacker == Team.RSC || attacker == Team.MTF))
+            else if ((player == Team.RSC || player == Team.MTF) && (attacker == Team.RSC || attacker == Team.MTF))
                 return true;
             else return false;
         }

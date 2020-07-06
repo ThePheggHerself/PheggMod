@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace PheggMod.Commands
 {
-    public class SlayCommand : ICommand
+    public class PocketCommand : ICommand
     {
-        public string Command => "slay";
+        public string Command => "pocket";
 
-        public string[] Aliases { get; } = { "kill" };
+        public string[] Aliases => null;
 
-        public string Description => "Kills the targeted player(s)";
+        public string Description => "Teleports the player into the pocket dimention";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -22,13 +22,10 @@ namespace PheggMod.Commands
             if (!canRun)
                 return false;
 
-            CommandSender cmdSender = sender as CommandSender;
+            foreach (ReferenceHub refhub in hubs)
+                refhub.playerMovementSync.OverridePosition(Vector3.down * 1998.5f, 0);
 
-            foreach(ReferenceHub refhub in hubs)
-                refhub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9999f, cmdSender.Nickname, DamageTypes.Nuke, int.Parse(cmdSender.SenderId)), refhub.gameObject);
-
-            response = $"Killed {hubs.Count} {(hubs.Count > 1 ? "players" : "player")}";
-
+            response = $"#Teleported {hubs.Count} {(hubs.Count == 1 ? "player" : "players")} to the pocket dimension";
             return true;
         }
     }

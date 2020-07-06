@@ -19,14 +19,14 @@ namespace PheggMod.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            bool canRun = CommandManager.CanRun(sender, PlayerPermissions.WarheadEvents, arguments, new[] { "Player" }, out response, out List<ReferenceHub> players);
+            bool canRun = CommandManager.CanRun(sender, PlayerPermissions.PlayersManagement, arguments, new[] { "player" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)
                 return false;
 
-            for (var i = 0; i < players.Count; i++)
-                players[i].inventory.ServerDropAll();
+            foreach (ReferenceHub refhub in hubs)
+                refhub.inventory.ServerDropAll();
 
-            response = $"Player {(players.Count > 1 ? "inventories" : "inventory")} dropped";
+            response = $"Player {(hubs.Count > 1 ? "inventories" : "inventory")} dropped";
 
 
             return true;

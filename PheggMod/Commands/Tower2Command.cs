@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace PheggMod.Commands
 {
-    public class SlayCommand : ICommand
+    public class Tower2Command : ICommand
     {
-        public string Command => "slay";
+        public string Command => "tower2";
 
-        public string[] Aliases { get; } = { "kill" };
+        public string[] Aliases => null;
 
-        public string Description => "Kills the targeted player(s)";
+        public string Description => "Teleports the player to a second tower on the surface";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -22,13 +22,10 @@ namespace PheggMod.Commands
             if (!canRun)
                 return false;
 
-            CommandSender cmdSender = sender as CommandSender;
+            foreach (ReferenceHub refhub in hubs)
+                refhub.playerMovementSync.OverridePosition(new Vector3(223, 1026, -18), 0);
 
-            foreach(ReferenceHub refhub in hubs)
-                refhub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9999f, cmdSender.Nickname, DamageTypes.Nuke, int.Parse(cmdSender.SenderId)), refhub.gameObject);
-
-            response = $"Killed {hubs.Count} {(hubs.Count > 1 ? "players" : "player")}";
-
+            response = $"#Teleported {hubs.Count} {(hubs.Count == 1 ? "player" : "players")} to tower 2";
             return true;
         }
     }

@@ -9,9 +9,14 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::MTFRespawn")]
     class PMMTFRespawn : MTFRespawn
     {
+        public static bool blockRespawn = false;
+
         public extern void orig_RespawnDeadPlayers();
         public void RespawnDeadPlayers()
         {
+            if (blockRespawn)
+                return;
+
             orig_RespawnDeadPlayers();
 
             try

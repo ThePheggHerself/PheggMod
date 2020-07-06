@@ -17,7 +17,7 @@ namespace PheggMod.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            bool canRun = CommandManager.CanRun(sender, PlayerPermissions.WarheadEvents, arguments, new[] { "Player" }, out response, out List<ReferenceHub> players);
+            bool canRun = CommandManager.CanRun(sender, PlayerPermissions.Broadcasting, arguments, new[] { "player", "duration", "message" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)
                 return false;
 
@@ -27,11 +27,10 @@ namespace PheggMod.Commands
                 return false;
             }
 
-            for (var i = 0; i < players.Count; i++)
+            foreach (ReferenceHub refhub in hubs)
             {
-                GameObject go = players[i].gameObject;
-                go.GetComponent<Broadcast>().TargetAddElement
-                    (go.GetComponent<NetworkConnection>(), string.Join(" ", arguments.Skip(3)), duration, arguments.Array[0].ToLower().Contains("mono") ? Broadcast.BroadcastFlags.Monospaced : Broadcast.BroadcastFlags.Normal);
+                GameObject go = refhub.gameObject;
+                go.GetComponent<Broadcast>().TargetAddElement(go.GetComponent<NetworkConnection>(), string.Join(" ", arguments.Skip(2)), duration, Broadcast.BroadcastFlags.Normal);
             }
 
             response = "Broadcast sent";
