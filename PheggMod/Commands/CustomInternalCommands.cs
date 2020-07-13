@@ -5,6 +5,7 @@ using MEC;
 using Mirror;
 using PheggMod.API.Commands;
 using PheggMod.EventTriggers;
+using Respawning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,7 +132,7 @@ namespace PheggMod.Commands
 
                 yield return Timing.WaitForSeconds(9f);
 
-                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement("ERROR IN FACILITY LIGHT CONTROL . SYSTEM TERMINATION IN 3 . 2 . 1", false, true);
+                RespawnEffectsController.PlayCassieAnnouncement("ERROR IN FACILITY LIGHT CONTROL . SYSTEM TERMINATION IN 3 . 2 . 1", false, true);
 
                 foreach (GameObject player in PlayerManager.players)
                     player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
@@ -154,7 +155,7 @@ namespace PheggMod.Commands
 
             if (!isLightsout)
             {
-                PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement("FACILITY LIGHT CONTROL SYSTEM REPAIR COMPLETE . LIGHT SYSTEM ENGAGED", false, true);
+                RespawnEffectsController.PlayCassieAnnouncement("FACILITY LIGHT CONTROL SYSTEM REPAIR COMPLETE . LIGHT SYSTEM ENGAGED", false, true);
                 yield return 0f;
             }
             else

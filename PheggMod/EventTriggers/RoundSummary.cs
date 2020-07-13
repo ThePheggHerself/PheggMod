@@ -12,7 +12,7 @@ namespace PheggMod.EventTriggers
         public extern void orig_RpcShowRoundSummary(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd);
         public void RpcShowRoundSummary(RoundSummary.SumInfo_ClassList list_start, RoundSummary.SumInfo_ClassList list_finish, LeadingTeam leadingTeam, int e_ds, int e_sc, int scp_kills, int round_cd)
         {
-            PMMTFRespawn.blockRespawn = false;
+            PMRespawnManager.blockRespawn = false;
             TimeSpan tspan = TimeSpan.FromSeconds(list_finish.time - list_start.time);
             Base.roundStartTime = null;
 

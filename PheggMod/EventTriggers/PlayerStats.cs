@@ -21,18 +21,29 @@ namespace PheggMod.EventTriggers
         {
             try
             {
-                if (isLocalPlayer || !NetworkServer.active)
+                if (isLocalPlayer || !NetworkServer.active || go == null)
                     try
                     {
                         return orig_HurtPlayer(info, go);
                     }
-                catch(Exception e)
+                    catch (Exception e)
                     {
                         Base.Error(e.ToString());
                         return orig_HurtPlayer(info, go);
                     }
-                
+
                 PheggPlayer player = new PheggPlayer(go);
+                if (player == null)
+                    try
+                    {
+                        return orig_HurtPlayer(info, go);
+                    }
+                    catch (Exception e)
+                    {
+                        Base.Error(e.ToString());
+                        return orig_HurtPlayer(info, go);
+                    }
+
 
                 if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
                     return orig_HurtPlayer(info, go);

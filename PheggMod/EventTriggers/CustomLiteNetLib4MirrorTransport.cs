@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PheggMod.EventTriggers
 {
-    [MonoModPatch("global::CustomLiteNetLib4MirrorTransport")]
+    //[MonoModPatch("global::CustomLiteNetLib4MirrorTransport")]
     public class PMCustomLiteNetLib4MirrorTransport : CustomLiteNetLib4MirrorTransport
     {
         protected extern void orig_ProcessConnectionRequest(ConnectionRequest request);
@@ -20,6 +20,30 @@ namespace PheggMod.EventTriggers
         protected override void ProcessConnectionRequest(ConnectionRequest request)
         {
             orig_ProcessConnectionRequest(request);
+
+            //if (UserIds.ContainsKey(request.RemoteEndPoint))
+            //{
+            //    if (PMConfigFile.enableSmartGuard)
+            //    {
+            //        NetDataReader nDR = request.Data;
+
+            //        if (!nDR.TryGetByte(out var a) || !nDR.TryGetByte(out var b) || !nDR.TryGetByte(out var c) || !nDR.TryGetInt(out var d) ||
+            //            !nDR.TryGetBytesWithLength(out var e) || !nDR.TryGetString(out var f) || !nDR.TryGetULong(out var g) || !nDR.TryGetByte(out byte flags))
+            //            return;
+
+            //        SmartGuard.SGPreauthCheck(UserIds[request.RemoteEndPoint], (CentralAuthPreauthFlags)flags, out SmartGuard.InfractionType infractionType, out string Reason);
+
+            //        //if(infractionType != SmartGuard.InfractionType.none)
+            //        //{
+            //        NetDataWriter RequestWriter = new NetDataWriter();
+            //        RequestWriter.Reset();
+            //        RequestWriter.Put((byte)RejectionReason.Custom);
+            //        RequestWriter.Put("TESTING123");
+            //        request.RejectForce(RequestWriter);
+            //        return;
+            //        //}
+            //    }
+            //}
 
             //try
             //{
@@ -31,12 +55,7 @@ namespace PheggMod.EventTriggers
             //    Base.Error($"Error triggering PreauthEvent: {e.InnerException.ToString()}");
             //}
 
-            //NetDataWriter a = new NetDataWriter();
-            //a.Reset();
-            //a.Put(10);
-            //a.Put("Custom Smelling badly");
-            //a.Put("Testing");
-            //request.Reject(a);
+
 
             //orig_ProcessConnectionRequest(request);
 

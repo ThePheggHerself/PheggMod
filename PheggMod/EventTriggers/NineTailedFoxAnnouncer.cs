@@ -1,4 +1,5 @@
 ﻿using MonoMod;
+using Respawning;
 using System.Collections.Generic;
 
 namespace PheggMod.EventTriggers
@@ -45,7 +46,7 @@ namespace PheggMod.EventTriggers
                     tts = tts + str + " ";
                 }
             }
-            PlayerManager.localPlayer.GetComponent<MTFRespawn>().RpcPlayCustomAnnouncement(tts, false, true);
+            RespawnEffectsController.PlayCassieAnnouncement(tts, false, true);
         }
     }
 }

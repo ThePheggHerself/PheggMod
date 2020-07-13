@@ -64,7 +64,7 @@ namespace PheggMod.CustomEffects
 
 		public void OnConsumableItemUse(ItemType item)
 		{
-			if (IsHealable(item))
+			if (IsHealable(item) || (item == ItemType.Medkit && new System.Random().Next(0, 100) < 15))
 			{
 				Hub.hints.Show(new TextHint("Your infection has been cured!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
 				ServerDisable();
