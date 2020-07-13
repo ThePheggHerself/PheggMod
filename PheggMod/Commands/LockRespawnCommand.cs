@@ -22,8 +22,8 @@ namespace PheggMod.Commands
             if (!success)
                 return false;
 
-            PMRespawnManager.blockRespawn = !PMRespawnManager.blockRespawn;
-            response = $"Respawn lock has been {(PMRespawnManager.blockRespawn ? "enabled" : "disabled")}";
+            RespawnManagerCrap.blockRespawns = !RespawnManagerCrap.blockRespawns;
+            response = $"Respawn lock has been {(RespawnManagerCrap.blockRespawns ? "enabled" : "disabled")}";
 
             return true;
         }

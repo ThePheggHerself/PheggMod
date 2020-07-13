@@ -7,45 +7,51 @@ using UnityEngine;
 
 namespace PheggMod.EventTriggers
 {
-    [MonoModPatch("global::RepsawnManager")]
+    [MonoModPatch("global::Respawning.RespawnManager")]
     public class PMRespawnManager : RespawnManager
     {
-        public static bool blockRespawn = false;
+        public extern void orig_Spawn();
+        public new void Spawn()
+        {
+            if (RespawnManagerCrap.blockRespawns)
+                return;
 
-        //public extern void orig_Spawn();
+            RespawnManagerCrap.isCI = NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
 
-        //public new void Spawn()
-        //{
-        //    if (blockRespawn)
-        //        return;
+            orig_Spawn();
+            try
+            {
+                Base.Debug("Triggering RespawnEvent");
+                PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(RespawnManagerCrap.isCI));
+            }
+            catch (Exception e)
+            {
+                Base.Error($"Error triggering RespawnEvent: {e.InnerException}");
+            }
 
-        //    bool isCI = NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
+            if (Commands.CustomInternalCommands.isLightsout)
+                RespawnManagerCrap.TorchSpawnerReplacementDueToShittyCode();
 
-        //    orig_Spawn();
+            if (RespawnManagerCrap.isCI && PMConfigFile.announceChaos)
+                RespawnEffectsController.PlayCassieAnnouncement(PMConfigFile.chaosAnnouncement, false, true);
 
-        //    try
-        //    {
-        //        Base.Debug("Triggering RespawnEvent");
-        //        PluginManager.TriggerEvent<IEventHandlerRespawn>(new RespawnEvent(isCI));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Base.Error($"Error triggering RespawnEvent: {e.InnerException}");
-        //    }
+        }
+    }
 
-        //    if (Commands.CustomInternalCommands.isLightsout)
-        //    {
-        //        foreach (GameObject player in PlayerManager.players)
-        //        {
-        //            if (player.GetComponent<Inventory>().items.FindIndex(i => i.id == ItemType.Flashlight) < 0)
-        //                player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
-        //        }
-        //    }
+    public static class RespawnManagerCrap
+    {
+        //Honestly, fuck this whole new respawning system. fucking useless piece of shit ffs
 
-        //    if (isCI && PMConfigFile.announceChaos)
-        //    {
-        //        RespawnEffectsController.PlayCassieAnnouncement(PMConfigFile.chaosAnnouncement, false, true);
-        //    }
-        //}
+        public static bool blockRespawns = false;
+        internal static bool isCI = false;
+
+        internal static void TorchSpawnerReplacementDueToShittyCode()
+        {
+            foreach (GameObject player in PlayerManager.players)
+            {
+                if (player.GetComponent<Inventory>().items.FindIndex(i => i.id == ItemType.Flashlight) < 0)
+                    player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
+            }
+        }
     }
 }
