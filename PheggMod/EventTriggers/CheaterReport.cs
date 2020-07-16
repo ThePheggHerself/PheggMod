@@ -16,7 +16,7 @@ namespace PheggMod.EventTriggers
     class PMCheaterReport : CheaterReport
     {
         [MonoModReplace]
-        internal static bool SubmitReport(string reporterUserId, string reportedUserId, string reason, ref int reportedId, string reporterNickname, string reportedNickname)
+        internal static bool SubmitReport(string reporterUserId, string reportedUserId, string reason, ref int reportedId, string reporterNickname, string reportedNickname, bool friendlyFire)
         {
             try
             {

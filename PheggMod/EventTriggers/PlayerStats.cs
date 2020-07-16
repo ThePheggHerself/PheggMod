@@ -16,8 +16,8 @@ namespace PheggMod.EventTriggers
     public class PMPlayerStats : PlayerStats
     {
         //PlayerHurtEvent
-        public extern bool orig_HurtPlayer(HitInfo info, GameObject go);
-        public new bool HurtPlayer(HitInfo info, GameObject go)
+        public extern bool orig_HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false);
+        public new bool HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace PheggMod.EventTriggers
                         Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
                     }
 
-                bool result = orig_HurtPlayer(info, go);
+                bool result = orig_HurtPlayer(info, go, noTeamDamage);
 
                 if (player == null)
                     return result;
