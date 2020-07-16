@@ -12,7 +12,7 @@ There are 2 locations where plugins can be loaded from:
 As always, these configs all go inside of the `config_gameplay` file
 
 | Config Option | Default value  | Description  |
-|:-------------:|:---------------:|:---------------:|
+|:-------------:|:--------------:|:------------:|
 | auto_restart_time | 04:30 | Specifies (on 24-hour format) when the server should automatically restart itself (E.g 05:30) |
 | pheggmod_debug | false | Enables debug mode for Pheggmod and supporting plugins |
 | universal_config_file | false | Specifies if the server should load plugins from your config location, or the plugins folder from the server's install directory |
@@ -27,8 +27,9 @@ As always, these configs all go inside of the `config_gameplay` file
 
 # Commands
 These are the available custom commands that Pheggmod offers
+
 | Command (Aliases) | Variables | Permission | Description |
-|:---------------:|:---------------:|:---------------:|:---------------:|
+|:-----------------:|:---------:|:----------:|:-----------:|
 | oban (offlineban ltapban) | [UserID] [Duration (e.g 3d, 1y)] [Reason] | BanningUpToDay | Adds the UserID to the UserIdBans file |
 | nukelock (nlock nukel locknuke) |  | WarheadEvents | Locks the nuke, preventing it from being enabled/disabled |
 | nuke | [Enable\disable] | WarheadEvents | Enables/Disables the nuke's lever |
@@ -51,6 +52,7 @@ These are the available custom commands that Pheggmod offers
 These are the available events that Pheggmod offers
 
 **Admin Events**
+
 | Event | Parameters |
 |:-----:|:----------:|
 | PlayerBanEvent | Player (PheggPlayer), Admin (PheggPlayer), Duration (Int), Reason (String) |
@@ -60,6 +62,7 @@ These are the available events that Pheggmod offers
 | RefreshAdminPermEvent | Admin (PheggPlayer) |
 
 **Player Events**
+
 | Event | Parameters |
 |:-----:|:----------:|
 | PlayerHurtEvent | Player (PheggPlayer), Attacker (PheggPlayer), Damage (Float), DamageType (DamageType) |
@@ -72,6 +75,7 @@ These are the available events that Pheggmod offers
 | PlayerReportEvent | Reporter (PheggPlayer), Target (PheggPlayer), Reason (String) |
 
 **Round Events**
+
 | Event | Parameters |
 |:-----:|:----------:|
 | WaitingForPlayersEvent | |
@@ -81,8 +85,3 @@ These are the available events that Pheggmod offers
 | WarheadCancelEvent | Disabler (PheggPlayer) |
 | WarheadDetonationEvent |  |
 | RespawnEvent | IsChaos (Bool) |
-
-**Misc. Events**
-| Event | Parameters |
-|:-----:|:----------:|
-| PreauthEvent | Endpoint (IPEndPoint), UserID (string) |
