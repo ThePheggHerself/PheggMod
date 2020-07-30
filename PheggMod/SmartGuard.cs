@@ -1,4 +1,4 @@
-﻿using GameCore;
+using GameCore;
 using Mirror;
 using PheggMod.EventTriggers;
 using System;
@@ -64,7 +64,7 @@ namespace PheggMod
 
 
         /// <summary>
-        /// A very quick SmatGuard check during the preauth period. Can help pick up blacklisted UserIds or new discord accounts and filter them out before they are able to connect fully.
+        /// A very quick SmartGuard check during the preauth period. Can help pick up blacklisted UserIds or new discord accounts and filter them out before they are able to connect fully.
         /// </summary>
         /// <param name="preauthItem"></param>
         /// <param name="flags"></param>
