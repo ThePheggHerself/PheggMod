@@ -105,6 +105,7 @@
     <Compile Include="API\Plugin\Plugin.cs" />
     <Compile Include="API\Commands\CustomAttributes.cs" />
     <Compile Include="API\Scale.cs" />
+    <Compile Include="Commands\ClearBloodCommand.cs" />
     <Compile Include="Commands\ClearupCommand.cs" />
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\CustomInternalCommands.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="Commands\PositionCommand\PositionParentCommand.cs" />
     <Compile Include="Commands\PositionCommand\PositionSetCommand.cs" />
     <Compile Include="Commands\SizeCommand.cs" />
-    <Compile Include="Commands\SlayCommand.cs" />
     <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Commands\Tower2Command.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
@@ -127,6 +127,7 @@
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
+    <Compile Include="EventTriggers\BloodDrawer.cs" />
     <Compile Include="EventTriggers\CheaterReport.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\ConfigFile.cs" />

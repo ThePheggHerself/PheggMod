@@ -25,7 +25,6 @@ client.on("ready", () => {
 		var object = { Type: "alive", channel: "RandomPacketToKeepAlive!" }
 
 		if (mainSocket) {
-			console.log("Sending ban command!")
 			mainSocket.write(JSON.stringify(object))
 		}
 	}, 300000)
@@ -58,6 +57,8 @@ tcpSocket.on("connection", (socket) => {
 			array.forEach(json => {
 				var object = JSON.parse(json)
 
+				console.log(json)
+
 				if (object.Type === "msg") {
 					if (object.Message) messages.push(object.Message);
 				}
@@ -65,12 +66,60 @@ tcpSocket.on("connection", (socket) => {
 					var status
 					if (object.CurrentPlayers === "0/30") status = 'idle'
 					else status = 'online'
-	
+
 					client.user.setPresence({ game: { name: `${object.CurrentPlayers}`, type: "WATCHING" }, status: status })
 				}
 				else if (object.Type === "plist") {
-	
-					client.channels.get(object.ChannelID).send(`${object.PlayerNames}`);
+
+					if (object.PlayerNames === "**No online players**") {
+						client.channels.get(object.ChannelID).send(`${object.PlayerNames}`);
+						return;
+					}
+					else {
+						var args = object.PlayerNames.split("```");
+						var players = args[1].split(", ");
+						var playerLists = [];
+						var fields = [];
+						var playerListTemp = "";
+
+						players.forEach(player => {
+							if (playerListTemp.length + player.length > 1023) {
+								playerLists.push(playerListTemp)
+
+								playerListTemp = player;
+							}
+							else if(playerListTemp.length > 0) {
+								playerListTemp = playerListTemp.concat(`, ${player}`);
+							}
+							else {
+								playerListTemp = player;
+							}
+						})
+
+						if (playerListTemp.length > 0)
+							playerLists.push(playerListTemp)
+
+						var embed = new Discord.RichEmbed();
+						embed.setColor('#e63120')
+						embed.setAuthor('DragonSCP Player list')
+						embed.setTimestamp();
+						//steam:/run/700330/args/-connect:51.68.204.237:7790
+						embed.addField(args[0].replace("\n", " ") + "Players currently online", `Join in at 51.68.204.237:${config.port - 1000}`)
+
+						var index = 0;
+						playerLists.forEach(list => {
+							if (index === 0)
+								embed.addField("Player list", list)
+							else {
+								embed.addField("Player list Cont.", list)
+
+								index++;
+
+							}
+						})
+
+						client.channels.get(object.ChannelID).send(embed);
+					}
 				}
 				else if (object.Type === "cmdmsg") {
 					client.channels.get(object.ChannelID).send(`<@${object.StaffID}>\n` + object.CommandMessage)
@@ -81,8 +130,7 @@ tcpSocket.on("connection", (socket) => {
 
 		}
 		catch (e) {
-			console.log(e.message + "\n" + string);
-			console.log(string)
+			console.log(e);
 		}
 	})
 
@@ -112,22 +160,26 @@ tcpSocket.on("connection", (socket) => {
 client.on('message', async message => {
 	try {
 		if (message.author.bot || message.member == null || message.author == null || !message.guild) return
-
-		if (message.mentions.users.first() != undefined && message.mentions.users.first().id === client.user.id) {
-			if (message.content.split(" ").length == 1) {
+		if (message.isMemberMentioned(client.user)) {
+			if (message.content.split(" ").length === 1) {
 				var object = { Type: "plist", channel: message.channel.id }
-
 				if (mainSocket) {
 					try {
+
+						console.log("Requesting player list")
 						mainSocket.write(JSON.stringify(object))
 					}
 					catch (e) { message.channel.send(e.message) }
+				}
+				else {
+					message.channel.send("Bot is not connected to the server");
 				}
 			}
 			else if (message.member.roles.find(r => r.id === config.staffRoleID)) {
 				var object = { Type: "cmd", channel: message.channel.id, Message: message.content, StaffID: message.author.id, Staff: message.member.user.tag }
 
 				if (mainSocket) {
+					console.log("Sending ban command")
 					mainSocket.write(JSON.stringify(object))
 				}
 			}

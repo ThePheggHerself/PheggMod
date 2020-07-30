@@ -88,6 +88,7 @@ namespace DiscordLab
         {
             public string Type = "supdate";
             public string CurrentPlayers = PlayerManager.players.Count() + "/" + ConfigFile.ServerConfig.GetInt("max_players", 20);
+            internal DateTime LastUpdate = DateTime.Now;
         }
         private class keepaliveMessage
         {
@@ -123,13 +124,10 @@ namespace DiscordLab
         {
             supdateMessage message = new supdateMessage();
 
-            if (_socket.Connected)
+            if (_lastSupdateMessage == null || _lastSupdateMessage.CurrentPlayers != message.CurrentPlayers || (DateTime.Now - _lastSupdateMessage.LastUpdate).Seconds > 30)
             {
-                if (_lastSupdateMessage == null || _lastSupdateMessage.CurrentPlayers != message.CurrentPlayers)
-                {
-                    SendMessage(JsonConvert.SerializeObject(message));
-                    _lastSupdateMessage = message;
-                }
+                SendMessage(JsonConvert.SerializeObject(message));
+                _lastSupdateMessage = message;
             }
 
             yield return Timing.WaitForSeconds(6f);
@@ -209,8 +207,6 @@ namespace DiscordLab
             if (!_socket.Connected)
                 OpenConnection();
 
-            //Plugin.Info(json);
-
             if (!_socket.Connected) return;
 
             try
@@ -238,7 +234,7 @@ namespace DiscordLab
             {
                 try
                 {
-                    _socket.Disconnect(true);
+                    _socket.Disconnect(false);
 
                     _socket.Connect(_ipAddress, port);
                     Plugin.Info("Bot connection established");
@@ -368,7 +364,7 @@ namespace DiscordLab
                     IssuanceTime = DateTime.UtcNow.Ticks,
                     Expires = DateTime.UtcNow.Add(duration).Ticks,
                     Reason = reason
-                }, (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP)); 
+                }, (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));
             }
 
             return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}!";
@@ -427,12 +423,12 @@ namespace DiscordLab
             if (!validIP && !validUID)
                 return $"```diff\n- Invalid UserID or IP given```";
 
-            if(validUID)
+            if (validUID)
                 details = BanHandler.QueryBan(arg[2], null).Key;
             else
                 details = BanHandler.QueryBan(null, arg[2]).Value;
 
-            if(details == null)
+            if (details == null)
                 return $"No ban found for `{arg[2]}`.\nMake sure you have typed it correctly, and that it has the @domain prefix if it's a UserID";
 
             BanHandler.RemoveBan(arg[2], (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));

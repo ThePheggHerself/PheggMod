@@ -7,6 +7,7 @@ using PheggMod.API.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,21 @@ namespace PheggMod.EventTriggers
         {
             orig_ProcessConnectionRequest(request);
 
+            IPEndPoint iP = request.RemoteEndPoint;
+
+            if (UserIds.ContainsKey(iP))
+            {
+                try
+                {
+                    Base.Debug("Triggering PreauthEvent");
+                    PluginManager.TriggerEvent<IEventHandlerPreauth>(new PreauthEvent(iP, UserIds[iP].UserId));
+                }
+                catch (Exception e)
+                {
+                    Base.Error($"Error triggering PreauthEvent: {e.InnerException}");
+                }
+            }
+            
             //if (UserIds.ContainsKey(request.RemoteEndPoint))
             //{
             //    if (PMConfigFile.enableSmartGuard)
@@ -54,8 +70,6 @@ namespace PheggMod.EventTriggers
             //{
             //    Base.Error($"Error triggering PreauthEvent: {e.InnerException.ToString()}");
             //}
-
-
 
             //orig_ProcessConnectionRequest(request);
 
@@ -91,7 +105,6 @@ namespace PheggMod.EventTriggers
             //a.Put("Testing");
             //request.RejectForce(a);
 
-
             ///// 1 = full server
             ///// 2 = invalid digital signature
             ///// 3 = different game version
@@ -108,8 +121,6 @@ namespace PheggMod.EventTriggers
             //request.RejectForce(a);
 
             #endregion
-
-
         }
     }
 }

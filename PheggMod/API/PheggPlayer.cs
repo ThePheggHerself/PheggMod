@@ -104,6 +104,7 @@ namespace PheggMod
                 _banPlayer = player.GetComponent<BanPlayer>();
                 _networkConnection = player.GetComponent<NetworkConnection>();
                 _broadcast = player.GetComponent<Broadcast>();
+
                 #endregion
 #pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

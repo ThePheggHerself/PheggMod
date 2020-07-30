@@ -27,9 +27,9 @@ namespace PheggMod.Commands
                 CheckCommand<PersonalBroadcastCommand>(typeof(PersonalBroadcastCommand));
                 CheckCommand<PocketCommand>(typeof(PocketCommand));
                 CheckCommand<SizeCommand>(typeof(SizeCommand));
-                CheckCommand<SlayCommand>(typeof(SlayCommand));
                 CheckCommand<TestCommand>(typeof(TestCommand));
                 CheckCommand<Tower2Command>(typeof(Tower2Command));
+                CheckCommand<ClearBloodCommand>(typeof(ClearBloodCommand));
             }
             catch(Exception e)
             {
@@ -116,10 +116,15 @@ namespace PheggMod.Commands
 
             foreach (string player in playerStrings)
             {
-                int index = hubs.FindIndex(p => p.queryProcessor.PlayerId.ToString() == player || p.nicknameSync.MyNick.ToLower().Contains(player) || p.characterClassManager.UserId == player);
-                if (index > -1)
+                if (int.TryParse(player, out int id) && ReferenceHub.TryGetHub(id, out ReferenceHub hub))
+                    playerList.Add(hub);
+                else
                 {
-                    playerList.Add(hubs[index]);
+                    int index = hubs.FindIndex(p => p.queryProcessor.PlayerId.ToString() == player || p.characterClassManager.UserId == player || (player.Length > 2 && p.nicknameSync.MyNick.ToLower().Contains(player)));
+                    if (index > -1)
+                    {
+                        playerList.Add(hubs[index]);
+                    }
                 }
             }
 

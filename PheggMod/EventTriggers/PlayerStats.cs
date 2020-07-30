@@ -98,9 +98,9 @@ namespace PheggMod.EventTriggers
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().name}\n{e}");
+                //Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().name}\n{e}");
                 return orig_HurtPlayer(info, go);
             }
         }
