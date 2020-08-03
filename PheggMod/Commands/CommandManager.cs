@@ -19,8 +19,6 @@ namespace PheggMod.Commands
                 CheckCommand<NukeParentCommand>(typeof(NukeParentCommand));
                 CheckCommand<PositionParentCommand>(typeof(PositionParentCommand));
 
-
-
                 CheckCommand<ClearupCommand>(typeof(ClearupCommand));
                 CheckCommand<DropCommand>(typeof(DropCommand));
                 //CheckCommand<LockRespawnCommand>(typeof(LockRespawnCommand));

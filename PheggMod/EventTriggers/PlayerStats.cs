@@ -108,18 +108,12 @@ namespace PheggMod.EventTriggers
         public extern void orig_Roundrestart();
         public new void Roundrestart()
         {
-            //try
-            //{
-            //    Commands.CustomInternalCommands.isLightsout = false;
-            //    PMAlphaWarheadController.nukeLock = false;
-
-            //    if (Commands.CustomInternalCommands.reloadPlugins)
-            //    {
-            //        Timing.RunCoroutine(TriggerPluginReload());
-            //        Commands.CustomInternalCommands.reloadPlugins = false;
-            //    }
-            //}
-            //catch (Exception) { }
+            try
+            {
+                Commands.CustomInternalCommands.isLightsout = false;
+                PMAlphaWarheadController.nukeLock = false;
+            }
+            catch (Exception) { }
 
             orig_Roundrestart();
         }

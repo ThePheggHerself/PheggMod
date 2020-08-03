@@ -1,19 +1,14 @@
-﻿using CustomPlayerEffects;
-using GameCore;
+﻿using GameCore;
 using Grenades;
 using MEC;
 using Mirror;
 using PheggMod.API.Commands;
-using PheggMod.EventTriggers;
 using Respawning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking.Match;
 using Object = UnityEngine.Object;
 
 namespace PheggMod.Commands
@@ -77,110 +72,35 @@ namespace PheggMod.Commands
 
         readonly BindingFlags flags = BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public;
 
-        //[PMCommand("help"), PMParameters("command"), PMConsoleRunnable(true), PMCommandSummary("Shows a summary of a given command")]
-        public void cmd_help(CommandInfo info)
-        {
-            string msg;
-            string q = info.commandArgs[1];
-
-            if (!PluginManager.allCommands.ContainsKey(q))
-                msg = "No command found!";
-            else
-            {
-                MethodInfo cmd = PluginManager.allCommands[q];
-                if (cmd == null || cmd.Equals(default(Type)))
-                    msg = "No command found!";
-
-                else
-                {
-                    PMCommandSummary pmSummary = (PMCommandSummary)cmd.GetCustomAttribute(typeof(PMCommandSummary));
-                    PMParameters pmParams = (PMParameters)cmd.GetCustomAttribute(typeof(PMParameters));
-                    PMPermission pmPerms = (PMPermission)cmd.GetCustomAttribute(typeof(PMPermission));
-
-                    string usage = $"{q} {(pmParams != null ? $"[{string.Join("] [", pmParams.parameters).ToUpper()}]" : "")}";
-                    string summary = pmSummary != null ? pmSummary.commandSummary : "No command summary found!";
-                    string permission = pmPerms != null ? pmPerms.perm.ToString() : "No specific permissions required";
-
-                    msg = $"Command info for: {q}"
-                        + $"\nUsage: {usage}"
-                        + $"\nSummary: {summary}"
-                        + $"\nPermission: {permission}";
-                }
-            }
-
-            if (info.gameObject != null)
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#{msg}", true, false, "");
-            else
-                Base.Info(msg);
-        }
-
         #region RA-Only Commands
 
         internal static bool isLightsout = false;
         [PMCommand("lightsout"), PMParameters(), PMPermission(PlayerPermissions.FacilityManagement)]
-        public void cmd_Lightsout(CommandInfo info) => Timing.RunCoroutine(Lightsout(info));
-        private IEnumerator<float> Lightsout(CommandInfo info)
+        public void cmd_Lightsout(CommandInfo info)
         {
             if (!isLightsout)
             {
-                isLightsout = true;
+                SetAllLights(2500);
 
-                info.commandSender.RaReply(info.commandName + $"#Facility lights have been disabled!", true, true, "");
+                foreach (var player in ReferenceHub.GetAllHubs())
+                    player.Value.inventory.AddNewItem(ItemType.Flashlight);
 
-                foreach (GameObject player in PlayerManager.players)
-                    player.GetComponent<Broadcast>().TargetAddElement(player.GetComponent<NetworkConnection>(), $"Lightsout has been enabled. This will cause occasional rapid flickering of lights throughout HCZ and LCZ", 20, Broadcast.BroadcastFlags.Normal);
-
-                yield return Timing.WaitForSeconds(9f);
-
-                RespawnEffectsController.PlayCassieAnnouncement("ERROR IN FACILITY LIGHT CONTROL . SYSTEM TERMINATION IN 3 . 2 . 1", false, true);
-
-                foreach (GameObject player in PlayerManager.players)
-                    player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
-
-                yield return Timing.WaitForSeconds(11f);
-
-                Timing.RunCoroutine(CheckLights());
-            }
-            else if (isLightsout)
-            {
-                isLightsout = false;
-                info.commandSender.RaReply(info.commandName.ToUpper() + $"#Facility lights will be enabled next cycle!", true, true, "");
-            }
-
-            yield return 0f;
-        }
-        private IEnumerator<float> CheckLights()
-        {
-            yield return Timing.WaitForSeconds(33f);
-
-            if (!isLightsout)
-            {
-                RespawnEffectsController.PlayCassieAnnouncement("FACILITY LIGHT CONTROL SYSTEM REPAIR COMPLETE . LIGHT SYSTEM ENGAGED", false, true);
-                yield return 0f;
             }
             else
-            {
-                foreach (Generator079 gen in UnityEngine.Object.FindObjectsOfType<Generator079>())
-                    //gen.RpcCustomOverchargeForOurBeautifulModCreators(30f, false);
+                SetAllLights(1);
 
-                Timing.RunCoroutine(CheckLights());
-            }
+            isLightsout = !isLightsout;
+
+            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Facility lights have been {(isLightsout ? "disabled" : "enabled")}!", true, true, "");
         }
-
-        internal static bool reloadPlugins = false;
-        [PMCommand("pluginreload"), PMAlias("reloadplugins", "plreload"), PMParameters(), PMPermission(PlayerPermissions.ServerConfigs)]
-        public void cmd_ReloadPlugins(CommandInfo info)
+        public static void SetAllLights(int time)
         {
-            if (!reloadPlugins)
+            foreach (var comp in Object.FindObjectsOfType<FlickerableLightController>())
             {
-                reloadPlugins = true;
-                info.commandSender.RaReply(info.commandName + $"#Server plugins will be reloaded upon round restart.", true, true, "");
+                var interactable = comp.GetComponent<Scp079Interactable>();
+                if (interactable == null || interactable.type != Scp079Interactable.InteractableType.LightController) continue;
 
-                Base.Warn($"{info.commandSender.Nickname} ({info.gameObject.GetComponent<CharacterClassManager>().UserId}) has triggered the pluginreload command!\nAll plugins and custom commands will be reloaded upon round restart");
-            }
-            else
-            {
-                info.commandSender.RaReply(info.commandName + $"#Server plugins are already set to reload upon round restart.", true, true, "");
+                comp.ServerFlickerLights(time);
             }
         }
 
