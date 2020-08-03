@@ -29,7 +29,6 @@ namespace PheggMod.Commands
                 CheckCommand<SizeCommand>(typeof(SizeCommand));
                 CheckCommand<TestCommand>(typeof(TestCommand));
                 CheckCommand<Tower2Command>(typeof(Tower2Command));
-                CheckCommand<ClearBloodCommand>(typeof(ClearBloodCommand));
             }
             catch(Exception e)
             {

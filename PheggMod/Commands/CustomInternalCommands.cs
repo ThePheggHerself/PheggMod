@@ -161,7 +161,7 @@ namespace PheggMod.Commands
             else
             {
                 foreach (Generator079 gen in UnityEngine.Object.FindObjectsOfType<Generator079>())
-                    gen.RpcCustomOverchargeForOurBeautifulModCreators(30f, false);
+                    //gen.RpcCustomOverchargeForOurBeautifulModCreators(30f, false);
 
                 Timing.RunCoroutine(CheckLights());
             }
