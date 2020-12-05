@@ -29,7 +29,7 @@ namespace PheggMod.Commands
                 NetworkServer.Destroy(rDs[p].gameObject);
             }
 
-            response = $"#Cleaned up all ragdolls";
+            response = $"Cleaned up all ragdolls";
             return true;
         }
     }

@@ -164,30 +164,7 @@ namespace PheggMod
         
         public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
         {
-            if (duration < 1)
-                Kick(reason, issuer);
-
-            BanHandler.IssueBan(new BanDetails
-            {
-                OriginalName = name,
-                Id = userId,
-                Issuer = issuer,
-                IssuanceTime = DateTime.UtcNow.Ticks,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(duration).Ticks,
-                Reason = reason
-            }, BanHandler.BanType.UserId);
-            if (banIP)
-            {
-                BanHandler.IssueBan(new BanDetails
-                {
-                    OriginalName = name,
-                    Id = ipAddress,
-                    Issuer = issuer,
-                    IssuanceTime = DateTime.UtcNow.Ticks,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(duration).Ticks,
-                    Reason = reason
-                }, BanHandler.BanType.IP);
-            }
+            _banPlayer.BanUser(gameObject, duration, reason, issuer);
         }
         public void Kick(string reason = "No reason provided", string issuer = "SERVER")
         {

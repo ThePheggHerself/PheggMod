@@ -21,7 +21,7 @@ namespace PheggMod.Commands
 
                 CheckCommand<ClearupCommand>(typeof(ClearupCommand));
                 CheckCommand<DropCommand>(typeof(DropCommand));
-                //CheckCommand<LockRespawnCommand>(typeof(LockRespawnCommand));
+                CheckCommand<LightsoutCommand>(typeof(LightsoutCommand));
                 CheckCommand<PersonalBroadcastCommand>(typeof(PersonalBroadcastCommand));
                 CheckCommand<PocketCommand>(typeof(PocketCommand));
                 CheckCommand<SizeCommand>(typeof(SizeCommand));

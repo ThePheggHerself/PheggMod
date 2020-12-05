@@ -12,7 +12,7 @@ namespace PheggMod.EventTriggers
         internal static string webhookUrl, webhookName, webhookAvatar, webhookMessage, reportHeader, reportContent, reportServerName;
         internal static int webhookColour, detonationTimer;
 
-        internal static bool announceChaos, cassieGlitch, cassieGlitchDetonation, stickyRound, targetAnnouncement, mockCommand, randomSizes, tutorialTrigger096, enable008;
+        internal static bool announceChaos, cassieGlitch, cassieGlitchDetonation, stickyRound, targetAnnouncement, mockCommand, tutorialTrigger096, enable008;
         internal static string chaosAnnouncement;
 
         internal static float doorCooldown173;
@@ -52,8 +52,6 @@ namespace PheggMod.EventTriggers
             webhookColour = ServerConfig.GetInt("report_color", 14423100);
 
             doorCooldown173 = ServerConfig.GetFloat("scp173_door_cooldown", 25f);
-
-            randomSizes = ServerConfig.GetBool("random_sizes", false);
 
             #region SmartGuard
             enableSmartGuard = ServerConfig.GetBool("sg_enabled", true);

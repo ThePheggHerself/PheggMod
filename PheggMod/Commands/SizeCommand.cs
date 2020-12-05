@@ -30,7 +30,7 @@ namespace PheggMod.Commands
 
             if (!float.TryParse(arguments.Array[2], out float scale))
             {
-                response = $"#Invalid scale given (Use numbers)";
+                response = $"Invalid scale given (Use numbers)";
                 return false;
             }
 
@@ -51,7 +51,7 @@ namespace PheggMod.Commands
                 }
             }
 
-            response = $"#Scale of {hubs.Count} {(hubs.Count != 1 ? "players" : "player")} has been set to {scale}";
+            response = $"Scale of {hubs.Count} {(hubs.Count != 1 ? "players" : "player")} has been set to {scale}";
             return true;
         }
     }

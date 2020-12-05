@@ -74,36 +74,6 @@ namespace PheggMod.Commands
 
         #region RA-Only Commands
 
-        internal static bool isLightsout = false;
-        [PMCommand("lightsout"), PMParameters(), PMPermission(PlayerPermissions.FacilityManagement)]
-        public void cmd_Lightsout(CommandInfo info)
-        {
-            if (!isLightsout)
-            {
-                SetAllLights(2500);
-
-                foreach (var player in ReferenceHub.GetAllHubs())
-                    player.Value.inventory.AddNewItem(ItemType.Flashlight);
-
-            }
-            else
-                SetAllLights(1);
-
-            isLightsout = !isLightsout;
-
-            info.commandSender.RaReply(info.commandName.ToUpper() + $"#Facility lights have been {(isLightsout ? "disabled" : "enabled")}!", true, true, "");
-        }
-        public static void SetAllLights(int time)
-        {
-            foreach (var comp in Object.FindObjectsOfType<FlickerableLightController>())
-            {
-                var interactable = comp.GetComponent<Scp079Interactable>();
-                if (interactable == null || interactable.type != Scp079Interactable.InteractableType.LightController) continue;
-
-                comp.ServerFlickerLights(time);
-            }
-        }
-
         [PMCommand("curpos"), PMParameters("PlayerID"), PMCommandSummary("Tells you your current position")]
         public void cmd_pos(CommandInfo info)
         {

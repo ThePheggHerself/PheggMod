@@ -17,7 +17,7 @@ namespace PheggMod.EventTriggers
         public extern void orig_ParseVisionInformation(VisionInformation info);
         public new void ParseVisionInformation(VisionInformation info)
         {
-            if (info.Source.GetComponent<CharacterClassManager>().CurClass == RoleType.Tutorial && !PMConfigFile.tutorialTrigger096)
+            if (info.SourceHub.characterClassManager.CurClass == RoleType.Tutorial && !PMConfigFile.tutorialTrigger096)
                 return;
             else
                 orig_ParseVisionInformation(info);

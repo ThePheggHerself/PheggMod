@@ -29,7 +29,7 @@ namespace PheggMod.EventTriggers
                 Base.Error($"Error triggering RespawnEvent: {e.InnerException}");
             }
 
-            if (Commands.CustomInternalCommands.isLightsout)
+            if (Commands.LightsoutCommand.isLightsout)
                 RespawnManagerCrap.TorchSpawnerReplacementDueToShittyCode();
 
             if (RespawnManagerCrap.isCI && PMConfigFile.announceChaos)

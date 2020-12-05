@@ -33,7 +33,7 @@ namespace PheggMod.EventTriggers
                         lastCommand = q;
                         PheggPlayer pheggPlayer = new PheggPlayer(go);
 
-                        if (q.ToUpper().Contains("CASSIE"))
+                        if (q.ToUpper().StartsWith("CASSIE"))
                             q = q.ToUpper() + " PITCH_1";
 
                         try

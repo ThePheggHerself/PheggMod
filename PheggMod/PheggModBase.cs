@@ -29,6 +29,7 @@ namespace PheggMod
         private int[] _restartTimeClean;
         public static int roundCount = 0;
         public static DateTime? roundStartTime = null;
+
         public static readonly List<string> colours = new List<string>
         {
             "RANDOMSTUPIDTEXTTOFORCEDEFAULT",

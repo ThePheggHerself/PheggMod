@@ -110,7 +110,7 @@ namespace PheggMod.EventTriggers
         {
             try
             {
-                Commands.CustomInternalCommands.isLightsout = false;
+                Commands.LightsoutCommand.isLightsout = false;
                 PMAlphaWarheadController.nukeLock = false;
             }
             catch (Exception) { }

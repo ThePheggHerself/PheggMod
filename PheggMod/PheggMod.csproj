@@ -110,6 +110,7 @@
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\CustomInternalCommands.cs" />
     <Compile Include="Commands\DropCommand.cs" />
+    <Compile Include="Commands\LightsoutCommand.cs" />
     <Compile Include="Commands\LockRespawnCommand.cs" />
     <Compile Include="Commands\NukeCommand\NukeDisableCommand.cs" />
     <Compile Include="Commands\NukeCommand\NukeEnableCommand.cs" />

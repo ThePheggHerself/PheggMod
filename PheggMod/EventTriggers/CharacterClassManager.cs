@@ -90,45 +90,6 @@ namespace PheggMod.EventTriggers
                             Base.Error($"Error triggering PlayerEscapeEvent: {e.InnerException}");
                         }
                 }
-
-
-                if (PMConfigFile.randomSizes)
-                {
-                    if (CurClass != RoleType.Spectator && CurClass != RoleType.Tutorial)
-                    {
-
-                        Scale.scaleObject sObject;
-                        if (Scale.lastScales.ContainsKey(UserId))
-                            sObject = Scale.lastScales[UserId];
-                        else
-                        {
-                            sObject = new Scale.scaleObject { lastMultiplier = 1f, respawnCount = 0 };
-
-                            Scale.lastScales.Add(UserId, sObject);
-                        }
-
-                        sObject.respawnCount++;
-
-                        if (sObject.respawnCount % 2 != 0 || sObject.respawnCount == 2)
-                            return;
-
-                        float scale;
-
-                        if (CurClass == RoleType.Scp93989)
-                            scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
-                        else if (CurClass == RoleType.Scp0492)
-                            scale = Scale.lastScales.ContainsKey(UserId) ? Scale.lastScales[UserId].lastMultiplier : (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
-                        else if (IsScpButNotZombie())
-                            scale = (float)(new System.Random().NextDouble() * (1.1 - 1) + 1);
-                        else
-                            scale = (float)(new System.Random().NextDouble() * (1.1 - 0.9) + 0.9);
-
-                        Scale.lastScales[UserId].lastMultiplier = scale;
-
-                        Scale.SetSize(scale, gameObject);
-                    }
-                }
-
             }
             catch (Exception e)
             {
