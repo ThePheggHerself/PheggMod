@@ -35,7 +35,6 @@ namespace PheggMod.EventTriggers
 
                 _client = new HttpClient();
                 _client.DefaultRequestHeaders.Add("User-Agent", "SCP SL");
-                _client.DefaultRequestHeaders.Add("Game-Version", CustomNetworkManager.CompatibleVersions[0]);
                 _client.Timeout = TimeSpan.FromSeconds(20.0);
 
                 _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));

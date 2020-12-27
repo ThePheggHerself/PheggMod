@@ -16,8 +16,8 @@ namespace PheggMod.EventTriggers
     public class PMPlayerStats : PlayerStats
     {
         //PlayerHurtEvent
-        public extern bool orig_HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false);
-        public new bool HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false)
+        public extern bool orig_HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true);
+        public new bool HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
         {
             try
             {
@@ -43,7 +43,6 @@ namespace PheggMod.EventTriggers
                         Base.Error(e.ToString());
                         return orig_HurtPlayer(info, go);
                     }
-
 
                 if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
                     return orig_HurtPlayer(info, go);

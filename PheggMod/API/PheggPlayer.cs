@@ -65,7 +65,7 @@ namespace PheggMod
                 _broadcast = player.GetComponent<Broadcast>();
 
                 name = refHub.nicknameSync.MyNick;
-                nameClean = _filterNames.Replace(name, string.Empty);
+                nameClean = _filterNames.Replace(name, @"\$&");
                 userId = refHub.characterClassManager.UserId;
                 domain = refHub.characterClassManager.UserId.Split('@')[1].ToUpper();
                 ipAddress = refHub.nicknameSync.connectionToClient.address;
@@ -158,7 +158,7 @@ namespace PheggMod
 
         public override string ToString()
         {
-            return $"{_filterNames.Replace(name, string.Empty)} ({userId})";
+            return $"{nameClean} ({userId})";
         }
         public void Kill() => refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Wall, playerId), gameObject);
         
