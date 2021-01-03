@@ -27,23 +27,32 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		HeavyModded|Any CPU = HeavyModded|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.HeavyModded|Any CPU.ActiveCfg = Debug|Any CPU
+		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
 		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79C1D5BF-DD69-4CC6-9487-1CD9ACA91C3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4216CED2-A507-40F7-824C-F1A05686186C}.HeavyModded|Any CPU.ActiveCfg = Debug|Any CPU
+		{4216CED2-A507-40F7-824C-F1A05686186C}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4216CED2-A507-40F7-824C-F1A05686186C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.HeavyModded|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F6E3680-2F99-4083-B994-B3340381EB8F}.HeavyModded|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F6E3680-2F99-4083-B994-B3340381EB8F}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
 		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

@@ -52,6 +52,7 @@ namespace PheggMod.EventTriggers
             {
                 Base.Error($"Error triggering RoundStartEvent: {e.InnerException}");
             }
+			FFDetector.FFDetector.DoCheck = true;
 
             return Bool;
         }

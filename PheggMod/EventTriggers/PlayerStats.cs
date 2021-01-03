@@ -51,27 +51,35 @@ namespace PheggMod.EventTriggers
                 try { attacker = new PheggPlayer(info.GetPlayerObject()); }
                 catch { }
 
-                bool IsKill = info.Amount >= player.health;
-                if (IsKill)
-                    try
-                    {
-                        Base.Debug("Triggering PlayerDeathEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.GetDamageType(), info));
-                    }
-                    catch (Exception e)
-                    {
-                        Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
-                    }
-                else
-                    try
-                    {
-                        Base.Debug("Triggering PlayerHurtEvent");
-                        PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.GetDamageType(), info));
-                    }
-                    catch (Exception e)
-                    {
-                        Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
-                    }
+				FFDetector.FFDetector.CalculateFF(go, info, out info.Amount);
+
+				//Base.Info(info.Amount.ToString());
+				
+
+				bool IsKill = info.Amount >= player.health;
+				if (info.Amount > 0)
+				{
+					if (IsKill && info.Amount > 0)
+						try
+						{
+							Base.Debug("Triggering PlayerDeathEvent");
+							PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.GetDamageType(), info));
+						}
+						catch (Exception e)
+						{
+							Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
+						}
+					else
+						try
+						{
+							Base.Debug("Triggering PlayerHurtEvent");
+							PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.GetDamageType(), info));
+						}
+						catch (Exception e)
+						{
+							Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
+						}
+				}
 
                 bool result = orig_HurtPlayer(info, go, noTeamDamage);
 
@@ -99,7 +107,6 @@ namespace PheggMod.EventTriggers
             }
             catch (Exception)
             {
-                //Base.Error($"PlayerStats.HurtPlayer error:\n{go.GetComponent<NicknameSync>().MyNick} - {info.GetDamageType().name}\n{e}");
                 return orig_HurtPlayer(info, go);
             }
         }
@@ -116,5 +123,5 @@ namespace PheggMod.EventTriggers
 
             orig_Roundrestart();
         }
-    }
+	}
 }

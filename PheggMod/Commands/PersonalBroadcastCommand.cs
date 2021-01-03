@@ -27,10 +27,16 @@ namespace PheggMod.Commands
                 return false;
             }
 
-            foreach (ReferenceHub refhub in hubs)
+			string message = $"<color=#FFA500><b>[Private]</b></color> <color=green>{string.Join(" ", arguments.Skip(2))}</color>";
+
+			GameObject senderObject = PlayerManager.players.Where(p => p.GetComponent<NicknameSync>().MyNick == ((CommandSender)sender).Nickname).FirstOrDefault();
+			if (senderObject != null)
+				hubs.Add(senderObject.GetComponent<ReferenceHub>());
+
+			foreach (ReferenceHub refhub in hubs)
             {
                 GameObject go = refhub.gameObject;
-                go.GetComponent<Broadcast>().TargetAddElement(go.GetComponent<NetworkConnection>(), string.Join(" ", arguments.Skip(2)), duration, Broadcast.BroadcastFlags.Normal);
+                go.GetComponent<Broadcast>().TargetAddElement(go.GetComponent<NetworkConnection>(), message, duration, Broadcast.BroadcastFlags.Normal);
             }
 
             response = "Broadcast sent";

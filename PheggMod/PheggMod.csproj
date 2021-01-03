@@ -31,6 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'HeavyModded|AnyCPU'">
+    <OutputPath>bin\HeavyModded\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -134,6 +143,7 @@
     <Compile Include="EventTriggers\CustomLiteNetLib4MirrorTransport.cs" />
     <Compile Include="EventTriggers\CustomNetworkManager.cs" />
     <Compile Include="EventTriggers\DecontaminationLCZ.cs" />
+    <Compile Include="EventTriggers\FragGrenade.cs" />
     <Compile Include="EventTriggers\GrenadeManager.cs" />
     <Compile Include="EventTriggers\NicknameSync.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
@@ -145,6 +155,7 @@
     <Compile Include="EventTriggers\RoundSummary.cs" />
     <Compile Include="EventTriggers\Scp096.cs" />
     <Compile Include="EventTriggers\ServerRoles.cs" />
+    <Compile Include="FFDetector\FFDetector.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />
     <Compile Include="API\Plugin\PluginManager.cs" />
