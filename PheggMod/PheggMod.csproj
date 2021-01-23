@@ -134,6 +134,7 @@
     <Compile Include="Commands\Tower2Command.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
     <Compile Include="CustomEffects\SCP008.cs" />
+    <Compile Include="DissonanceShit.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />

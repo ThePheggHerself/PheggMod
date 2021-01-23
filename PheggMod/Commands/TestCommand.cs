@@ -1,9 +1,11 @@
 ﻿using CommandSystem;
+using Interactables.Interobjects.DoorUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telepathy;
 
 namespace PheggMod.Commands
 {
@@ -17,11 +19,11 @@ namespace PheggMod.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response, out List<ReferenceHub> hubs);
-            if (!canRun)
-                return false;
+			bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response, out List<ReferenceHub> hubs);
+			if (!canRun)
+				return false;
 
-            response = $"Never gonna give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.";
+			response = $"Never gonna give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.";
             return true;
         }
     }

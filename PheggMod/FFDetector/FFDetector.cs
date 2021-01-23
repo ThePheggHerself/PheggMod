@@ -52,7 +52,6 @@ namespace PheggMod.FFDetector
 			public FFPlayer FFPlayer;
 			public DateTime LastLegitDamage;
 		}
-
 		internal static void CalculateFF(GameObject Victim, PlayerStats.HitInfo info, out float damage)
 		{
 			try
@@ -83,7 +82,6 @@ namespace PheggMod.FFDetector
 				{
 					if (GrenadeThrowers.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
 						ffInfo.GrenadeThrower = GrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId];
-
 					else
 					{
 						ffInfo.GrenadeThrower = new GrenadeThrower
@@ -112,8 +110,6 @@ namespace PheggMod.FFDetector
 				}
 
 				bool isFF = IsFF(ffInfo, ffInfo.Target);
-
-				//Base.Info($"{isFF} { ffInfo.Attacker.characterClassManager.CurRole.team} {ffInfo.Target.characterClassManager.CurRole.team}");
 
 				if (DamageList.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
 					ffInfo.LastLegitDamage = DamageList[ffInfo.Attacker.characterClassManager.UserId];

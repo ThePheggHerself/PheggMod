@@ -3,6 +3,9 @@ using LightContainmentZoneDecontamination;
 using MonoMod;
 using PheggMod.API.Events;
 using System;
+using System.Linq;
+using UnityEngine;
+using Interactables.Interobjects.DoorUtils;
 
 namespace PheggMod.EventTriggers
 {
