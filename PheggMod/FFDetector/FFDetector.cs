@@ -243,7 +243,10 @@ namespace PheggMod.FFDetector
 		{
 			ffInfo.Attacker.hints.Show(new TextHint("I Shouldn't Shoot Friendlies...", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
 
-			ffInfo.Attacker.playerStats.HurtPlayer(new PlayerStats.HitInfo(Mathf.Clamp(ffInfo.HitInfo.Amount / 4, 5, 50), ffInfo.HitInfo.Attacker, ffInfo.HitInfo.GetDamageType(), ffInfo.Attacker.playerId), ffInfo.Attacker.gameObject);
+			float damage = Mathf.Clamp(ffInfo.HitInfo.Amount / 4, 5, 50);
+			damage = Mathf.Clamp(damage, 0, ffInfo.Attacker.playerStats.Health - 1);
+
+			ffInfo.Attacker.playerStats.HurtPlayer(new PlayerStats.HitInfo(damage, ffInfo.HitInfo.Attacker, ffInfo.HitInfo.GetDamageType(), ffInfo.Attacker.playerId), ffInfo.Attacker.gameObject);
 			ffInfo.Attacker.inventory.SetCurItem(ItemType.None);
 
 			if (ffInfo.FFPlayer.Triggers > 2)

@@ -528,7 +528,7 @@ namespace DiscordLab
 
 			public override ulong Permissions => ServerStatic.GetPermissionsHandler().FullPerm;
 
-			public override byte KickPower => 10;
+			public override byte KickPower => 255;
 
 			public override bool FullPermissions => true;
 
