@@ -25,6 +25,9 @@ namespace PheggMod.EventTriggers
             {
                 Base.Error($"Error triggering RoundEndEvent: {e.InnerException}");
             }
+			FFDetector.FFDetector.FFPlayers.Clear();
+			FFDetector.FFDetector.GrenadeThrowers.Clear();
+			FFDetector.FFDetector.DoCheck = false;
 
             orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
         }

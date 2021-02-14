@@ -13,12 +13,14 @@ using UnityEngine;
 namespace PheggMod.EventTriggers
 {
     [MonoModPatch("global::RemoteAdmin.CommandProcessor")]
-    class PMCommandProcessor
+    public class PMCommandProcessor
     {   
         internal static string lastCommand;
 
+		public static void PMProcessQuery(string command, CommandSender sender) => ProcessQuery(command, sender);
+
         public static extern void orig_ProcessQuery(string q, CommandSender sender);
-        public static void ProcessQuery(string q, CommandSender sender)
+		public static void ProcessQuery(string q, CommandSender sender)
         {
             try
             {

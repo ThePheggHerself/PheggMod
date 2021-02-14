@@ -17,6 +17,9 @@ client.on("ready", () => {
 			var DiscordMessage = messages.join('\n');
 			messages.length = 0
 
+			if (DiscordMessage.length > 1950)
+				DiscordMessage = DiscordMessage.substring(0, 1950);
+
 			client.channels.get(config.channel).send(`[${new Date().toLocaleTimeString()}]\n` + DiscordMessage.replace(/.gg\//g, ""));
 		}
 	}, 1000)
@@ -99,12 +102,12 @@ tcpSocket.on("connection", (socket) => {
 						if (playerListTemp.length > 0)
 							playerLists.push(playerListTemp)
 
-						var embed = new Discord.RichEmbed();
-						embed.setColor('#e63120')
-						embed.setAuthor('DragonSCP Player list')
-						embed.setTimestamp();
-						//steam:/run/700330/args/-connect:51.68.204.237:7790
-						embed.addField(args[0].replace("\n", " ") + "Players currently online", `Join in at 51.68.204.237:${config.port - 1000}`)
+                        var embed = new Discord.RichEmbed()
+                            .setDescription('User with DoNotTrack enabled will **NOT** be shown in the list below')
+                            .setColor('#e63120')
+						    .setAuthor('DragonSCP Player list')
+						    .setTimestamp()
+						    .addField(args[0].replace("\n", " ") + "Players currently online", `Join in at 51.68.204.237:${config.port - 1000}`);
 
 						var index = 0;
 						playerLists.forEach(list => {
