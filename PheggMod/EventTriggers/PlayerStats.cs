@@ -85,14 +85,24 @@ namespace PheggMod.EventTriggers
 
 				if (PMConfigFile.enable008 && (info.GetDamageType() == DamageTypes.Scp0492 || info.GetDamageType() == DamageTypes.Poison))
 				{
-					CustomEffects.SCP008 effect = player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>();
-
 					if (IsKill)
 						player.roleType = RoleType.Scp0492;
 
-					return result;
+					else if (info.GetDamageType() == DamageTypes.Scp0492)
+					{
+						CustomEffects.SCP008 effect = player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>();
+
+						if (effect == null || !effect.Enabled)
+							player.gameObject.GetComponent<PlayerEffectsController>().EnableEffect<CustomEffects.SCP008>(300f, false);
+
+						else
+							player.refHub.playerEffectsController.GetEffect<CustomEffects.SCP008>().intensity++;
+					}
 				}
-            }
+
+				return result;
+
+			}
             catch (Exception)
             {
                 return orig_HurtPlayer(info, go);
