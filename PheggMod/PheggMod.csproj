@@ -63,12 +63,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Build\DissonanceVoip.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CognitiveServices.Speech.csharp, Version=1.14.0.28, Culture=neutral, PublicKeyToken=d2e6dcccb609e663, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CognitiveServices.Speech.1.14.0\lib\net461\Microsoft.CognitiveServices.Speech.csharp.dll</HintPath>
-    </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\Mirror.dll</HintPath>
@@ -158,7 +152,6 @@
     <Compile Include="Commands\Tower2Command.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
     <Compile Include="CustomEffects\SCP008.cs" />
-    <Compile Include="DissonanceShit.cs" />
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
@@ -206,11 +199,4 @@
   <PropertyGroup>
     <PostBuildEvent>$(ProjectDir)bin\Build\monomod.bat</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Microsoft.CognitiveServices.Speech.1.14.0\build\net461\Microsoft.CognitiveServices.Speech.targets" Condition="Exists('..\packages\Microsoft.CognitiveServices.Speech.1.14.0\build\net461\Microsoft.CognitiveServices.Speech.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.CognitiveServices.Speech.1.14.0\build\net461\Microsoft.CognitiveServices.Speech.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CognitiveServices.Speech.1.14.0\build\net461\Microsoft.CognitiveServices.Speech.targets'))" />
-  </Target>
 </Project>
