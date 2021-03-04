@@ -181,6 +181,7 @@
     <Compile Include="EventTriggers\RoundSummary.cs" />
     <Compile Include="EventTriggers\Scp096.cs" />
     <Compile Include="EventTriggers\ServerRoles.cs" />
+    <Compile Include="EventTriggers\ServerStatic.cs" />
     <Compile Include="FFDetector\FFDetector.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />

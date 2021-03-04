@@ -16,6 +16,7 @@ using System.Diagnostics;
 using GameCore;
 using UnityEngine.Networking;
 using CommandSystem;
+using PheggMod.EventTriggers;
 
 namespace PheggMod
 {
@@ -76,10 +77,15 @@ namespace PheggMod
                 ///It's set for 60 seconds to ensure that the whole minute passes, meaning that regardless of server specs, it is impossible to start looping :D
                 if (dTime.Hour == _restartTimeClean[0] && dTime.Minute == _restartTimeClean[1] && Time.realtimeSinceStartup > 60)
                 {
-                    AddLog($"[PHEGGMOD] Server time has reached {dTime.ToShortTimeString()}, so the server will now restart!");
+					bool RoundOngoing = ReferenceHub.HostHub.characterClassManager.RoundStarted;
 
-                    _quitting = true;
-                    GameCore.Console.singleton.TypeCommand("QUIT");
+                    AddLog($"[PHEGGMOD] Server time has reached the specified restart time ({dTime.ToShortTimeString()}). The server will restart {(RoundOngoing ? "at the end of the current round" : "now")}");
+					PMServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
+
+					if (!RoundOngoing)
+						PMPlayerStats.StaticChangeLevel(true);
+
+					_quitting = true;
                 }
             }
 

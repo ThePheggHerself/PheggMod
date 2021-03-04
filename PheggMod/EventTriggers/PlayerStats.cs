@@ -120,5 +120,8 @@ namespace PheggMod.EventTriggers
 
 			orig_Roundrestart();
 		}
+
+		public static extern void orig_StaticChangeLevel(bool noShutdownMessage = false);
+		public static void StaticChangeLevel(bool noShutdownMessage = false) => orig_StaticChangeLevel(noShutdownMessage);
 	}
 }
