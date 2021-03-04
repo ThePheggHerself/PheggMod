@@ -22,8 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSCPChanges", "DSCPChanges\DSCPChanges.csproj", "{4F6E3680-2F99-4083-B994-B3340381EB8F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,12 +47,6 @@ Global
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA8A6F56-0A07-4EBA-9232-C5AD86E91076}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.HeavyModded|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.HeavyModded|Any CPU.Build.0 = Debug|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F6E3680-2F99-4083-B994-B3340381EB8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

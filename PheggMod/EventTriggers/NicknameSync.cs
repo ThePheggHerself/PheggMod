@@ -40,9 +40,6 @@ namespace PheggMod.EventTriggers
             {
                 Base.Error($"Error: {e.InnerException}");
             }
-
-			go.GetComponent<Broadcast>().TargetAddElement(go.GetComponent<NetworkConnection>(), "Welcome to DragonSCP. We are currently testing an experimental Friendly Fire system on our servers.", 10, Broadcast.BroadcastFlags.Normal);
-			go.GetComponent<Broadcast>().TargetAddElement(go.GetComponent<NetworkConnection>(), "If you wish to give feedback, feel free to do so on our discord. discord.gg/NUCDjPn", 10, Broadcast.BroadcastFlags.Normal);
 		}
     }
 }

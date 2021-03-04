@@ -90,7 +90,7 @@ namespace PheggMod
         public new void ReloadServerName()
         {
             orig_ReloadServerName();
-            _serverName += "<color=#ffffff00><size=1>SMPheggMod</size></color>";
+            _serverName += "<color=#ffffff00><size=1>PheggMod</size></color>";
         }
         public extern void orig_Start();
         public void Start()
