@@ -1,5 +1,7 @@
 ﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
 #pragma warning disable CS0109 // Member does not hide an inherited member; new keyword is not required
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable IDE0052 // Remove unread private members
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,7 @@ namespace PheggMod
     [MonoModPatch("global::ServerConsole")]
     public class Base : ServerConsole
     {
+
         private static string _serverName = string.Empty;
         private bool _quitting = false;
         private static bool _debug;
@@ -59,6 +62,7 @@ namespace PheggMod
         };
 
         private extern void orig_FixedUpdate();
+
         private new void FixedUpdate()
         {
             if (!_quitting && !string.IsNullOrEmpty(_restartTime))

@@ -19,7 +19,7 @@ namespace PheggMod.Commands
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-			bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response, out List<ReferenceHub> hubs);
+			bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response);
 			if (!canRun)
 				return false;
 

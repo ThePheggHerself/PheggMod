@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
+﻿#pragma warning disable IDE0060 // Remove unused parameter
 using MonoMod;
 using Utf8Json;
 using PheggMod.API.Events;
@@ -16,6 +16,8 @@ namespace PheggMod.EventTriggers
     class PMCheaterReport : CheaterReport
     {
         [MonoModReplace]
+
+
         internal static bool SubmitReport(string reporterUserId, string reportedUserId, string reason, ref int reportedId, string reporterNickname, string reportedNickname, bool friendlyFire)
         {
             try

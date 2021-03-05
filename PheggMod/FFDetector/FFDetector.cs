@@ -20,6 +20,7 @@ namespace PheggMod.FFDetector
 
 		public static Dictionary<string, FFPlayer> FFPlayers = new Dictionary<string, FFPlayer>();
 		public static bool DoCheck = false;
+		public static bool DetectorEnabled = true;
 
 		public class FFPlayer
 		{
@@ -58,7 +59,7 @@ namespace PheggMod.FFDetector
 			{
 				damage = info.Amount;
 
-				if (!DoCheck || Victim.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator || (!info.GetDamageType().isWeapon && info.GetDamageType() != DamageTypes.Grenade))
+				if (!DetectorEnabled || !DoCheck || Victim.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator || (!info.GetDamageType().isWeapon && info.GetDamageType() != DamageTypes.Grenade))
 					return;
 
 				FFInfo ffInfo = new FFInfo
@@ -74,7 +75,7 @@ namespace PheggMod.FFDetector
 
 				if (ffInfo.Target.characterClassManager.CurClass == RoleType.ClassD && ffInfo.Attacker.characterClassManager.CurClass == RoleType.ClassD)
 				{
-					updateLegitDamage(ffInfo.Attacker.characterClassManager.UserId);
+					UpdateLegitDamage(ffInfo.Attacker.characterClassManager.UserId);
 					return;
 				}
 
@@ -263,11 +264,11 @@ namespace PheggMod.FFDetector
 				ffInfo.Attacker.playerEffectsController.EnableEffect<Ensnared>(5 * (ffInfo.FFPlayer.Triggers - 5));
 			}
 
-			Base.Info($"{ffInfo.Attacker.nicknameSync.DisplayName} ({ffInfo.Attacker.characterClassManager.UserId}) was punished by FFDetector for Friendly Fire against {ffInfo.Target.nicknameSync.DisplayName} ({ffInfo.Target.characterClassManager.UserId})" +
-				$"\nPlayer Information: {ffInfo.Attacker.characterClassManager.CurClass} ({ffInfo.Attacker.characterClassManager.CurRole.team})" +
-				$"\nTarget Information: {ffInfo.Target.characterClassManager.CurClass} ({ffInfo.Target.characterClassManager.CurRole.team}) {(ffInfo.Target.handcuffs.CufferId > -1 ? "Disarmed" : "Not disarmed")} {(ffInfo.Target.playerEffectsController.GetEffect<SCP008>().Enabled ? "Infected" : "Not infected")}" +
-				$"\nDistance: {Vector3.Distance(ffInfo.Attacker.playerMovementSync.RealModelPosition, ffInfo.Target.playerMovementSync.RealModelPosition)}m Angle: {Vector3.Angle(ffInfo.Attacker.playerMovementSync.transform.forward, ffInfo.Attacker.playerMovementSync.transform.position - ffInfo.Target.GetComponent<PlayerMovementSync>().transform.position)} DamageType: {ffInfo.HitInfo.GetDamageType().name}" +
-				$"\nHostiles: {ffInfo.Hostiles.Count} Friendlies: {ffInfo.Friendlies.Count} Total: {ffInfo.NearbyPlayers.Count}");
+			//Base.Info($"{ffInfo.Attacker.nicknameSync.DisplayName} ({ffInfo.Attacker.characterClassManager.UserId}) was punished by FFDetector for Friendly Fire against {ffInfo.Target.nicknameSync.DisplayName} ({ffInfo.Target.characterClassManager.UserId})" +
+			//	$"\nPlayer Information: {ffInfo.Attacker.characterClassManager.CurClass} ({ffInfo.Attacker.characterClassManager.CurRole.team})" +
+			//	$"\nTarget Information: {ffInfo.Target.characterClassManager.CurClass} ({ffInfo.Target.characterClassManager.CurRole.team}) {(ffInfo.Target.handcuffs.CufferId > -1 ? "Disarmed" : "Not disarmed")} {(ffInfo.Target.playerEffectsController.GetEffect<SCP008>().Enabled ? "Infected" : "Not infected")}" +
+			//	$"\nDistance: {Vector3.Distance(ffInfo.Attacker.playerMovementSync.RealModelPosition, ffInfo.Target.playerMovementSync.RealModelPosition)}m Angle: {Vector3.Angle(ffInfo.Attacker.playerMovementSync.transform.forward, ffInfo.Attacker.playerMovementSync.transform.position - ffInfo.Target.GetComponent<PlayerMovementSync>().transform.position)} DamageType: {ffInfo.HitInfo.GetDamageType().name}" +
+			//	$"\nHostiles: {ffInfo.Hostiles.Count} Friendlies: {ffInfo.Friendlies.Count} Total: {ffInfo.NearbyPlayers.Count}");
 		}
 		private static List<ReferenceHub> GetNearbyPlayers(FFInfo ffInfo)
 		{
@@ -317,7 +318,7 @@ namespace PheggMod.FFDetector
 			else return false;
 		}
 
-		private static void updateLegitDamage(string Attacker)
+		private static void UpdateLegitDamage(string Attacker)
 		{
 			if (DamageList.ContainsKey(Attacker))
 				DamageList[Attacker] = DateTime.Now;

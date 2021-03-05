@@ -17,13 +17,6 @@ namespace PheggMod.EventTriggers
 
         internal static float doorCooldown173;
 
-        #region SmartGuard;
-        internal static bool enableSmartGuard, skipServerStaff, skipGlobalStaff, skipStudioStaff, smartFilter, defaultProfile, profNotSet;
-        internal static string[] whitelistedNames, whitelistedUids, blacklistedNames, blacklistedUids;
-        internal static int minorInfractionBan, mediumInfractionBan, MajorInfractionBan, accountAgeRequirement;
-        internal static string SteamKey;
-        #endregion
-
         public static extern void orig_ReloadGameConfigs(bool firstTime = false);
         public static void ReloadGameConfigs(bool firstTime = false)
         {
@@ -53,30 +46,8 @@ namespace PheggMod.EventTriggers
 
             doorCooldown173 = ServerConfig.GetFloat("scp173_door_cooldown", 25f);
 
-            #region SmartGuard
-            enableSmartGuard = ServerConfig.GetBool("sg_enabled", true);
-            skipServerStaff = ServerConfig.GetBool("sg_skip_staff_server", true);
-            skipGlobalStaff = ServerConfig.GetBool("sg_skip_global_staff", true);
-            skipGlobalStaff = ServerConfig.GetBool("sg_skip_studio_staff", true);
-            smartFilter = ServerConfig.GetBool("sg_smart_filter", true);
+			FFDetector.FFDetector.DetectorEnabled = ServerConfig.GetBool("pheggmod_friendly_fire_detector_enabled", true);
 
-            whitelistedNames = ServerConfig.GetStringList("sg_whitelist_names").ToArray();
-            blacklistedNames = ServerConfig.GetStringList("sg_blacklist_names").ToArray();
-            blacklistedNames.Concat(new string[] { "kite1101", "beefteef420", "saltcollector" }).ToArray();
-
-            blacklistedUids = ServerConfig.GetStringList("sg_whitelist_uids").ToArray();
-            whitelistedUids = ServerConfig.GetStringList("sg_whitelist_uids").ToArray();
-
-            minorInfractionBan = ServerConfig.GetInt("sg_minor_duration", 15); //15 minutes
-            mediumInfractionBan = ServerConfig.GetInt("sg_medium_duration", 4320); //3 days
-            MajorInfractionBan = ServerConfig.GetInt("sg_major_duration", 20160); //2 weeks
-
-            accountAgeRequirement = ServerConfig.GetInt("sg_minimum_age", 10080);
-
-            SteamKey = ServerConfig.GetString("steam_api_key", null);
-            defaultProfile = ServerConfig.GetBool("sg_steam_pdefaultprofile", false);
-            profNotSet = ServerConfig.GetBool("sg_steam_pprofilenotset", true);
-            #endregion
         }
     }
 }

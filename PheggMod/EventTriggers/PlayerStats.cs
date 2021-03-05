@@ -24,34 +24,35 @@ namespace PheggMod.EventTriggers
 				if (isLocalPlayer || !NetworkServer.active || go == null)
 					try
 					{
-						return orig_HurtPlayer(info, go);
+						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 					}
 					catch (Exception e)
 					{
 						Base.Error(e.ToString());
-						return orig_HurtPlayer(info, go);
+						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 					}
 
 				PheggPlayer player = new PheggPlayer(go);
 				if (player == null)
 					try
 					{
-						return orig_HurtPlayer(info, go);
+						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 					}
 					catch (Exception e)
 					{
 						Base.Error(e.ToString());
-						return orig_HurtPlayer(info, go);
+						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 					}
 
 				if (player.refHub.characterClassManager.isLocalPlayer || info.GetDamageType() == DamageTypes.None || player.refHub.characterClassManager.GodMode)
-					return orig_HurtPlayer(info, go);
+					return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 
 				PheggPlayer attacker = null;
 				try { attacker = new PheggPlayer(info.GetPlayerObject()); }
 				catch { }
 
-				FFDetector.FFDetector.CalculateFF(go, info, out info.Amount);
+				if (FFDetector.FFDetector.DetectorEnabled)
+					FFDetector.FFDetector.CalculateFF(go, info, out info.Amount);
 
 				bool IsKill = info.Amount >= player.health;
 				if (info.Amount > 0)
@@ -78,7 +79,7 @@ namespace PheggMod.EventTriggers
 						}
 				}
 
-				bool result = orig_HurtPlayer(info, go, noTeamDamage);
+				bool result = orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 
 				if (player == null)
 					return result;
@@ -103,11 +104,11 @@ namespace PheggMod.EventTriggers
 				return result;
 
 			}
-            catch (Exception)
-            {
-                return orig_HurtPlayer(info, go);
-            }
-        }
+			catch (Exception)
+			{
+				return orig_HurtPlayer(info, go);
+			}
+		}
 		public extern void orig_Roundrestart();
 		public new void Roundrestart()
 		{

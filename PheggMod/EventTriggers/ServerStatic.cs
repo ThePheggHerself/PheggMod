@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS0626 // orig_ method is marked external and has no attributes on it.
-using System;
+﻿using System;
 using MonoMod;
 
 using PheggMod.API.Events;

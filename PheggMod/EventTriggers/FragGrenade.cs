@@ -11,11 +11,14 @@ namespace PheggMod.EventTriggers
 	class PMFragGrenade : Grenades.FragGrenade
 	{
 		public extern bool orig_ServersideExplosion();
-		public bool ServersideExplosion()
+		public override bool ServersideExplosion()
 		{
-			if (FFDetector.FFDetector.GrenadeThrowers.ContainsKey(thrower.hub.characterClassManager.UserId))
+			if (FFDetector.FFDetector.DetectorEnabled)
 			{
-				FFDetector.FFDetector.GrenadeThrowers[thrower.hub.characterClassManager.UserId].DetonatePosition = transform.position;
+				if (FFDetector.FFDetector.GrenadeThrowers.ContainsKey(thrower.hub.characterClassManager.UserId))
+				{
+					FFDetector.FFDetector.GrenadeThrowers[thrower.hub.characterClassManager.UserId].DetonatePosition = transform.position;
+				}
 			}
 
 			return orig_ServersideExplosion();
