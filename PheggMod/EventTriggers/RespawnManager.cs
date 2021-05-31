@@ -3,6 +3,7 @@ using MonoMod;
 using PheggMod.API.Events;
 using Respawning;
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace PheggMod.EventTriggers
@@ -10,7 +11,7 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::Respawning.RespawnManager")]
     public class PMRespawnManager : RespawnManager
     {
-        public extern void orig_Spawn();
+		public extern void orig_Spawn();
         public new void Spawn()
         {
             if (RespawnManagerCrap.blockRespawns)

@@ -49,7 +49,7 @@ namespace PheggMod.CustomEffects
 			{
 				int chance = new System.Random().Next(0, 100);
 
-				if (chance > 20)
+				if (chance > 50)
 				{
 					NoEffect("Medkit");
 					return false;

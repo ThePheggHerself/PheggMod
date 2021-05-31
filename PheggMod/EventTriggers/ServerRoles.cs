@@ -18,6 +18,13 @@ namespace PheggMod.EventTriggers
     [MonoModPatch("global::ServerRoles")]
     class PMServerRoles : ServerRoles
     {
+		internal UserGroup Group;
+
+		public UserGroup UserGroup
+		{
+			get => Group;
+		}
+
         public extern void orig_RefreshPermissions(bool disp = false);
         public new void RefreshPermissions(bool disp = false)
         {
@@ -33,5 +40,9 @@ namespace PheggMod.EventTriggers
                 Base.Error($"Error triggering RefreshAdminPermsEvent: {e.InnerException}");
             }
         }
-    }
+
+		public extern void orig_TargetOpenRemoteAdmin(NetworkConnection connection, bool password);
+		[MonoModPublic]
+		public void TargetOpenRemoteAdmin(NetworkConnection connection, bool password) => orig_TargetOpenRemoteAdmin(connection, password);
+	}
 }

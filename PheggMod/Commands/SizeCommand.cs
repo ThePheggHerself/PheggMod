@@ -47,9 +47,14 @@ namespace PheggMod.Commands
                     if (lobbyPlayers[i] != refhub.gameObject)
                         conn.Send(dMsg, 0);
 
-                    typeof(NetworkServer).GetMethod("SendSpawnMessage", flags).Invoke(null, new object[] { nId, conn });
+                    typeof(NetworkServer).GetMethod("SendSpawnMessage", flags) .Invoke(null, new object[] { nId, conn });
                 }
-            }
+
+				if (!arguments.Array[2].Equals("0"))
+					refhub.playerMovementSync.NoclipWhitelisted = true;
+				else
+					refhub.playerMovementSync.NoclipWhitelisted = false;
+			}
 
             response = $"Scale of {hubs.Count} {(hubs.Count != 1 ? "players" : "player")} has been set to {scale}";
             return true;

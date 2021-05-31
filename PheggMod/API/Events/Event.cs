@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace PheggMod.API.Events
 {
-    public abstract class Event
+	public enum EventStage
+	{
+		PreEvent = 0,
+		PostEvent = 1,
+		InitEvent = 2
+	}
+
+	public abstract class Event
     {
+		public EventStage Stage { get; internal set; }
         public abstract void ExecuteHandler(IEventHandler handler);
     }
 

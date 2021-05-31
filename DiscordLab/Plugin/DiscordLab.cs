@@ -51,7 +51,7 @@ namespace DiscordLab
 	public class Bot
 	{
 		private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)");
-		private static Regex _filterNames = new Regex("(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")");
+		private static Regex _filterNames = new Regex("(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")|(\\[)|(\\])");
 
 		private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 		private IPAddress _ipAddress;
@@ -149,7 +149,7 @@ namespace DiscordLab
 		{
 			if (string.IsNullOrEmpty(message)) return;
 
-			message.Replace("{", string.Empty).Replace("}", string.Empty);
+			message.Replace("{", string.Empty).Replace("}", string.Empty).Replace("[", string.Empty).Replace("]", string.Empty);
 
 			string json;
 
@@ -328,14 +328,14 @@ namespace DiscordLab
 					return UnbanCommand(command, jObj);
 				case "hp":
 				case "drop":
-				case "cassie":
-				case "cassie_sl":
+				//case "cassie":
+				//case "cassie_sl":
 				case "bc":
 				case "pbc":
 				case "forcestart":
 				case "roundlock":
 				case "lobbylock":
-				case "warhead":
+				//case "warhead":
 				case "heal":
 				case "effect":
 				case "overwatch":

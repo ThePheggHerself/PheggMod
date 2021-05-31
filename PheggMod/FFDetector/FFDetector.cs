@@ -82,7 +82,11 @@ namespace PheggMod.FFDetector
 				if (ffInfo.DamageType == DamageTypes.Grenade)
 				{
 					if (GrenadeThrowers.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
+					{
 						ffInfo.GrenadeThrower = GrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId];
+
+						//Base.Info("FFInfoGrenadeThrower Set.");
+					}
 					else
 					{
 						ffInfo.GrenadeThrower = new GrenadeThrower
@@ -92,6 +96,8 @@ namespace PheggMod.FFDetector
 							UserId = ffInfo.Attacker.characterClassManager.UserId,
 							DetonatePosition = ffInfo.Target.playerMovementSync.RealModelPosition
 						};
+
+						//Base.Info("FFInfoGrenadeThrower Default.");
 					}
 
 					ffInfo.NearbyPlayers = GetNearbyPlayersGrenade(GrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId].DetonatePosition);
@@ -102,6 +108,8 @@ namespace PheggMod.FFDetector
 				if (ffInfo.Attacker.characterClassManager.CurRole.team == Team.RIP && ffInfo.DamageType == DamageTypes.Grenade)
 					ffInfo.AttackerTeam = ffInfo.GrenadeThrower.Team;
 
+				//Base.Info(ffInfo.AttackerTeam.ToString());
+
 				foreach (ReferenceHub hub in ffInfo.NearbyPlayers)
 				{
 					if (IsFF(ffInfo, hub))
@@ -111,6 +119,8 @@ namespace PheggMod.FFDetector
 				}
 
 				bool isFF = IsFF(ffInfo, ffInfo.Target);
+
+				//Base.Info(isFF.ToString());
 
 				if (DamageList.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
 					ffInfo.LastLegitDamage = DamageList[ffInfo.Attacker.characterClassManager.UserId];

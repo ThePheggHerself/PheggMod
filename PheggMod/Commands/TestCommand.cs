@@ -1,5 +1,6 @@
 ﻿using CommandSystem;
 using Interactables.Interobjects.DoorUtils;
+using PheggMod.EventTriggers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,11 @@ namespace PheggMod.Commands
 			bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response);
 			if (!canRun)
 				return false;
+
+			
+
+			foreach (var user in PMReservedSlots.Users)
+				Base.Info(user);
 
 			response = $"Never gonna give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.";
             return true;

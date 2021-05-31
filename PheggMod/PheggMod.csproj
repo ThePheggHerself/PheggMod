@@ -110,6 +110,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\UnityEngine.CoreModule.dll</HintPath>
@@ -117,6 +118,10 @@
     <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Build\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UNETModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -146,6 +151,7 @@
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\CustomInternalCommands.cs" />
     <Compile Include="Commands\DropCommand.cs" />
+    <Compile Include="Commands\IgnoreAnticheat.cs" />
     <Compile Include="Commands\LightsoutCommand.cs" />
     <Compile Include="Commands\LockRespawnCommand.cs" />
     <Compile Include="Commands\NukeCommand\NukeDisableCommand.cs" />
@@ -164,6 +170,7 @@
     <Compile Include="EventTriggers\AlphaWarheadController.cs" />
     <Compile Include="EventTriggers\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="EventTriggers\BanPlayer.cs" />
+    <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\CheaterReport.cs" />
     <Compile Include="EventTriggers\CommandProcessor.cs" />
     <Compile Include="EventTriggers\ConfigFile.cs" />
@@ -175,16 +182,19 @@
     <Compile Include="EventTriggers\NicknameSync.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
     <Compile Include="EventTriggers\PlayerStats.cs" />
-    <Compile Include="EventTriggers\CharacterClassManager.cs" />
     <Compile Include="EventTriggers\QueryProcessor.cs" />
     <Compile Include="EventTriggers\RagdollManager.cs" />
+    <Compile Include="EventTriggers\ReservedSlots.cs" />
     <Compile Include="EventTriggers\RespawnManager.cs" />
+    <Compile Include="EventTriggers\RespawnTickets.cs" />
     <Compile Include="EventTriggers\RoundSummary.cs" />
     <Compile Include="EventTriggers\Scp096.cs" />
     <Compile Include="EventTriggers\ServerRoles.cs" />
     <Compile Include="EventTriggers\ServerStatic.cs" />
+    <Compile Include="EventTriggers\TeslaGateController.cs" />
+    <Compile Include="EventTriggers\VisionInformation.cs" />
     <Compile Include="FFDetector\FFDetector.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Misc\GlobalSuppressions.cs" />
     <Compile Include="PheggModBase.cs" />
     <Compile Include="API\PheggPlayer.cs" />
     <Compile Include="API\Plugin\PluginManager.cs" />
@@ -196,9 +206,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
-    <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="Misc\.editorconfig" />
+    <None Include="Misc\app.config" />
+    <None Include="Misc\packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

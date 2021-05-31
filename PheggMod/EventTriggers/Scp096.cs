@@ -14,16 +14,6 @@ namespace PheggMod.EventTriggers
     {
         List<int> warnedTargets;
 
-        public extern void orig_ParseVisionInformation(VisionInformation info);
-        public new void ParseVisionInformation(VisionInformation info)
-        {
-            if (info.SourceHub.characterClassManager.CurClass == RoleType.Tutorial && !PMConfigFile.tutorialTrigger096)
-                return;
-            else
-                orig_ParseVisionInformation(info);
-        }
-
-
         public extern void orig_AddTarget(GameObject target);
         public new void AddTarget(GameObject target)
         {

@@ -27,6 +27,7 @@ namespace PheggMod.Commands
                 CheckCommand<SizeCommand>(typeof(SizeCommand));
                 CheckCommand<TestCommand>(typeof(TestCommand));
                 CheckCommand<Tower2Command>(typeof(Tower2Command));
+				CheckCommand<IgnoreAnticheat>(typeof(IgnoreAnticheat));
             }
             catch(Exception e)
             {
@@ -105,7 +106,7 @@ namespace PheggMod.Commands
         public static List<ReferenceHub> GetPlayersFromString(string users)
         {
             if (users.ToLower() == "*")
-                return ReferenceHub.GetAllHubs().Values.ToList();
+                return ReferenceHub.GetAllHubs().Values.Where(p => !string.Equals(p.nicknameSync.MyNick, "Dedicated Server", StringComparison.OrdinalIgnoreCase)).ToList();
 
             string[] playerStrings = users.Split('.');
             List<ReferenceHub> playerList = new List<ReferenceHub>();

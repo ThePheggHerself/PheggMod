@@ -143,8 +143,8 @@ namespace PheggMod.API.Events
         }
     }
 
-    //LCZDecontaminateEvent
-    public interface IEventHandlerLczDecontaminate : IEventHandler
+	//LCZDecontaminateEvent
+	public interface IEventHandlerLczDecontaminate : IEventHandler
     {
         void OnLczDecontaminate(LczDecontaminateEvent ev);
     }
