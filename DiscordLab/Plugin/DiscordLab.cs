@@ -29,7 +29,7 @@ using PheggMod.EventTriggers;
 namespace DiscordLab
 {
 	[Plugin.PluginDetails(
-		author = "ThePheggHimself",
+		author = "ThePheggHerself",
 		name = "DiscordLab",
 		description = "Basic logging bot for SCP: Secret Laboratory",
 		version = "1.0"
@@ -50,7 +50,7 @@ namespace DiscordLab
 
 	public class Bot
 	{
-		private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)");
+		private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)|({)|(})|(<)|(>)|(\")|(\\[)|(\\])");
 		private static Regex _filterNames = new Regex("(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")|(\\[)|(\\])");
 
 		private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

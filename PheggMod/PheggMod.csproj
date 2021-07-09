@@ -182,6 +182,7 @@
     <Compile Include="EventTriggers\NicknameSync.cs" />
     <Compile Include="EventTriggers\NineTailedFoxAnnouncer.cs" />
     <Compile Include="EventTriggers\PlayerStats.cs" />
+    <Compile Include="EventTriggers\PocketDimensionTeleport.cs" />
     <Compile Include="EventTriggers\QueryProcessor.cs" />
     <Compile Include="EventTriggers\RagdollManager.cs" />
     <Compile Include="EventTriggers\ReservedSlots.cs" />
