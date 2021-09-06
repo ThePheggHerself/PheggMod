@@ -3,7 +3,7 @@ using MonoMod;
 
 using PheggMod.API.Events;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::ServerStatic")]
 	public class PMServerStatic : ServerStatic

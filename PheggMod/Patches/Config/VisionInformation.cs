@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::PlayableScps.VisionInformation")]
 	public readonly struct PMVisionInformation

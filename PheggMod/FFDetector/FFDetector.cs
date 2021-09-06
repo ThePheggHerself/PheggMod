@@ -10,7 +10,7 @@ using Mirror;
 using Telepathy;
 using PheggMod.CustomEffects;
 using System.Diagnostics.Eventing.Reader;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 
 namespace PheggMod.FFDetector
 {

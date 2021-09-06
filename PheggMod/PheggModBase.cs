@@ -18,7 +18,7 @@ using System.Diagnostics;
 using GameCore;
 using UnityEngine.Networking;
 using CommandSystem;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 
 namespace PheggMod
 {

@@ -1,53 +1,64 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
+// Require the necessary discord.js classes
+
+console.log(process.version)
+
+const { Client, Intents, MessageEmbed } = require('discord.js');
+const config = require('./config.json');
+
+const myIntents = new Intents();
+myIntents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS);
+
+// Create a new client instance
+const botClient = new Client({ intents: myIntents });
 const net = require('net');
-const config = require("./config.json");
 const tcpSocket = net.createServer();
 const connection = tcpSocket.listen(config.port, config.address)
 
 var messages = []
 var mainSocket;
 
+console.log("Bot starting up");
 
 
 // #region Bot events
-client.on("ready", () => {
-	console.log("Bot online and listening to port " + config.port)
+botClient.on("ready", () => {
+    console.log("Bot online and listening to port " + config.port)
 
-	setInterval(() => {
-		if (messages.length > 0) {
-			var DiscordMessage = messages.join('\n');
-			messages.length = 0
+    setInterval(() => {
+        if (messages.length > 0) {
+            var DiscordMessage = messages.join('\n');
+            messages.length = 0
 
-			if (DiscordMessage.length > 1950)
-				DiscordMessage = DiscordMessage.substring(0, 1950);
+            if (DiscordMessage.length > 1950)
+                DiscordMessage = DiscordMessage.substring(0, 1950);
 
-            client.channels.cache.get(config.channel).send(`[${new Date().toLocaleTimeString()}]\n` + DiscordMessage.replace(/.gg\//g, ""));
-		}
-	}, 1000)
+            botClient.channels.cache.get(config.channel).send(`[${new Date().toLocaleTimeString()}]\n` + DiscordMessage.replace(/.gg\//g, ""));
+        }
+    }, 2000)
 
-	setInterval(() => {
-		var object = { Type: "alive", channel: "RandomPacketToKeepAlive!" }
+    setInterval(() => {
+        var object = { Type: "alive", channel: "RandomPacketToKeepAlive!" }
 
-		if (mainSocket) {
-			mainSocket.write(JSON.stringify(object))
-		}
-	}, 300000)
+        if (mainSocket) {
+            mainSocket.write(JSON.stringify(object))
+        }
+    }, 300000)
 });
 
-client.on("warn", warn => console.log(warn));
-client.on("error", error => console.error(error));
-client.on('disconnect', () => console.log('Connection to the Discord API has been lost. I will attempt to reconnect momentarily'));
-client.on('reconnecting', () => console.log('Attempting to reconnect to the Discord API now. Please stand by...'));
+botClient.on("warn", warn => console.warn(warn));
+botClient.on("error", error => console.error(error.message));
+botClient.on("unhandledRejection", error => console.error(error));
+botClient.on('disconnect', () => console.log('Connection to the Discord API has been lost. I will attempt to reconnect momentarily'));
+botClient.on('reconnecting', () => console.log('Attempting to reconnect to the Discord API now. Please stand by...'));
 
 tcpSocket.on("connection", (socket) => {
     socket.setEncoding('utf8');
 
-	messages.push(`**++ - - - - - ++ SERVER ONLINE ++ - - - - -++**`
-		+ "\n```"
-		+ "\nThe connection between the bot and the server has been established```");
+    messages.push(`**++ - - - - - ++ SERVER ONLINE ++ - - - - -++**`
+        + "\n```"
+        + "\nThe connection between the bot and the server has been established```");
 
-	mainSocket = socket;
+    mainSocket = socket;
 
     socket.on("data", (data) => {
         //console.log(data);
@@ -65,22 +76,25 @@ tcpSocket.on("connection", (socket) => {
 
             array.forEach(json => {
                 var object = JSON.parse(json)
-                console.log(json);
 
                 if (object.Type === "msg") {
                     if (object.Message) messages.push(object.Message);
                 }
                 else if (object.Type === "supdate") {
-                    if (object.CurrentPlayers === "0/30")
-                        client.user.setStatus('idle')
-                    else client.user.setStatus('online')
 
-                    client.user.setActivity(`${object.CurrentPlayers}`, { type: "WATCHING" }).catch((e) => { console.log(e); })
+                    if (botClient.user != null) {
+                        if (object.CurrentPlayers === "0/30")
+                            botClient.user.setStatus('idle');
+                        else
+                            botClient.user.setStatus('online');
+
+                        botClient.user.setActivity(`${object.CurrentPlayers}`, { type: 'WATCHING' })
+                    }
                 }
                 else if (object.Type === "plist") {
 
                     if (object.PlayerNames === "**No online players**") {
-                        client.channels.cache.get(object.ChannelID).send(`${object.PlayerNames}`);
+                        botClient.channels.cache.get(object.ChannelID).send(`${object.PlayerNames}`);
                         return;
                     }
                     else {
@@ -106,12 +120,14 @@ tcpSocket.on("connection", (socket) => {
                         if (playerListTemp.length > 0)
                             playerLists.push(playerListTemp)
 
-                        var embed = new Discord.MessageEmbed();
-                        embed.setColor('#e63120')
-                        embed.setAuthor('DragonSCP Player list')
-                        embed.setTimestamp();
                         //steam:/run/700330/args/-connect-51.68.204.237:7790
-                        embed.addField(args[0].replace("\n", " ") + "Players currently online", `Join in at 51.68.204.237:${config.port - 1000}`)
+                        var embed = new MessageEmbed()
+                            .setColor('#e63120')
+                            .setAuthor('DragonSCP Player list')
+                            .setTimestamp()
+                            .addFields(
+                                { name: args[0].replace("\n", " ") + "Players currently online", value: `Join in at 51.68.204.237:${config.port - 1000}` }
+                            );
 
                         var index = 0;
                         playerLists.forEach(list => {
@@ -123,11 +139,11 @@ tcpSocket.on("connection", (socket) => {
                             }
                         })
 
-                        client.channels.cache.get(object.ChannelID).send(embed);
+                        botClient.channels.cache.get(object.ChannelID).send({ embeds: [embed] });
                     }
                 }
                 else if (object.Type === "cmdmsg") {
-                    client.channels.cache.get(object.ChannelID).send(`<@${object.StaffID}>\n` + object.CommandMessage)
+                    botClient.channels.cache.get(object.ChannelID).send(`<@${object.StaffID}>\n` + object.CommandMessage)
                 }
                 else return
             });
@@ -139,33 +155,33 @@ tcpSocket.on("connection", (socket) => {
         }
     })
 
-	socket.on("close", () => {
-		messages.push(`**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
-			+ "\n```"
-			+ "\nThe connection between the bot and the server has been terminated (The server is possibly offline or restarting)```");
-		console.log("Socket closed!")
-		client.user.setPresence({ game: { name: `for server startup`, type: "WATCHING" }, status: 'dnd' });
-	})
+    socket.on("close", () => {
+        messages.push(`**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
+            + "\n```"
+            + "\nThe connection between the bot and the server has been terminated (The server is possibly offline or restarting)```");
+        console.log("Socket closed!")
+        botClient.user.setPresence({ game: { name: `for server startup`, type: "WATCHING" }, status: 'dnd' });
+    })
 
-	socket.on("error", error => {
-		messages.push(`\n**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
-			+ "\n```"
-			+ "\nThe connection between the bot and the server has errored!"
-			+ `\n${error.message}\`\`\``);
-		console.log(error)
-	});
-	socket.on("timeout", timeout => {
-		messages.push(`\n**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
-			+ "\n```"
-			+ "\nThe connection between the bot and the server has timed out!```");
-		console.log("Socket closed!")
-	});
+    socket.on("error", error => {
+        messages.push(`\n**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
+            + "\n```"
+            + "\nThe connection between the bot and the server has errored!"
+            + `\n${error.message}\`\`\``);
+        console.log(error)
+    });
+    socket.on("timeout", timeout => {
+        messages.push(`\n**++ - - - - - ++ SERVER OFFLINE ++ - - - - -++**`
+            + "\n```"
+            + "\nThe connection between the bot and the server has timed out!```");
+        console.log("Socket closed!")
+    });
 });
 
-client.on('message', async message => {
+botClient.on('messageCreate', async message => {
     try {
         if (message.author.bot || message.member == null || message.author == null || !message.guild) return
-        if (message.mentions.has(client.user)) {
+        if (message.mentions.has(botClient.user)) {
 
             if (message.content.split(" ").length === 1) {
                 var object = { Type: "plist", channel: message.channel.id }
@@ -181,12 +197,12 @@ client.on('message', async message => {
                     message.channel.send("Bot is not connected to the server");
                 }
             }
-            else if (message.member.roles.cache.has(config.staffRoleID) || message.member.hasPermission(["MANAGE_ROLES"])) {
+            else if (message.member.roles.cache.has(config.staffRoleID) || message.member.permissions.has('ADMINISTRATOR')) {
                 if (!message.channel.permissionsFor(message.guild.roles.everyone).has('VIEW_CHANNEL')) {
                     var object = { Type: "cmd", channel: message.channel.id, Message: message.content, StaffID: message.author.id, Staff: message.member.user.tag }
 
                     if (mainSocket) {
-                        console.log("Sending ban command")
+                        console.log("Sending remote command")
                         mainSocket.write(JSON.stringify(object))
                     }
                 }
@@ -198,4 +214,4 @@ client.on('message', async message => {
     }
 })
 
-client.login(config.token);
+botClient.login(config.token);

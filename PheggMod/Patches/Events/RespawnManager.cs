@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::Respawning.RespawnManager")]
     public class PMRespawnManager : RespawnManager

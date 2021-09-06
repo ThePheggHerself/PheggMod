@@ -7,14 +7,19 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::NicknameSync")]
 	class PMNicknameSync : NicknameSync
 	{
 		readonly static string[] filteredwords =
 		{
-			"niggers", "niggas", "faggots", "trannies"
+			"niggers", "niggas", "faggots", "trannies", "hitlers", "nazis"
+		};
+
+		readonly static string[] animals =
+		{
+			"duck", "frog", "bear", "lion", "unicorn", "boar", "kangaroo", "elephant", "goose", "turkey", "platypus", "pig", "cow", "horse"
 		};
 
 
@@ -48,11 +53,9 @@ namespace PheggMod.EventTriggers
 
 				foreach (var MatchedWord in filteredwords)
 				{
-					Base.Info(MatchedWord);
-
 					if (StringContains(NewNick, MatchedWord, StringComparison.OrdinalIgnoreCase))
 					{
-						NewNick = Regex.Replace(NewNick, MatchedWord, "duck", RegexOptions.IgnoreCase);
+						NewNick = Regex.Replace(NewNick, MatchedWord, animals[new System.Random().Next(0, animals.Length - 1)], RegexOptions.IgnoreCase);
 					}
 				}
 
@@ -70,7 +73,7 @@ namespace PheggMod.EventTriggers
 
 				foreach (var MatchedWord in newFilter.Where(w => StringContains(NewNick, w, StringComparison.OrdinalIgnoreCase)))
 				{
-					NewNick = Regex.Replace(NewNick, MatchedWord, "duck", RegexOptions.IgnoreCase);
+					NewNick = Regex.Replace(NewNick, MatchedWord, animals[new System.Random().Next(0, animals.Length - 1)], RegexOptions.IgnoreCase);
 				}
 
 				var RefHub = ReferenceHub.GetHub(gameObject);

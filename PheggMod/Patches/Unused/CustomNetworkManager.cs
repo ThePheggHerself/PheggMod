@@ -8,7 +8,7 @@ using System.Linq;
 using Dissonance.Integrations.MirrorIgnorance;
 using GameCore;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     //[MonoModPatch("global::CustomNetworkManager")]
     class PMCustomNetworkManager : CustomNetworkManager

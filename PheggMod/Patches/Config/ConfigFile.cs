@@ -4,7 +4,7 @@ using MonoMod;
 using System;
 using System.Linq;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::GameCore.ConfigFile")]
     public static class PMConfigFile

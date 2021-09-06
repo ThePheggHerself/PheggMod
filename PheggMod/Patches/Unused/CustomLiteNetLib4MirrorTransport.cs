@@ -11,7 +11,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     //[MonoModPatch("global::CustomLiteNetLib4MirrorTransport")]
     public class PMCustomLiteNetLib4MirrorTransport : CustomLiteNetLib4MirrorTransport

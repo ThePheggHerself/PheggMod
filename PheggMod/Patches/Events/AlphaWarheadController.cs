@@ -14,7 +14,7 @@ using GameCore;
 
 using PheggMod.API.Events;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::AlphaWarheadController")]
     internal class PMAlphaWarheadController : AlphaWarheadController

@@ -4,7 +4,7 @@ using MonoMod;
 
 using PheggMod.API.Events;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::RoundSummary")]
     public class PMRoundSummary : RoundSummary

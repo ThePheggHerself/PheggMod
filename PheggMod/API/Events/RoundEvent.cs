@@ -1,4 +1,4 @@
-﻿using PheggMod.EventTriggers;
+﻿using PheggMod.Patches;
 using System;
 using System.Collections.Generic;
 using System.Linq;

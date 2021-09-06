@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using CloudflareSolverRe;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::CheaterReport")]
     class PMCheaterReport : CheaterReport

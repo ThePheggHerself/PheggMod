@@ -6,7 +6,7 @@ using Mirror;
 using PheggMod.API.Events;
 using PheggMod.API;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::CharacterClassManager")]
 	class PMCharacterClassManager : CharacterClassManager

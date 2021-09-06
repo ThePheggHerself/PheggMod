@@ -13,7 +13,7 @@ using System.Net;
 using GameCore;
 
 using PheggMod.API.Events;
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::ServerRoles")]
     class PMServerRoles : ServerRoles

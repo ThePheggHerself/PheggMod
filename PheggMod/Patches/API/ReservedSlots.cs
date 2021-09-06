@@ -4,7 +4,7 @@ using Mirror;
 using MonoMod;
 using System.Collections.Generic;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::ReservedSlot")]
 	public class PMReservedSlots

@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEngine;
 using Interactables.Interobjects.DoorUtils;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::DecontaminationController")]
     class PMDecontaminationLCZ : DecontaminationController

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::PlayableScps.Scp096")]
     class PMScp096 : Scp096

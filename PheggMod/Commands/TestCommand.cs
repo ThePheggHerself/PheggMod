@@ -1,6 +1,6 @@
 ﻿using CommandSystem;
 using Interactables.Interobjects.DoorUtils;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::PocketDimensionTeleport")]
 	public class PMPocketDimensionTeleport : PocketDimensionTeleport

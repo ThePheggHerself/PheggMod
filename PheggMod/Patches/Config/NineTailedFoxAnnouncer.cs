@@ -2,7 +2,7 @@
 using Respawning;
 using System.Collections.Generic;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::NineTailedFoxAnnouncer")]
     class PMNineTailedFoxAnnouncer : NineTailedFoxAnnouncer

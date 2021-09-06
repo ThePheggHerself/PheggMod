@@ -5,7 +5,7 @@ using PheggMod.API.Events;
 using System;
 using System.Collections.Generic;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::Grenades.FragGrenade")]
 	class PMFragGrenade : Grenades.FragGrenade

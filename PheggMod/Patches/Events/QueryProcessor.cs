@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace PheggMod.EventTriggers
+namespace PheggMod.Patches
 {
     [MonoModPatch("global::RemoteAdmin.QueryProcessor")]
     class PMQueryProcessor : RemoteAdmin.QueryProcessor
