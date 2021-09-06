@@ -336,7 +336,7 @@ namespace PheggMod
 		[Obsolete("Use the newer attribute based command system. This was only (re)added for backwards compatability!")]
 		public static void AddCommand(Plugin plugin, ICommand command, string name, string[] alias)
 		{
-			Base.Info(name);
+			//Base.Info(name);
 
 			if (allCommands.ContainsKey(name) || oldCommands.ContainsKey(name))
 			{

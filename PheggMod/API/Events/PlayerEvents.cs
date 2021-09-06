@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using InventorySystem.Items.ThrowableProjectiles;
 
 namespace PheggMod.API.Events
 {
@@ -170,11 +171,12 @@ namespace PheggMod.API.Events
     }
     public class PlayerThrowGrenadeEvent : PlayerEvent
     {
-        public PlayerThrowGrenadeEvent(PheggPlayer player, Grenades.GrenadeSettings settings) : base(player)
+        public PlayerThrowGrenadeEvent(PheggPlayer player, ThrownProjectile projectile) : base(player)
         {
             Name = player.name;
-            Grenade = settings.apiName;
-        }
+			Grenade = projectile.name;
+
+		}
 
         public string Name { get; private set; }
         public string Grenade { get; private set; }

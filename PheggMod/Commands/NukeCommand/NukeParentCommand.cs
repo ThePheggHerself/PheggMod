@@ -12,8 +12,8 @@ namespace PheggMod.Commands.NukeCommand
         public NukeParentCommand()
         {
             RegisterCommand(new NukeLockCommand());
-            RegisterCommand(new NukeEnableCommand());
-            RegisterCommand(new NukeDisableCommand());
+            //RegisterCommand(new NukeEnableCommand());
+            //RegisterCommand(new NukeDisableCommand());
         }
 
         public override void LoadGeneratedCommands()

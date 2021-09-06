@@ -1,5 +1,5 @@
 ﻿using CommandSystem;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 using System;
 using UnityEngine;
 
@@ -21,7 +21,7 @@ namespace PheggMod.Commands.NukeCommand
             if (!success)
                 return false;
 
-            PMAlphaWarheadNukesitePanel.Disable();
+            //PMAlphaWarheadNukesitePanel.Disable();
             response = $"Warhead has been disabled";
 
             return success;

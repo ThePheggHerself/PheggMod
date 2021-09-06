@@ -29,7 +29,16 @@ namespace PheggMod.Commands
                 NetworkServer.Destroy(rDs[p].gameObject);
             }
 
-            response = $"Cleaned up all ragdolls";
+			
+
+			List<Knife.DeferredDecals.Decal> decals = UnityEngine.Object.FindObjectsOfType<Knife.DeferredDecals.Decal>().ToList();
+
+			for (var p = 0; p < rDs.Count; p++)
+			{
+				Knife.DeferredDecals.DeferredDecalsManager.instance.RemoveDecal(decals[p]);
+			}
+
+			response = $"Cleaned up all ragdolls and decals";
             return true;
         }
     }

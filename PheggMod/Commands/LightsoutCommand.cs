@@ -1,10 +1,11 @@
 ﻿using CommandSystem;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InventorySystem;
 using Object = UnityEngine.Object;
 
 namespace PheggMod.Commands
@@ -35,7 +36,7 @@ namespace PheggMod.Commands
 
 			if (isLightsout)
 				foreach (var player in ReferenceHub.GetAllHubs())
-					player.Value.inventory.AddNewItem(ItemType.Flashlight);
+					player.Value.inventory.ServerAddItem(ItemType.Flashlight);
 
 			response = $"Facility lights have been {(isLightsout ? "disabled" : "enabled")}!";
 			return canrun;

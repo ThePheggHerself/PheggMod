@@ -22,12 +22,13 @@ namespace PheggMod.Commands
                 CheckCommand<ClearupCommand>(typeof(ClearupCommand));
                 CheckCommand<DropCommand>(typeof(DropCommand));
                 CheckCommand<LightsoutCommand>(typeof(LightsoutCommand));
-                CheckCommand<PersonalBroadcastCommand>(typeof(PersonalBroadcastCommand));
                 CheckCommand<PocketCommand>(typeof(PocketCommand));
                 CheckCommand<SizeCommand>(typeof(SizeCommand));
                 CheckCommand<TestCommand>(typeof(TestCommand));
                 CheckCommand<Tower2Command>(typeof(Tower2Command));
 				CheckCommand<IgnoreAnticheat>(typeof(IgnoreAnticheat));
+				CheckCommand<FFDetectorCommand>(typeof(FFDetectorCommand));
+				//CheckCommand<GrenadeCommand>(typeof(GrenadeCommand));
             }
             catch(Exception e)
             {

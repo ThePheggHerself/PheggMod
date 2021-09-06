@@ -7,10 +7,12 @@ using UnityEngine;
 using CustomPlayerEffects;
 using Hints;
 using Mirror;
-using Telepathy;
 using PheggMod.CustomEffects;
 using System.Diagnostics.Eventing.Reader;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
+using InventorySystem;
+using InventorySystem.Items;
+using InventorySystem.Disarming;
 
 namespace PheggMod.FFDetector
 {
@@ -59,12 +61,12 @@ namespace PheggMod.FFDetector
 			{
 				damage = info.Amount;
 
-				if (!DetectorEnabled || !DoCheck || Victim.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator || (!info.GetDamageType().isWeapon && info.GetDamageType() != DamageTypes.Grenade))
-					return;
+				//if (!DetectorEnabled || !DoCheck || Victim.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator || (!info.Tool ! && info.GetDamageType() != DamageTypes.Grenade))
+				//	return;
 
 				FFInfo ffInfo = new FFInfo
 				{
-					DamageType = info.GetDamageType(),
+					//DamageType = info.Tool
 					HitInfo = info,
 					Target = ReferenceHub.GetHub(Victim),
 					Attacker = ReferenceHub.GetHub(info.GetPlayerObject()),
@@ -257,11 +259,11 @@ namespace PheggMod.FFDetector
 			float damage = Mathf.Clamp(ffInfo.HitInfo.Amount / 4, 5, 50);
 			damage = Mathf.Clamp(damage, 0, ffInfo.Attacker.playerStats.Health - 1);
 
-			ffInfo.Attacker.playerStats.HurtPlayer(new PlayerStats.HitInfo(damage, ffInfo.HitInfo.Attacker, ffInfo.HitInfo.GetDamageType(), ffInfo.Attacker.playerId), ffInfo.Attacker.gameObject);
-			ffInfo.Attacker.inventory.SetCurItem(ItemType.None);
+			ffInfo.Attacker.playerStats.HurtPlayer(new PlayerStats.HitInfo(damage, ffInfo.HitInfo.Attacker, ffInfo.HitInfo.Tool, ffInfo.Attacker.playerId, false), ffInfo.Attacker.gameObject);
+			//ffInfo.Attacker.inventory.
 
 			if (ffInfo.FFPlayer.Triggers > 2)
-				ffInfo.Attacker.inventory.ServerDropAll();
+				//ffInfo.Attacker.inventory.ServerDropAll();
 
 			if (ffInfo.FFPlayer.Triggers == 4)
 				ffInfo.Attacker.playerEffectsController.EnableEffect<Amnesia>(10);
@@ -274,11 +276,11 @@ namespace PheggMod.FFDetector
 				ffInfo.Attacker.playerEffectsController.EnableEffect<Ensnared>(5 * (ffInfo.FFPlayer.Triggers - 5));
 			}
 
-			//Base.Info($"{ffInfo.Attacker.nicknameSync.DisplayName} ({ffInfo.Attacker.characterClassManager.UserId}) was punished by FFDetector for Friendly Fire against {ffInfo.Target.nicknameSync.DisplayName} ({ffInfo.Target.characterClassManager.UserId})" +
-			//	$"\nPlayer Information: {ffInfo.Attacker.characterClassManager.CurClass} ({ffInfo.Attacker.characterClassManager.CurRole.team})" +
-			//	$"\nTarget Information: {ffInfo.Target.characterClassManager.CurClass} ({ffInfo.Target.characterClassManager.CurRole.team}) {(ffInfo.Target.handcuffs.CufferId > -1 ? "Disarmed" : "Not disarmed")} {(ffInfo.Target.playerEffectsController.GetEffect<SCP008>().Enabled ? "Infected" : "Not infected")}" +
-			//	$"\nDistance: {Vector3.Distance(ffInfo.Attacker.playerMovementSync.RealModelPosition, ffInfo.Target.playerMovementSync.RealModelPosition)}m Angle: {Vector3.Angle(ffInfo.Attacker.playerMovementSync.transform.forward, ffInfo.Attacker.playerMovementSync.transform.position - ffInfo.Target.GetComponent<PlayerMovementSync>().transform.position)} DamageType: {ffInfo.HitInfo.GetDamageType().name}" +
-			//	$"\nHostiles: {ffInfo.Hostiles.Count} Friendlies: {ffInfo.Friendlies.Count} Total: {ffInfo.NearbyPlayers.Count}");
+			Base.Debug($"{ffInfo.Attacker.nicknameSync.DisplayName} ({ffInfo.Attacker.characterClassManager.UserId}) was punished by FFDetector for Friendly Fire against {ffInfo.Target.nicknameSync.DisplayName} ({ffInfo.Target.characterClassManager.UserId})" +
+				$"\nPlayer Information: {ffInfo.Attacker.characterClassManager.CurClass} ({ffInfo.Attacker.characterClassManager.CurRole.team})" +
+				$"\nTarget Information: {ffInfo.Target.characterClassManager.CurClass} ({ffInfo.Target.characterClassManager.CurRole.team}) {(ffInfo.Target.inventory.IsDisarmed() ? "Disarmed" : "Not disarmed")} {(ffInfo.Target.playerEffectsController.GetEffect<SCP008>().IsEnabled ? "Infected" : "Not infected")}" +
+				$"\nDistance: {Vector3.Distance(ffInfo.Attacker.playerMovementSync.RealModelPosition, ffInfo.Target.playerMovementSync.RealModelPosition)}m Angle: {Vector3.Angle(ffInfo.Attacker.playerMovementSync.transform.forward, ffInfo.Attacker.playerMovementSync.transform.position - ffInfo.Target.GetComponent<PlayerMovementSync>().transform.position)} DamageType: {ffInfo.HitInfo.Tool.ToString()}" +
+				$"\nHostiles: {ffInfo.Hostiles.Count} Friendlies: {ffInfo.Friendlies.Count} Total: {ffInfo.NearbyPlayers.Count}");
 		}
 		private static List<ReferenceHub> GetNearbyPlayers(FFInfo ffInfo)
 		{
@@ -315,8 +317,8 @@ namespace PheggMod.FFDetector
 
 		private static bool IsFF(FFInfo ffInfo, ReferenceHub Target)
 		{
-			if (Target.playerEffectsController.GetEffect<SCP008>().Enabled)
-				return false;
+			//if (Target.playerEffectsController.GetEffect<SCP008>().Enabled)
+			//	return false;
 
 			Team AttackerTeam = ffInfo.Attacker.characterClassManager.CurRole.team == Team.RIP ? ffInfo.AttackerTeam : ffInfo.Attacker.characterClassManager.CurRole.team;
 			Team TargetTeam = Target.characterClassManager.CurRole.team;

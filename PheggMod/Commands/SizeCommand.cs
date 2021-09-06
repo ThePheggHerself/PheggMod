@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace PheggMod.Commands
 {
-    public class SizeCommand : ICommand
+    public class SizeCommand : ICommand, IUsageProvider
     {
         readonly BindingFlags flags = BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public;
 
@@ -20,7 +20,9 @@ namespace PheggMod.Commands
 
         public string Description => "Sets the scale of a player";
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public string[] Usage { get; } = { "%player%", "scale" };
+
+		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             bool canRun = CommandManager.CanRun(sender, PlayerPermissions.PlayersManagement, arguments, new[] { "player", "scale" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)

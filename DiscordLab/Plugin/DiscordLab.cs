@@ -24,7 +24,7 @@ using PheggMod;
 using MEC;
 using System.Runtime.InteropServices;
 using PheggMod.Commands;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 
 namespace DiscordLab
 {
@@ -111,14 +111,18 @@ namespace DiscordLab
 
 		public Bot()
 		{
-			_ipAddress = IPAddress.Parse(ConfigFile.ServerConfig.GetString("dl_address", "127.0.0.1"));
-
-			Timing.RunCoroutine(StatusUpdate());
-			Timing.RunCoroutine(KeepAlive());
-			new Thread(() =>
+			try
 			{
-				BotListener();
-			}).Start();
+				_ipAddress = IPAddress.Parse(ConfigFile.ServerConfig.GetString("dl_address", "127.0.0.1"));
+
+				Timing.RunCoroutine(StatusUpdate());
+				Timing.RunCoroutine(KeepAlive());
+				new Thread(() =>
+				{
+					BotListener();
+				}).Start();
+			}
+			catch (Exception ex) { Plugin.Error(ex.ToString()); }
 		}
 
 		private IEnumerator<float> StatusUpdate()
@@ -261,9 +265,13 @@ namespace DiscordLab
 
 					foreach (string message in messages)
 					{
+						Plugin.Info(message);
+
 						if (!string.IsNullOrEmpty(message))
 						{
 							JObject jObj = JsonConvert.DeserializeObject<JObject>(message);
+
+							Plugin.Info(jObj["Type"].ToString());
 
 							if (jObj["Type"].ToString().ToLower() == "plist")
 								NewMessage(Playerlist(), messageType.PLIST, jObj);
@@ -344,11 +352,11 @@ namespace DiscordLab
 				case "unmute":
 				case "iunmute":
 				case "intercom-timeout":
-				case "open":
-				case "close":
-				case "lock":
-				case "unlock":
-				case "destroy":
+				//case "open":
+				//case "close":
+				//case "lock":
+				//case "unlock":
+				//case "destroy":
 				case "give":
 				case "request_data":
 				//case "server_event":
@@ -410,6 +418,11 @@ namespace DiscordLab
 
 				if (player != null)
 				{
+					if (player.serverRoles.BypassStaff)
+					{
+						return "```diff\n- User is global staff and cannot be banned```";
+					}
+
 					BanHandler.IssueBan(new BanDetails
 					{
 						OriginalName = player.nicknameSync.MyNick,

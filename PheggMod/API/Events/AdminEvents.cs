@@ -17,14 +17,14 @@ namespace PheggMod.API.Events
     }
     public class PlayerBanEvent : AdminEvent
     {
-        public PlayerBanEvent(PheggPlayer player, int duration, PheggPlayer admin = null, string reason = null)
+        public PlayerBanEvent(PheggPlayer player, long duration, PheggPlayer admin = null, string reason = null)
         {
             Duration = duration;
             Player = player;
             Admin = admin;
             Reason = reason;
         }
-        public int Duration { get; internal set; }
+        public long Duration { get; internal set; }
         public PheggPlayer Player { get; internal set; }
         public PheggPlayer Admin { get; internal set; }
         public string Reason { get; internal set; }

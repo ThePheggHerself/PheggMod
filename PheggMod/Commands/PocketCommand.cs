@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace PheggMod.Commands
 {
-    public class PocketCommand : ICommand
+    public class PocketCommand : ICommand, IUsageProvider
     {
         public string Command => "pocket";
 
@@ -16,7 +16,9 @@ namespace PheggMod.Commands
 
         public string Description => "Teleports the player into the pocket dimention";
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public string[] Usage { get; } = { "%player%" };
+
+		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             bool canRun = CommandManager.CanRun(sender, PlayerPermissions.PlayersManagement, arguments, new[] { "player" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)

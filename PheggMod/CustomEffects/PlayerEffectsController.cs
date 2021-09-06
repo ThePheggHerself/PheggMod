@@ -2,64 +2,76 @@
 using CustomPlayerEffects;
 using Mirror;
 using MonoMod;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace PheggMod.CustomEffects
 {
-    [MonoModPatch("global::PlayerEffectsController")]
-    class PMPlayerEffectsController : PlayerEffectsController
-    {
-        private ReferenceHub hub;
+	[MonoModPatch("global::PlayerEffectsController")]
+	class PMPlayerEffectsController : PlayerEffectsController
+	{
+		private ReferenceHub hub;
 
-        private extern void orig_Awake();
+		//[MonoModReplace]
+		internal SyncList<byte> syncEffectsIntensity = new SyncList<byte>();
+		//[MonoModReplace]
+		internal PlayerEffect[] _allEffects = new PlayerEffect[] { };
+
+		private extern void orig_Awake();
 #pragma warning disable IDE0051 // Remove unused private members
-        private void Awake()
-        {
-            hub = ReferenceHub.GetHub(gameObject);
+		private void Awake()
+		{
+			orig_Awake();
 
-            AllEffects.Add(typeof(Scp207), new Scp207(hub));
-            AllEffects.Add(typeof(Scp268), new Scp268(hub));
-            AllEffects.Add(typeof(Corroding), new Corroding(hub));
-            AllEffects.Add(typeof(Visuals939), new Visuals939(hub));
-            AllEffects.Add(typeof(Decontaminating), new Decontaminating(hub));
-            AllEffects.Add(typeof(SinkHole), new SinkHole(hub));
-            AllEffects.Add(typeof(Flashed), new Flashed(hub));
-            AllEffects.Add(typeof(Amnesia), new Amnesia(hub));
-            AllEffects.Add(typeof(Blinded), new Blinded(hub));
-            AllEffects.Add(typeof(Hemorrhage), new Hemorrhage(hub));
-            AllEffects.Add(typeof(Poisoned), new Poisoned(hub));
-            AllEffects.Add(typeof(Bleeding), new Bleeding(hub));
-            AllEffects.Add(typeof(Disabled), new Disabled(hub));
-            AllEffects.Add(typeof(Ensnared), new Ensnared(hub));
-            AllEffects.Add(typeof(Concussed), new Concussed(hub));
-            AllEffects.Add(typeof(Burned), new Burned(hub));
-            AllEffects.Add(typeof(Deafened), new Deafened(hub));
-            AllEffects.Add(typeof(Asphyxiated), new Asphyxiated(hub));
-            AllEffects.Add(typeof(Exhausted), new Exhausted(hub));
-            AllEffects.Add(typeof(Panic), new Panic(hub));
-            AllEffects.Add(typeof(Invigorated), new Invigorated(hub));
+			var effectList = new List<PlayerEffect>(_allEffects);
 
-            AllEffects.Add(typeof(SCP008), new SCP008(hub));
+			try
+			{
+				var SCP008 = effectsGameObject.AddComponent<SCP008>();
+				SCP008.name = "SCP008";
 
-            if (NetworkServer.active) Resync();
-        }
+				Instantiate(SCP008);
+
+				AllEffects.Add(SCP008.GetType(), SCP008);
+				syncEffectsIntensity.Add(0);
+
+				effectList.Add(SCP008);
+			}
+			catch (Exception e)
+			{
+				Base.Error(e.ToString());
+			}
+
+			_allEffects = effectList.ToArray();
+		}
 #pragma warning restore IDE0051 // Remove unused private members
+		[Server]
+		public bool ChangeByString(string type, byte intensity, float duration = 0f)
+		{
+			foreach (PlayerEffect item in _allEffects)
+			{
+				try
+				{
+					if (!item.ToString().StartsWith(type, StringComparison.InvariantCultureIgnoreCase))
+						continue;
 
-        [Server]
-        public new bool ChangeByString(string type, byte intens, float duration = 0f)
-        {
-            foreach (var item in AllEffects)
-            {
-                if (string.Equals(item.Key.ToString(), "customplayereffects." + type, System.StringComparison.InvariantCultureIgnoreCase) ||
-                    string.Equals(item.Key.ToString(), "PheggMod.CustomEffects." + type, System.StringComparison.InvariantCultureIgnoreCase))
-                {
-                    item.Value.ServerChangeIntensity(intens);
-                    if (duration > 0)
-                        item.Value.ServerChangeDuration(duration);
-                    return true;
-                }
-            }
+					item.Intensity = intensity;
 
-            return false;
-        }
-    }
+					if (duration > 0)
+						item.ServerChangeDuration(duration);
+				}
+				catch (Exception e)
+				{
+					Base.Error(e.ToString());
+					return false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+	}
 }

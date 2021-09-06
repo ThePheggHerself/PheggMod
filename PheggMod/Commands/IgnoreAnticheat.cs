@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace PheggMod.Commands
 {
-	public class IgnoreAnticheat : ICommand
+	public class IgnoreAnticheat : ICommand, IUsageProvider
 	{
 		public string Command { get; } = "ignoreanticheat";
 
 		public string[] Aliases { get; } = { "iac", "ignoreac" };
 
 		public string Description { get; } = "Makes a user bypass the anti-cheat";
+
+		public string[] Usage { get; } = { "%player%" };
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{

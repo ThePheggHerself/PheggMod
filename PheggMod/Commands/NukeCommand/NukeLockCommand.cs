@@ -1,5 +1,5 @@
 ﻿using CommandSystem;
-using PheggMod.EventTriggers;
+using PheggMod.Patches;
 using System;
 
 namespace PheggMod.Commands.NukeCommand
