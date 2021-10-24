@@ -73,7 +73,7 @@
     </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Mirror.dll</HintPath>
+      <HintPath>bin\Build\Mirror.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod, Version=19.12.4.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -152,6 +152,8 @@
     <Compile Include="Commands\CustomInternalCommands.cs" />
     <Compile Include="Commands\DropCommand.cs" />
     <Compile Include="Commands\FFDetectorCommand.cs" />
+    <Compile Include="Commands\GrenadeCommands\FlashCommand.cs" />
+    <Compile Include="Commands\GrenadeCommands\BallCommand.cs" />
     <Compile Include="Commands\GrenadeCommands\GrenadeCommand.cs" />
     <Compile Include="Commands\IgnoreAnticheat.cs" />
     <Compile Include="Commands\LightsoutCommand.cs" />
@@ -169,6 +171,7 @@
     <Compile Include="Commands\Tower2Command.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
     <Compile Include="CustomEffects\SCP008.cs" />
+    <Compile Include="Patches\Command\BanCommand.cs" />
     <Compile Include="Patches\Config\BanHandler.cs" />
     <Compile Include="Patches\Events\AlphaWarheadController.cs" />
     <Compile Include="Patches\Command\AlphaWarheadNukesitePanel.cs" />

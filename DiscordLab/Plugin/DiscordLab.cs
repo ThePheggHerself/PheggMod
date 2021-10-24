@@ -1,17 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Reflection;
 using PheggMod.API.Plugin;
-using PheggMod.API.Events;
 using UnityEngine;
 using System;
-using PheggMod.API.Commands;
-using Mirror;
-using Cryptography;
-using RemoteAdmin;
 using System.Text.RegularExpressions;
 using GameCore;
 using System.Threading;
@@ -19,16 +11,11 @@ using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Net;
 using Newtonsoft.Json.Linq;
-
-using PheggMod;
 using MEC;
-using System.Runtime.InteropServices;
-using PheggMod.Commands;
-using PheggMod.Patches;
 
 namespace DiscordLab
 {
-	[Plugin.PluginDetails(
+	[PluginDetails(
 		author = "ThePheggHerself",
 		name = "DiscordLab",
 		description = "Basic logging bot for SCP: Secret Laboratory",
@@ -265,13 +252,9 @@ namespace DiscordLab
 
 					foreach (string message in messages)
 					{
-						Plugin.Info(message);
-
 						if (!string.IsNullOrEmpty(message))
 						{
 							JObject jObj = JsonConvert.DeserializeObject<JObject>(message);
-
-							Plugin.Info(jObj["Type"].ToString());
 
 							if (jObj["Type"].ToString().ToLower() == "plist")
 								NewMessage(Playerlist(), messageType.PLIST, jObj);
@@ -289,6 +272,7 @@ namespace DiscordLab
 				Thread.Sleep(50);
 			}
 		}
+
 
 		private string Playerlist()
 		{
@@ -318,65 +302,63 @@ namespace DiscordLab
 
 		private string HandleCommand(JObject jObj)
 		{
-			string[] command = jObj["Message"].ToString().Split(' ');
-
-			switch (command[1].ToLower())
+			try
 			{
-				case "ban":
-				case "rban":
-				case "remoteban":
-					return BanCommand(command, jObj);
-				case "kick":
-				case "rkick":
-				case "remotekick":
-					return KickCommand(command, jObj);
-				case "unban":
-				case "runban":
-				case "remoteunban":
-					return UnbanCommand(command, jObj);
-				case "hp":
-				case "drop":
-				//case "cassie":
-				//case "cassie_sl":
-				case "bc":
-				case "pbc":
-				case "forcestart":
-				case "roundlock":
-				case "lobbylock":
-				//case "warhead":
-				case "heal":
-				case "effect":
-				case "overwatch":
-				case "mute":
-				case "imute":
-				case "unmute":
-				case "iunmute":
-				case "intercom-timeout":
-				//case "open":
-				//case "close":
-				//case "lock":
-				//case "unlock":
-				//case "destroy":
-				case "give":
-				case "request_data":
-				//case "server_event":
-				case "roundtime":
-					try
-					{
-						var dlcp = new DiscordLabCommandSender();
-						dlcp.jObject = jObj;
+				string[] command = jObj["Message"].ToString().Split(' ').Skip(1).ToArray();
 
-						GameCore.Console.singleton.TypeCommand($"/{string.Join(" ", command.Skip(1))}", dlcp);
+				switch (command[0].ToLower())
+				{
+					case "ban":
+					case "rban":
+					case "remoteban":
+						return BanCommand(command, jObj);
+					case "kick":
+					case "rkick":
+					case "remotekick":
+						return KickCommand(command, jObj);
+					case "unban":
+					case "runban":
+					case "remoteunban":
+						return UnbanCommand(command, jObj);
+					case "hp":
+					case "drop":
+					case "bc":
+					case "pbc":
+					case "forcestart":
+					case "roundlock":
+					case "lobbylock":
+					case "heal":
+					case "effect":
+					case "overwatch":
+					case "mute":
+					case "imute":
+					case "unmute":
+					case "iunmute":
+					case "intercom-timeout":
+					case "give":
+					case "request_data":
+					case "roundtime":
+						try
+						{
+							var dlcp = new DiscordLabCommandSender();
+							dlcp.jObject = jObj;
 
-						return string.Empty;
-					}
-					catch (Exception e)
-					{
-						return e.ToString();
-					}
-				default:
-					return "```diff\n - Unknown Command```";
+							GameCore.Console.singleton.TypeCommand($"/{string.Join(" ", command.Skip(0))}", dlcp);
 
+							return string.Empty;
+						}
+						catch (Exception e)
+						{
+							return e.ToString();
+						}
+					default:
+						return "```diff\n - Unknown Command```";
+
+				}
+			}
+			catch (Exception e)
+			{
+				return e.ToString();
 			}
 		}
 
@@ -384,44 +366,48 @@ namespace DiscordLab
 		{
 			try
 			{
-				if (arg.Count() < 5) return $"```{arg[1]} [UserID/Ip] [Duration] [Reason]```";
-
-				bool validUID = arg[2].Contains('@');
-				bool validIP = IPAddress.TryParse(arg[2], out IPAddress ip);
-
-				if (!validIP && !validUID)
-					return $"```diff\n- Invalid UserID or IP given```";
-
-				var chars = arg[3].Where(Char.IsLetter).ToArray();
-
-				//return string.Join(" ", chars);
-
-				if (chars.Length < 1 || !int.TryParse(new string(arg[3].Where(Char.IsDigit).ToArray()), out int amount) || !validUnits.Contains(chars[0]) || amount < 1)
-					return "```diff\n- Invalid duration```";
-
-				TimeSpan duration = GetBanDuration(chars[0], amount);
-				string reason = string.Join(" ", arg.Skip(4));
-
+				string command = arg[0];
+				string searchvariable = string.Empty;
+				TimeSpan duration;
+				string durationString = string.Empty;
+				string reason = string.Empty;
 				ReferenceHub player = null;
-				if (validIP)
+
+				if (arg.Count() < 4 || arg[1].Length < 1)
+					return $"```{arg[0]} [UserID/IP] [Duration] [Reason]```";
+
+				//Forces the search variable to the front of the array
+				arg = arg.Skip(1).ToArray();
+
+				if (arg[0].StartsWith("'") || arg[0].StartsWith("\""))
 				{
-					var list = ReferenceHub.GetAllHubs().Where(p => p.Value.characterClassManager.connectionToClient.address == arg[2]);
-					if (list.Count() > 0)
-						player = list.First().Value;
+					string result = string.Join(" ", arg).Split(new string[] { "\"" }, 3, StringSplitOptions.None)[1];
+
+					searchvariable = result;
+
+					arg = string.Join(" ", arg).Replace("\"" + result + "\"", string.Empty).Trim(' ').Split(' ');
 				}
 				else
 				{
-					var list = ReferenceHub.GetAllHubs().Where(p => p.Value.characterClassManager.UserId == arg[2]);
-					if (list.Count() > 0)
-						player = list.First().Value;
+					searchvariable = arg[0];
+
+					arg = arg.Skip(1).ToArray();
 				}
+
+				durationString = arg[0];
+				var chars = durationString.Where(Char.IsLetter).ToArray();
+				if (chars.Length < 1 || !int.TryParse(new string(durationString.Where(Char.IsDigit).ToArray()), out int amount) || !validUnits.Contains(chars[0]) || amount < 1)
+					return "```diff\n- Invalid duration provided```";
+
+				if (!GetPlayer(searchvariable, out player))
+					return $"Unable to find player `{searchvariable.Replace("`", "\\`")}`";
+
+				duration = GetBanDuration(chars[0], amount);
+				arg = arg.Skip(1).ToArray();
+				reason = string.Join(" ", arg);
 
 				if (player != null)
 				{
-					if (player.serverRoles.BypassStaff)
-					{
-						return "```diff\n- User is global staff and cannot be banned```";
-					}
 
 					BanHandler.IssueBan(new BanDetails
 					{
@@ -443,22 +429,22 @@ namespace DiscordLab
 						Reason = reason
 					}, BanHandler.BanType.IP);
 
-					ServerConsole.Disconnect(player.gameObject, reason);
+					ServerConsole.Disconnect(player.gameObject, $"You have been banned by the server staff\nReason: " + reason);
 
-					return $"`{player.nicknameSync.MyNick} ({player.characterClassManager.UserId})` was banned for {arg[3]} with reason: {reason}";
+					return $"`{player.nicknameSync.MyNick} ({player.characterClassManager.UserId})` was banned for {durationString} with reason: {reason}";
 				}
 				else
 				{
 					BanHandler.IssueBan(new BanDetails
 					{
 						OriginalName = "Offline player",
-						Id = arg[2],
+						Id = searchvariable,
 						Issuer = jObject["Staff"].ToString(),
 						IssuanceTime = DateTime.UtcNow.Ticks,
 						Expires = DateTime.UtcNow.Add(duration).Ticks,
 						Reason = reason
-					}, (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));
-					return $"`{arg[2]}` was banned for {arg[3]} with reason {reason}!";
+					}, searchvariable.Contains('@') ? BanHandler.BanType.UserId : BanHandler.BanType.IP);
+					return $"`{searchvariable}` was banned for {durationString} with reason: {reason}!";
 				}
 			}
 			catch (Exception e)
@@ -487,32 +473,45 @@ namespace DiscordLab
 
 		private string KickCommand(string[] arg, JObject jObject)
 		{
-			if (arg.Count() < 4) return $"```{arg[1]} [UserID] [Reason]```";
-			else if (!arg[2].Contains('@')) return "Invalid UserID given";
+			if (arg.Count() < 3 || arg[1].Length < 1)
+				return $"```{arg[0]} [UserID/IP] [Reason]```";
 
-			string reason = string.Join(" ", arg.Skip(3));
+			string searchvariable = string.Empty;
 
-			GameObject go = PlayerManager.players.Where(p => p.GetComponent<CharacterClassManager>().UserId == arg[2]).FirstOrDefault();
+			//Forces the search variable to the front of the array
+			arg = arg.Skip(1).ToArray();
 
-
-			if (go == null || go.Equals(default(GameObject)))
+			if (arg[0].StartsWith("'") || arg[0].StartsWith("\""))
 			{
-				return $"Unable to find user `{arg[2]}` on the server!";
+				string result = string.Join(" ", arg).Split(new string[] { "\"" }, 3, StringSplitOptions.None)[1];
+
+				searchvariable = result;
+
+				arg = string.Join(" ", arg).Replace("\"" + result + "\"", string.Empty).Trim(' ').Split(' ');
 			}
 			else
 			{
-				ServerConsole.Disconnect(go, reason);
+				searchvariable = arg[0];
 
-				return $"`{go.GetComponent<NicknameSync>().MyNick} ({go.GetComponent<CharacterClassManager>().UserId})` was kicked with reason {reason}!";
+				arg = arg.Skip(1).ToArray();
 			}
+
+			if (!GetPlayer(searchvariable, out ReferenceHub player))
+				return $"Unable to find player `{searchvariable.Replace("`", "\\`")}`";
+
+			string reason = string.Join(" ", arg);
+
+			ServerConsole.Disconnect(player.gameObject, $"You have been kicked by the server staff\nReason: " + reason);
+
+			return $"`{player.nicknameSync.MyNick} ({player.characterClassManager.UserId})` was kicked with reason: {reason}";
 		}
 
 		private string UnbanCommand(string[] arg, JObject jObject)
 		{
-			if (arg.Count() < 3) return $"```{arg[1]} [UserID/Ip]```";
+			if (arg.Count() < 2) return $"```{arg[0]} [UserID/Ip]```";
 
 			bool validUID = arg[2].Contains('@');
-			bool validIP = IPAddress.TryParse(arg[2], out IPAddress ip);
+			bool validIP = IPAddress.TryParse(arg[1], out IPAddress ip);
 
 			BanDetails details;
 
@@ -520,16 +519,61 @@ namespace DiscordLab
 				return $"```diff\n- Invalid UserID or IP given```";
 
 			if (validUID)
-				details = BanHandler.QueryBan(arg[2], null).Key;
+				details = BanHandler.QueryBan(arg[1], null).Key;
 			else
-				details = BanHandler.QueryBan(null, arg[2]).Value;
+				details = BanHandler.QueryBan(null, arg[1]).Value;
 
 			if (details == null)
-				return $"No ban found for `{arg[2]}`.\nMake sure you have typed it correctly, and that it has the @domain prefix if it's a UserID";
+				return $"No ban found for `{arg[1]}`.\nMake sure you have typed it correctly, and that it has the @domain prefix if it's a UserID";
 
-			BanHandler.RemoveBan(arg[2], (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));
+			BanHandler.RemoveBan(arg[1], (validUID ? BanHandler.BanType.UserId : BanHandler.BanType.IP));
 
-			return $"`{arg[2]}` has been unbanned.";
+			return $"`{arg[1]}` has been unbanned.";
+		}
+
+		private bool GetPlayer(string SearchParameter, out ReferenceHub Player)
+		{
+			Player = null;
+
+			KeyValuePair<GameObject, ReferenceHub>[] playerList;
+
+			if (SearchParameter.Contains('@'))
+			{
+				playerList = ReferenceHub.GetAllHubs().Where(p => p.Value.characterClassManager.UserId == SearchParameter).ToArray();
+
+				if (playerList.Any())
+				{
+					Player = playerList[0].Value;
+					return true;
+				}
+
+				else return true;
+
+			}
+			else if (IPAddress.TryParse(SearchParameter, out IPAddress IP))
+			{
+				playerList = ReferenceHub.GetAllHubs().Where(p => p.Value.characterClassManager.connectionToClient.address == SearchParameter).ToArray();
+
+				if (playerList.Any())
+				{
+					Player = playerList[0].Value;
+					return true;
+				}
+
+				else return true;
+			}
+
+			playerList = ReferenceHub.GetAllHubs().Where(p => p.Value.nicknameSync.MyNick.ToLowerInvariant() == SearchParameter.ToLowerInvariant()).ToArray();
+
+			if (playerList.Any())
+			{
+				Player = playerList[0].Value;
+				return true;
+			}
+
+
+			return false;
+
 		}
 
 		internal class DiscordLabCommandSender : CommandSender

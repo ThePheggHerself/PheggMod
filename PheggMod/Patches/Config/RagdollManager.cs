@@ -37,6 +37,10 @@ namespace PheggMod.Patches
 				}
 
 				pos = GetPos(list);
+				pos.y += 1;
+
+				Base.Info(pos.ToString());
+
 				allowRecall = false;
 			}
 

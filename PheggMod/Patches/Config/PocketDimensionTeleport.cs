@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace PheggMod.Patches
 {
-	[MonoModPatch("global::PocketDimensionTeleport")]
+	//[MonoModPatch("global::PocketDimensionTeleport")]
 	public class PMPocketDimensionTeleport : PocketDimensionTeleport
 	{
 		private readonly List<Vector3> tpPositions;

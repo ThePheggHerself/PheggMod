@@ -28,8 +28,10 @@ namespace PheggMod.Commands
                 CheckCommand<Tower2Command>(typeof(Tower2Command));
 				CheckCommand<IgnoreAnticheat>(typeof(IgnoreAnticheat));
 				CheckCommand<FFDetectorCommand>(typeof(FFDetectorCommand));
-				//CheckCommand<GrenadeCommand>(typeof(GrenadeCommand));
-            }
+				CheckCommand<GrenadeCommand>(typeof(GrenadeCommand));
+				CheckCommand<FlashCommand>(typeof(FlashCommand));
+				CheckCommand<BallCommand>(typeof(BallCommand));
+			}
             catch(Exception e)
             {
                 Base.Error(e.ToString());

@@ -111,10 +111,8 @@ namespace PheggMod
 		}
 
 
-		public override string ToString()
-		{
-			return $"{nameClean} ({userId})";
-		}
+		public override string ToString() => $"{nameClean} ({userId})";
+		
 		public void Kill() => refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Wall, playerId, false), gameObject);
 
 		public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)

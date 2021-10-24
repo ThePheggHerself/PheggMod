@@ -18,11 +18,6 @@ namespace PheggMod.Patches
 		{
 			orig_ServerThrow(fullForce);
 
-			//Base.Info($"{this.Projectile.ToString()} {this.Projectile.Info.ToString()} {this.Projectile.Info.ItemId} {this.Projectile.name}");
-
-			//if (this.Category != ItemCategory.Grenade)
-			//	return;
-
 			try
 			{
 				Base.Debug("Triggering PlayerThrowGrenadeEvent");

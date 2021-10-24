@@ -52,8 +52,6 @@ namespace PheggMod.Patches
 
 				foreach (var MatchedWord in filteredwords)
 				{
-					//Base.Info(MatchedWord);
-
 					if (StringContains(NewNick, MatchedWord, StringComparison.OrdinalIgnoreCase))
 					{
 						NewNick = Regex.Replace(NewNick, MatchedWord, "duck", RegexOptions.IgnoreCase);

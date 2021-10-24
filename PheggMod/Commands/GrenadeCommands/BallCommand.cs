@@ -11,13 +11,13 @@ using InventorySystem.Items.ThrowableProjectiles;
 
 namespace PheggMod.Commands
 {
-	public class GrenadeCommand : ICommand, IUsageProvider
+	public class BallCommand : ICommand, IUsageProvider
 	{
-		public string Command => "grenade";
+		public string Command => "ball";
 
 		public string[] Aliases => null;
 
-		public string Description => "Spawns a grenade at a player's location";
+		public string Description => "Spawns SCP018 at a player's location";
 
 		public string[] Usage { get; } = { "%player%" };
 
@@ -34,26 +34,16 @@ namespace PheggMod.Commands
 				if (plr.characterClassManager.CurClass == RoleType.Spectator)
 					continue;
 
-				ThrowableItem ItemBase = (ThrowableItem)plr.inventory.CreateItemInstance(ItemType.GrenadeHE, false);
+				ThrowableItem ItemBase = (ThrowableItem)plr.inventory.CreateItemInstance(ItemType.SCP018, false);
 
 				Vector3 Pos = plr.playerMovementSync.GetRealPosition();
 				Pos.y += 1;
 
-				ExplosionGrenade grenade = (ExplosionGrenade)UnityEngine.Object.Instantiate(ItemBase.Projectile, Pos, Quaternion.identity);
+				Scp018Projectile grenade = (Scp018Projectile)UnityEngine.Object.Instantiate(ItemBase.Projectile, Pos, Quaternion.identity);
 
 				grenade.PreviousOwner = new Footprinting.Footprint(plr);
 				Mirror.NetworkServer.Spawn(grenade.gameObject.gameObject);
 				grenade.ServerActivate();
-
-
-				//var grenade = UnityEngine.Object.Instantiate(new ExplosionGrenade(), plr.playerMovementSync.GetRealPosition(), Quaternion.identity);
-				//grenade._maxRadius
-
-				//Mirror.NetworkServer.Spawn(grenade.gameObject.gameObject);
-
-				////new ExplosionGrenade(ItemType.GrenadeHE, plr)
-
-				////UnityEngine.Object.Instantiate<ThrownProjectile>(new ExplosionGrenade()).GetComponent<ThrowableItem>().ServerThrow(10, 10, Vector3.zero);
 			}
 
 			response = $"#Spawned grenade on {hubs.Count} {(hubs.Count > 1 ? "players" : "player")}";
