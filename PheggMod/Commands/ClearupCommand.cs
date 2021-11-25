@@ -1,10 +1,13 @@
 ﻿using CommandSystem;
+using InventorySystem.Items.Firearms.Ammo;
 using Mirror;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Interactables.Interobjects.DoorUtils;
 
 namespace PheggMod.Commands
 {
@@ -22,23 +25,19 @@ namespace PheggMod.Commands
             if (!canRun)
                 return false;
 
-            List<Ragdoll> rDs = UnityEngine.Object.FindObjectsOfType<Ragdoll>().ToList();
-
-            for (var p = 0; p < rDs.Count; p++)
+			List<Ragdoll> ragdolls = UnityEngine.Object.FindObjectsOfType<Ragdoll>().ToList();
+            for (var p = 0; p < ragdolls.Count; p++)
             {
-                NetworkServer.Destroy(rDs[p].gameObject);
-            }
+                NetworkServer.Destroy(ragdolls[p].gameObject);
+            }			
 
-			
-
-			List<Knife.DeferredDecals.Decal> decals = UnityEngine.Object.FindObjectsOfType<Knife.DeferredDecals.Decal>().ToList();
-
-			for (var p = 0; p < rDs.Count; p++)
+			List<AmmoPickup> ammo = UnityEngine.Object.FindObjectsOfType<AmmoPickup>().ToList();
+			for (var p = 0; p < ammo.Count; p++)
 			{
-				Knife.DeferredDecals.DeferredDecalsManager.instance.RemoveDecal(decals[p]);
+				NetworkServer.Destroy(ammo[p].gameObject);
 			}
 
-			response = $"Cleaned up all ragdolls and decals";
+			response = $"Facility cleaned up!";
             return true;
         }
     }

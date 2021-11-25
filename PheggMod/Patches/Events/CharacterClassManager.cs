@@ -99,5 +99,31 @@ namespace PheggMod.Patches
 				Base.Error(e.ToString());
 			}
 		}
+
+		public extern void orig_SetPlayersClass(RoleType classid, GameObject ply, SpawnReason spawnReason, bool lite = false);
+		public void SetPlayersClass(RoleType classid, GameObject ply, SpawnReason spawnReason, bool lite = false)
+		{
+			try
+			{
+				orig_SetPlayersClass(classid, ply, spawnReason, lite);
+			}
+			catch(Exception e)
+			{
+				Base.Error(e.ToString());
+			}
+		}
+
+		public extern void orig_SetClassID(RoleType id, SpawnReason spawnReason);
+		public void SetClassID(RoleType id, SpawnReason spawnReason)
+		{
+			try
+			{
+				orig_SetClassID(id, spawnReason);
+			}
+			catch (Exception e)
+			{
+				Base.Error(e.ToString());
+			}
+		}
 	}
 }

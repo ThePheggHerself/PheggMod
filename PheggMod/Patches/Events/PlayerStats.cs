@@ -56,10 +56,10 @@ namespace PheggMod.Patches
 				//if (FFDetector.FFDetector.DetectorEnabled)
 				//	FFDetector.FFDetector.CalculateFF(go, info, out info.Amount);
 
-				bool IsKill = info.Amount >= player.health;
-				if (info.Amount > 0)
+				bool IsKill = info.Amount >= player.health || info.Amount == -1;
+				if (info.Amount != 0)
 				{
-					if (IsKill && info.Amount > 0)
+					if (IsKill)
 						try
 						{
 							Base.Debug("Triggering PlayerDeathEvent");
@@ -80,7 +80,6 @@ namespace PheggMod.Patches
 							Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
 						}
 				}
-
 				bool result = orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
 
 				if (player == null)
@@ -102,7 +101,6 @@ namespace PheggMod.Patches
 							player.refHub.playerEffectsController.GetEffect<CustomPlayerEffects.SCP008>().Intensity++;
 					}
 				}
-
 				return result;
 
 			}

@@ -52,8 +52,6 @@ namespace CustomPlayerEffects
 							
 		}
 
-
-
 		public bool IsHealable(ItemType it)
 		{
 			if (!NetworkServer.active || !IsEnabled)

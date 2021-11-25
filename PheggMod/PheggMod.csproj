@@ -173,6 +173,7 @@
     <Compile Include="CustomEffects\SCP008.cs" />
     <Compile Include="Patches\Command\BanCommand.cs" />
     <Compile Include="Patches\Config\BanHandler.cs" />
+    <Compile Include="Patches\Config\DisarmedPlayers.cs" />
     <Compile Include="Patches\Events\AlphaWarheadController.cs" />
     <Compile Include="Patches\Command\AlphaWarheadNukesitePanel.cs" />
     <Compile Include="Patches\Events\BanPlayer.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Patches\Config\ConfigFile.cs" />
     <Compile Include="Patches\Config\ServerConfigSynchronizer.cs" />
     <Compile Include="Patches\Grenades\ThrowableItem.cs" />
+    <Compile Include="Patches\BugFixes\PMInventoryProvider.cs" />
     <Compile Include="Patches\Unused\CustomLiteNetLib4MirrorTransport.cs" />
     <Compile Include="Patches\Unused\CustomNetworkManager.cs" />
     <Compile Include="Patches\Events\DecontaminationLCZ.cs" />
