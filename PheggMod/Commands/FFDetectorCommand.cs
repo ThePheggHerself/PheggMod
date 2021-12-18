@@ -23,9 +23,9 @@ namespace PheggMod.Commands
 			if (!canRun)
 				return false;
 
-			FFDetector.FFDetector.DoCheck = !FFDetector.FFDetector.DoCheck;
+			//FFDetector.FFDetector.DoCheck = !FFDetector.FFDetector.DoCheck;
 
-			response = $"FriendlyFireDetector has been {(FFDetector.FFDetector.DoCheck ? "enabled" : "disabled")}";
+			//response = $"FriendlyFireDetector has been {(FFDetector.FFDetector.DoCheck ? "enabled" : "disabled")}";
 			return true;
 		}
 	}

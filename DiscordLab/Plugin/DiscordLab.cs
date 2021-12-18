@@ -510,7 +510,7 @@ namespace DiscordLab
 		{
 			if (arg.Count() < 2) return $"```{arg[0]} [UserID/Ip]```";
 
-			bool validUID = arg[2].Contains('@');
+			bool validUID = arg[1].Contains('@');
 			bool validIP = IPAddress.TryParse(arg[1], out IPAddress ip);
 
 			BanDetails details;

@@ -171,6 +171,7 @@
     <Compile Include="Commands\Tower2Command.cs" />
     <Compile Include="CustomEffects\PlayerEffectsController.cs" />
     <Compile Include="CustomEffects\SCP008.cs" />
+    <Compile Include="Patches\API\ScpDamageHandler.cs" />
     <Compile Include="Patches\Command\BanCommand.cs" />
     <Compile Include="Patches\Config\BanHandler.cs" />
     <Compile Include="Patches\Config\DisarmedPlayers.cs" />
@@ -185,7 +186,7 @@
     <Compile Include="Patches\Grenades\ThrowableItem.cs" />
     <Compile Include="Patches\BugFixes\PMInventoryProvider.cs" />
     <Compile Include="Patches\Unused\CustomLiteNetLib4MirrorTransport.cs" />
-    <Compile Include="Patches\Unused\CustomNetworkManager.cs" />
+    <Compile Include="Patches\API\CustomNetworkManager.cs" />
     <Compile Include="Patches\Events\DecontaminationLCZ.cs" />
     <Compile Include="Patches\Events\NicknameSync.cs" />
     <Compile Include="Patches\Config\NineTailedFoxAnnouncer.cs" />

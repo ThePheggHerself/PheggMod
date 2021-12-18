@@ -7,6 +7,7 @@ using UnityEngine;
 using Hints;
 using InventorySystem;
 using InventorySystem.Disarming;
+using PlayerStatsSystem;
 
 namespace PheggMod
 {
@@ -25,7 +26,10 @@ namespace PheggMod
 		public string ipAddress { get; internal set; }
 		public int playerId { get; internal set; }
 
-		public GameObject gameObject { get; internal set; }
+		public GameObject gameObject
+		{
+			get { return refHub.gameObject; }
+		}
 
 		private BanPlayer _banPlayer { get; set; }
 		private NetworkConnection _networkConnection { get; set; }
@@ -55,22 +59,46 @@ namespace PheggMod
 				domain = refHub.characterClassManager.UserId.Split('@')[1].ToUpper();
 				ipAddress = refHub.nicknameSync.connectionToClient.address;
 				playerId = refHub.queryProcessor.PlayerId;
-
-				gameObject = player;
 			}
 		}
 
-		public bool godmode
+		public PheggPlayer(ReferenceHub player)
+		{
+			if (player == null)
+				throw new ArgumentNullException("Can't make PheggPlayer from null");
+			else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
+			{
+				throw new ArgumentNullException("Can't make PheggPlayer from server");
+			}
+			else
+			{
+				isEmpty = false;
+				refHub = player;
+
+				_banPlayer = player.gameObject.GetComponent<BanPlayer>();
+				_networkConnection = player.gameObject.GetComponent<NetworkConnection>();
+				_broadcast = player.gameObject.GetComponent<Broadcast>();
+
+				name = player.nicknameSync.MyNick;
+				nameClean = _filterNames.Replace(name, @"\$&");
+				userId = player.characterClassManager.UserId;
+				domain = player.characterClassManager.UserId.Split('@')[1].ToUpper();
+				ipAddress = player.nicknameSync.connectionToClient.address;
+				playerId = player.queryProcessor.PlayerId;
+			}
+		}
+
+		public bool Godmode
 		{
 			get => refHub.characterClassManager.GodMode;
 			set => refHub.characterClassManager.GodMode = value;
 		}
-		public bool bypass
+		public bool Bypass
 		{
 			get => refHub.serverRoles.BypassMode;
 			set => refHub.serverRoles.BypassMode = value;
 		}
-		public bool disarmed
+		public bool Disarmed
 		{
 			get => refHub.inventory.IsDisarmed();
 			set
@@ -82,18 +110,37 @@ namespace PheggMod
 				}
 			}
 		}
-		public float health
+		public float Health
 		{
-			get => refHub.playerStats.Health;
-			set => refHub.playerStats.Health = value;
+			get 
+			{
+				return refHub.playerStats.GetModule<HealthStat>().CurValue;
+			}
+			set
+			{
+				refHub.playerStats.GetModule<HealthStat>().CurValue = value;
+			}
 		}
+
+		public float AHP
+		{
+			get
+			{
+				return refHub.playerStats.GetModule<AhpStat>().CurValue;
+			}
+			set
+			{
+				refHub.playerStats.GetModule<AhpStat>().CurValue = value;
+			}
+		}
+
 		public RoleType roleType
 		{
 			get => refHub.characterClassManager.CurClass;
 			set
 			{
 				refHub.characterClassManager.SetClassID(value, CharacterClassManager.SpawnReason.ForceClass);
-				refHub.playerStats.Health = refHub.characterClassManager.Classes.Get(value).maxHP;
+				this.Health = refHub.characterClassManager.Classes.Get(value).maxHP;
 			}
 		}
 		public Team team
@@ -113,7 +160,7 @@ namespace PheggMod
 
 		public override string ToString() => $"{nameClean} ({userId})";
 		
-		public void Kill() => refHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10000, "WORLD", DamageTypes.Wall, playerId, false), gameObject);
+		public void Kill() => refHub.playerStats.DealDamage(new UniversalDamageHandler(UniversalDamageHandler.KillValue, DeathTranslations.Crushed));
 
 		public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
 		{

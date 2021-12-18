@@ -1,9 +1,10 @@
 ﻿using CustomPlayerEffects;
 using Hints;
 using Mirror;
+using PlayerStatsSystem;
 using UnityEngine;
 
-namespace CustomPlayerEffects
+namespace PheggMod.CustomEffects
 {
 	public class SCP008 : PlayerEffect, IDisplayablePlayerEffect, IHealablePlayerEffect
 	{
@@ -48,7 +49,7 @@ namespace CustomPlayerEffects
 
 			TimeLeft += TimeBetweenTicks;
 
-			Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2f * Intensity, "Infection", DamageTypes.Poison, 0, true), Hub.gameObject);
+			Hub.playerStats.DealDamage(new UniversalDamageHandler(2f * Intensity, DeathTranslations.Poisoned));
 							
 		}
 
@@ -106,6 +107,8 @@ namespace CustomPlayerEffects
 		{
 			if (newClass == RoleType.Spectator)
 			{
+				Hub.characterClassManager.NetworkCurClass = RoleType.Scp0492;
+
 				Intensity = 0;
 				return;
 			}

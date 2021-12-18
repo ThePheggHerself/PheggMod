@@ -26,12 +26,12 @@ namespace PheggMod.Patches
                 Base.Error($"Error triggering RoundEndEvent: {e.InnerException}");
             }
 
-			if (FFDetector.FFDetector.DetectorEnabled)
-			{
-				FFDetector.FFDetector.FFPlayers.Clear();
-				FFDetector.FFDetector.GrenadeThrowers.Clear();
-				FFDetector.FFDetector.DoCheck = false;
-			}
+			//if (FFDetector.FFDetector.DetectorEnabled)
+			//{
+			//	FFDetector.FFDetector.FFPlayers.Clear();
+			//	FFDetector.FFDetector.GrenadeThrowers.Clear();
+			//	FFDetector.FFDetector.DoCheck = false;
+			//}
 
 				orig_RpcShowRoundSummary(list_start, list_finish, leadingTeam, e_ds, e_sc, scp_kills, round_cd);
         }
@@ -41,7 +41,7 @@ namespace PheggMod.Patches
             if (!PMConfigFile.stickyRound) return;
 
             Base.Info("The server's player count has reached 0, so the round will be ended");
-            PlayerManager.localPlayer.GetComponent<PlayerStats>().Roundrestart();
+			RoundRestarting.RoundRestart.InitiateRoundRestart();
         }
 
         [MonoModEnumReplace]

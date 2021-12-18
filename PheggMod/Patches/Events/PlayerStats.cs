@@ -6,109 +6,109 @@ using Mirror;
 using MonoMod;
 using PheggMod.API;
 using PheggMod.API.Events;
+using PheggMod.Patches.API;
+using PheggMod.CustomEffects;
+using PlayerStatsSystem;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace PheggMod.Patches
 {
-	[MonoModPatch("global::PlayerStats")]
-	public class PMPlayerStats : PlayerStats
+	[MonoModPatch("global::PlayerStatsSystem.PlayerStats")]
+	public class PMPlayerStats : PlayerStatsSystem.PlayerStats
 	{
 		public static DateTime LastRespawn = new DateTime();
 
-		//PlayerHurtEvent
-		public extern bool orig_HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true);
-		public new bool HurtPlayer(HitInfo info, GameObject go, bool noTeamDamage = false, bool IsValidDamage = true)
+		private bool _eventsLinked = false;
+
+		private extern void orig_Start();
+		private void Start()
 		{
-			try
+			orig_Start();
+
+			if (this.isLocalPlayer)
 			{
-				if (isLocalPlayer || !NetworkServer.active || go == null)
-					try
-					{
-						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-					}
-					catch (Exception e)
-					{
-						Base.Error(e.ToString());
-						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-					}
-
-				PheggPlayer player = new PheggPlayer(go);
-				if (player == null)
-					try
-					{
-						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-					}
-					catch (Exception e)
-					{
-						Base.Error(e.ToString());
-						return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-					}
-
-				if (player.refHub.characterClassManager.isLocalPlayer || info.Tool == DamageTypes.None || player.refHub.characterClassManager.GodMode)
-					return orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-
-				PheggPlayer attacker = null;
-				try { attacker = new PheggPlayer(info.GetPlayerObject()); }
-				catch { }
-
-				//if (FFDetector.FFDetector.DetectorEnabled)
-				//	FFDetector.FFDetector.CalculateFF(go, info, out info.Amount);
-
-				bool IsKill = info.Amount >= player.health || info.Amount == -1;
-				if (info.Amount != 0)
-				{
-					if (IsKill)
-						try
-						{
-							Base.Debug("Triggering PlayerDeathEvent");
-							PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(player, attacker, info.Amount, info.Tool, info));
-						}
-						catch (Exception e)
-						{
-							Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
-						}
-					else
-						try
-						{
-							Base.Debug("Triggering PlayerHurtEvent");
-							PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(player, attacker, info.Amount, info.Tool, info));
-						}
-						catch (Exception e)
-						{
-							Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
-						}
-				}
-				bool result = orig_HurtPlayer(info, go, noTeamDamage, IsValidDamage);
-
-				if (player == null)
-					return result;
-
-				if (PMConfigFile.enable008 && (info.Tool == DamageTypes.Scp0492 || info.Tool == DamageTypes.Poison))
-				{
-					if (IsKill)
-						player.roleType = RoleType.Scp0492;
-
-					else if (info.Tool == DamageTypes.Scp0492)
-					{
-						CustomPlayerEffects.SCP008 effect = player.refHub.playerEffectsController.GetEffect<CustomPlayerEffects.SCP008>();
-
-						if (effect == null || !effect.IsEnabled)
-							player.gameObject.GetComponent<PlayerEffectsController>().EnableEffect<CustomPlayerEffects.SCP008>(300f, false);
-
-						else
-							player.refHub.playerEffectsController.GetEffect<CustomPlayerEffects.SCP008>().Intensity++;
-					}
-				}
-				return result;
-
-			}
-			catch (Exception)
-			{
-				return orig_HurtPlayer(info, go);
+				OnAnyPlayerDamaged += PlayerDamaged;
+				OnAnyPlayerDied += PlayerKilled;
 			}
 		}
+
+		private extern void orig_OnDestroy();
+		private void OnDestroy()
+		{
+			orig_OnDestroy();
+
+			if (this.isLocalPlayer)
+			{
+				OnAnyPlayerDamaged -= PlayerDamaged;
+				OnAnyPlayerDied -= PlayerKilled;
+			}
+		}
+
+		private void PlayerDamaged(ReferenceHub refhub, DamageHandlerBase handler)
+		{
+			if (!(handler is StandardDamageHandler standard))
+				return;
+
+			try
+			{
+				Base.Debug("Triggering PlayerHurtEvent");
+				PluginManager.TriggerEvent<IEventHandlerPlayerHurt>(new PlayerHurtEvent(new PheggPlayer(refhub), standard));
+			}
+			catch (Exception e)
+			{
+				Base.Error($"Error triggering PlayerHurtEvent: {e.InnerException}");
+			}
+
+			if (!PMConfigFile.enable008)
+				return;
+
+			if(handler is PMScpDamageHandler scpDH && scpDH._translationId == DeathTranslations.Zombie.Id)
+			{
+				SCP008 effect = refhub.playerEffectsController.GetEffect<SCP008>();
+
+				if (effect == null || !effect.IsEnabled)
+					refhub.playerEffectsController.EnableEffect<SCP008>(300f, false);
+				else
+					effect.Intensity++;
+			}
+		}
+
+		private void PlayerKilled(ReferenceHub refhub, DamageHandlerBase handler)
+		{
+			if (!(handler is StandardDamageHandler standard))
+				return;
+
+			var pPlayer = new PheggPlayer(refhub);
+
+			try
+			{
+				Base.Debug("Triggering PlayerDeathEvent");
+				PluginManager.TriggerEvent<IEventHandlerPlayerDeath>(new PlayerDeathEvent(new PheggPlayer(refhub), standard));
+			}
+			catch (Exception e)
+			{
+				Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
+			}
+
+			if (!PMConfigFile.enable008)
+				return;
+
+			if ((handler is PMScpDamageHandler scpDH && scpDH._translationId == DeathTranslations.Zombie.Id) || (handler is UniversalDamageHandler uDH && uDH.TranslationId == DeathTranslations.Poisoned.Id))
+			{
+				try
+				{
+					Base.Info("AAA");
+					pPlayer.roleType = RoleType.Scp0492;
+				}
+				catch(Exception e)
+				{
+					Base.Error(e.ToString());
+				}
+			}
+		}
+
 		public extern void orig_Roundrestart();
 		public new void Roundrestart()
 		{
