@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace PheggMod.Patches
 {
-	[MonoModPatch("global::Respawning.RespawnTickets")]
+	//[MonoModPatch("global::Respawning.RespawnTickets")]
 	public class PMRespawnTickets : RespawnTickets
 	{
 		//public new const SpawnableTeamType DefaultTeam = SpawnableTeamType.NineTailedFox;

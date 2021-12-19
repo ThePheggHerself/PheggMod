@@ -153,8 +153,10 @@ namespace DiscordLab
 		{
 			if (aDH is FirearmDamageHandler fDH)
 				return fDH.WeaponType.ToString();
+			else if (aDH is DisruptorDamageHandler dDH)
+				return "Particle Disruptor";
 			else if (aDH is ExplosionDamageHandler eDH)
-				return "grenade";
+				return "Grenade";
 			else if (aDH is MicroHidDamageHandler mhidDH)
 				return "Micro HID";
 			else if (aDH is RecontainmentDamageHandler reconDH)
@@ -165,6 +167,8 @@ namespace DiscordLab
 				return "SCP 096";
 			else if (aDH is ScpDamageHandler scpDH)
 				return scpDH.Attacker.Hub.characterClassManager.CurRole.ToString();
+
+
 
 			else return "THIS SHOULD NEVER APPEAR!!!";
 		}

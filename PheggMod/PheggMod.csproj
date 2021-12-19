@@ -177,7 +177,6 @@
     <Compile Include="Patches\Config\DisarmedPlayers.cs" />
     <Compile Include="Patches\Events\AlphaWarheadController.cs" />
     <Compile Include="Patches\Command\AlphaWarheadNukesitePanel.cs" />
-
     <Compile Include="Patches\Events\BanPlayer.cs" />
     <Compile Include="Patches\Events\CharacterClassManager.cs" />
     <Compile Include="Patches\Config\CheaterReport.cs" />
@@ -185,28 +184,25 @@
     <Compile Include="Patches\Config\ConfigFile.cs" />
     <Compile Include="Patches\Config\ServerConfigSynchronizer.cs" />
     <Compile Include="Patches\Grenades\ThrowableItem.cs" />
-    <Compile Include="Patches\BugFixes\PMInventoryProvider.cs" />
+    <Compile Include="Patches\Unused\PMInventoryProvider.cs" />
     <Compile Include="Patches\Unused\CustomLiteNetLib4MirrorTransport.cs" />
     <Compile Include="Patches\API\CustomNetworkManager.cs" />
     <Compile Include="Patches\Events\DecontaminationLCZ.cs" />
-
     <Compile Include="Patches\Events\NicknameSync.cs" />
     <Compile Include="Patches\Config\NineTailedFoxAnnouncer.cs" />
     <Compile Include="Patches\Events\PlayerStats.cs" />
-    <Compile Include="Patches\Config\PocketDimensionTeleport.cs" />
+    <Compile Include="Patches\Unused\PocketDimensionTeleport.cs" />
     <Compile Include="Patches\Events\QueryProcessor.cs" />
     <Compile Include="Patches\Config\Ragdoll.cs" />
-
     <Compile Include="Patches\API\ReservedSlots.cs" />
     <Compile Include="Patches\Events\RespawnManager.cs" />
-    <Compile Include="Patches\Config\RespawnTickets.cs" />
+    <Compile Include="Patches\Unused\RespawnTickets.cs" />
     <Compile Include="Patches\Events\RoundSummary.cs" />
     <Compile Include="Patches\Config\Scp096.cs" />
     <Compile Include="Patches\Events\ServerRoles.cs" />
     <Compile Include="Patches\Config\ServerStatic.cs" />
     <Compile Include="Patches\Config\TeslaGateController.cs" />
     <Compile Include="Patches\VisionInformation.cs" />
-
     <Compile Include="FFDetector\FFDetector.cs" />
     <Compile Include="Misc\GlobalSuppressions.cs" />
     <Compile Include="PheggModBase.cs" />
@@ -228,7 +224,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Patches\BugFixes\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>$(ProjectDir)bin\Build\monomod.bat</PostBuildEvent>

@@ -273,7 +273,6 @@ namespace DiscordLab
 			}
 		}
 
-
 		private string Playerlist()
 		{
 			if (PlayerManager.players.Count < 1)

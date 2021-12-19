@@ -87,9 +87,9 @@ namespace PheggMod.Patches
 		{
 			try
 			{
-				if (isLocalPlayer || newClass == RoleType.Spectator) return;
+				if (newClass == RoleType.Spectator) return;
 
-				if(spawnReason == SpawnReason.Escaped)
+				if (spawnReason == SpawnReason.Escaped)
 				{
 					try
 					{
@@ -103,10 +103,12 @@ namespace PheggMod.Patches
 				}
 				else
 				{
+					Base.Info("CC");
+
 					try
 					{
 						Base.Debug("Triggering PlayerSpawnEvent");
-						PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(this.gameObject), this.CurClass, this.Classes.SafeGet(this.CurClass).team));
+						PluginManager.TriggerEvent<IEventHandlerPlayerSpawn>(new PlayerSpawnEvent(new PheggPlayer(userHub), newClass, this.Classes.SafeGet(this.CurClass).team));
 					}
 					catch (Exception e)
 					{
