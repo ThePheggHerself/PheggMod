@@ -19,7 +19,7 @@ namespace PheggMod.Patches
 	public class PMPlayerStats : PlayerStatsSystem.PlayerStats
 	{
 		public static DateTime LastRespawn = new DateTime();
-
+		private ReferenceHub _hub;
 		private bool _eventsLinked = false;
 
 		private extern void orig_Start();
@@ -27,7 +27,7 @@ namespace PheggMod.Patches
 		{
 			orig_Start();
 
-			if (this.isLocalPlayer)
+			if (isLocalPlayer)
 			{
 				OnAnyPlayerDamaged += PlayerDamaged;
 				OnAnyPlayerDied += PlayerKilled;
@@ -39,7 +39,7 @@ namespace PheggMod.Patches
 		{
 			orig_OnDestroy();
 
-			if (this.isLocalPlayer)
+			if (isLocalPlayer)
 			{
 				OnAnyPlayerDamaged -= PlayerDamaged;
 				OnAnyPlayerDied -= PlayerKilled;
@@ -80,7 +80,7 @@ namespace PheggMod.Patches
 			if (!(handler is StandardDamageHandler standard))
 				return;
 
-			var pPlayer = new PheggPlayer(refhub);
+			refhub.characterClassManager.DeathPosition = refhub.playerMovementSync.RealModelPosition;
 
 			try
 			{
@@ -92,17 +92,27 @@ namespace PheggMod.Patches
 				Base.Error($"Error triggering PlayerDeathEvent: {e.InnerException}");
 			}
 
+
+		}
+
+		private extern void orig_KillPlayer(DamageHandlerBase handler);
+		private void KillPlayer(DamageHandlerBase handler)
+		{
+			orig_KillPlayer(handler);
+
 			if (!PMConfigFile.enable008)
 				return;
+
+			var pPlayer = new PheggPlayer(_hub);
 
 			if ((handler is PMScpDamageHandler scpDH && scpDH._translationId == DeathTranslations.Zombie.Id) || (handler is UniversalDamageHandler uDH && uDH.TranslationId == DeathTranslations.Poisoned.Id))
 			{
 				try
 				{
-					Base.Info("AAA");
-					pPlayer.roleType = RoleType.Scp0492;
+					
+					pPlayer.refHub.characterClassManager.SetClassIDAdv(RoleType.Scp0492, true, CharacterClassManager.SpawnReason.ForceClass);
 				}
-				catch(Exception e)
+				catch (Exception e)
 				{
 					Base.Error(e.ToString());
 				}

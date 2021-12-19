@@ -193,7 +193,7 @@
     <Compile Include="Patches\Events\PlayerStats.cs" />
     <Compile Include="Patches\Config\PocketDimensionTeleport.cs" />
     <Compile Include="Patches\Events\QueryProcessor.cs" />
-    <Compile Include="Patches\Config\RagdollManager.cs" />
+    <Compile Include="Patches\Config\Ragdoll.cs" />
     <Compile Include="Patches\API\ReservedSlots.cs" />
     <Compile Include="Patches\Events\RespawnManager.cs" />
     <Compile Include="Patches\Config\RespawnTickets.cs" />

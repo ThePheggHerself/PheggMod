@@ -94,7 +94,10 @@ namespace PheggMod
 						PMServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
 
 						if (!RoundOngoing)
-							PMPlayerStats.StaticChangeLevel(true);
+						{
+							PMServerStatic.ChangeLevel(false);
+						}
+							
 
 						_quitting = true;
 					}

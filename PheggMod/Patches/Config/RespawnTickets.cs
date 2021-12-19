@@ -12,6 +12,6 @@ namespace PheggMod.Patches
 	public class PMRespawnTickets : RespawnTickets
 	{
 		//public new const SpawnableTeamType DefaultTeam = SpawnableTeamType.NineTailedFox;
-		public new const int DefaultTeamAmount = 30;
+		//public new const int DefaultTeamAmount = 30;
 	}
 }

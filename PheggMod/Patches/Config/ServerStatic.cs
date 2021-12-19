@@ -12,5 +12,7 @@ namespace PheggMod.Patches
 		public static NextRoundAction StopNextRound = NextRoundAction.DoNothing;
 		public static YamlConfig RolesConfig, SharedGroupsConfig, SharedGroupsMembersConfig;
 
+		internal static extern void orig_ChangeLevel(bool noShutdownMessage);
+		internal static void ChangeLevel(bool noShutdownMessage) => orig_ChangeLevel(noShutdownMessage);
 	}
 }
