@@ -20,7 +20,7 @@ namespace PheggMod.Commands.NukeCommand
                 return false;
 
 
-            PMAlphaWarheadNukesitePanel.Enable();
+            //PMAlphaWarheadNukesitePanel.Enable();
             response = $"Warhead has been enabled";
 
             return success;

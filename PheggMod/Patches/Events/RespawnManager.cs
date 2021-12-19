@@ -5,6 +5,8 @@ using Respawning;
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using InventorySystem;
+using System.Linq;
 
 namespace PheggMod.Patches
 {
@@ -36,6 +38,8 @@ namespace PheggMod.Patches
             if (RespawnManagerCrap.isCI && PMConfigFile.announceChaos)
                 RespawnEffectsController.PlayCassieAnnouncement(PMConfigFile.chaosAnnouncement, false, true);
 
+			PMPlayerStats.LastRespawn = DateTime.Now;
+
         }
     }
 
@@ -48,10 +52,14 @@ namespace PheggMod.Patches
 
         internal static void TorchSpawnerReplacementDueToShittyCode()
         {
-            foreach (GameObject player in PlayerManager.players)
+            foreach (var player in ReferenceHub.GetAllHubs())
             {
-                if (player.GetComponent<Inventory>().items.FindIndex(i => i.id == ItemType.Flashlight) < 0)
-                    player.GetComponent<Inventory>().AddNewItem(ItemType.Flashlight);
+				if (player.Value.isDedicatedServer || player.Value.characterClassManager.CurClass == RoleType.Spectator)
+					continue;
+
+
+				if (!player.Value.inventory.UserInventory.Items.Where(r => r.Value.ItemTypeId == ItemType.Flashlight).Any())
+					player.Value.inventory.ServerAddItem(ItemType.Flashlight);
             }
         }
     }

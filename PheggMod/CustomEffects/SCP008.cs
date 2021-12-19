@@ -1,7 +1,7 @@
 ﻿using CustomPlayerEffects;
 using Hints;
 using Mirror;
-using Telepathy;
+using PlayerStatsSystem;
 using UnityEngine;
 
 namespace PheggMod.CustomEffects
@@ -9,22 +9,53 @@ namespace PheggMod.CustomEffects
 	public class SCP008 : PlayerEffect, IDisplayablePlayerEffect, IHealablePlayerEffect
 	{
 		public bool hasNotified = false;
-		public int intensity = 1;
-
 		public bool HasUsedPainkiller = false;
 
-		public SCP008(ReferenceHub hub)
+		protected override void Enabled()
 		{
-			Hub = hub;
-			Slot = ConsumableAndWearableItems.UsableItem.ItemSlot.Unwearable;
-			TimeBetweenTicks = 4f;
-			TimeLeft = 20f;
+			hasNotified = false;
 			HasUsedPainkiller = false;
+
+			TimeBetweenTicks = 10;
+			TimeLeft = TimeBetweenTicks;
+			IsEnabled = true;
+		}
+
+		protected override void Disabled()
+		{
+			hasNotified = false;
+			HasUsedPainkiller = false;
+			IsEnabled = false;
+			Intensity = 0;
+		}
+
+		protected override void OnUpdate()
+		{
+			if (!NetworkServer.active)
+				return;
+
+			if (!IsEnabled || !Hub.characterClassManager.IsHuman() || Intensity < 0)
+				this.Disabled();
+
+			if (!hasNotified)
+			{
+				Hub.hints.Show(new TextHint("You have been infected!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
+				hasNotified = true;
+			}
+
+			TimeLeft -= Time.deltaTime;
+			if (TimeLeft > 0)
+				return;
+
+			TimeLeft += TimeBetweenTicks;
+
+			Hub.playerStats.DealDamage(new UniversalDamageHandler(2f * Intensity, DeathTranslations.Poisoned));
+							
 		}
 
 		public bool IsHealable(ItemType it)
 		{
-			if (!NetworkServer.active || !Enabled)
+			if (!NetworkServer.active || !IsEnabled)
 				return false;
 
 			if (it == ItemType.SCP500 || it == ItemType.Adrenaline)
@@ -41,7 +72,7 @@ namespace PheggMod.CustomEffects
 				}
 
 				HasUsedPainkiller = true;
-				DecreaseIntensity(intensity - 1);
+				DecreaseIntensity(Intensity - 1);
 
 				return false;
 			}
@@ -62,7 +93,7 @@ namespace PheggMod.CustomEffects
 				}
 				else
 				{
-					DecreaseIntensity(Mathf.Clamp(intensity - 1, 1, 20));
+					DecreaseIntensity(Mathf.Clamp(Intensity - 1, 1, 20));
 					return false;
 				}
 			}
@@ -72,45 +103,13 @@ namespace PheggMod.CustomEffects
 				return false;
 			}
 		}
-		public override void PublicOnIntensityChange(byte prevState, byte newState) => intensity = newState;
-
-		public override void PublicUpdate()
-		{
-			if (!NetworkServer.active)
-				return;
-			if (Enabled)
-			{
-				if (!Hub.characterClassManager.IsHuman() || intensity < 1)
-				{
-					ServerDisable();
-					return;
-				}
-
-				if (!hasNotified)
-				{
-					Hub.hints.Show(new TextHint("You have been infected!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
-					hasNotified = true;
-				}
-
-				TimeLeft -= Time.deltaTime;
-				if (TimeLeft > 0)
-					return;
-				TimeLeft += TimeBetweenTicks;
-
-				Hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2f * intensity, "INFECTION", DamageTypes.Poison, 0), Hub.gameObject);
-			}
-			else
-			{
-				TimeLeft = TimeBetweenTicks;
-				hasNotified = false;
-			}
-		}
-
-		public override void PublicOnClassChange(RoleType previousClass, RoleType newClass)
+		public override void OnClassChanged(RoleType previousClass, RoleType newClass)
 		{
 			if (newClass == RoleType.Spectator)
 			{
-				ServerDisable();
+				Hub.characterClassManager.NetworkCurClass = RoleType.Scp0492;
+
+				Intensity = 0;
 				return;
 			}
 
@@ -118,19 +117,20 @@ namespace PheggMod.CustomEffects
 				return;
 
 			Hub.hints.Show(new TextHint("You have succumbed to your infection!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
-			ServerDisable();
+			Intensity = 0;
 		}
 
 		public void CureInfection()
 		{
 			Hub.hints.Show(new TextHint("Your infection has been cured!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
-			ServerDisable();
+			Intensity = 0;
+			Disabled();
 		}
 		public void DecreaseIntensity(int Level)
 		{
-			PublicOnIntensityChange((byte)intensity, (byte)Level);
+			Intensity = (byte)Level;
 
-			if (intensity < 1)
+			if (Intensity < 1)
 				CureInfection();
 			else
 				Hub.hints.Show(new TextHint("Your infection's intensity has decreased!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
@@ -139,12 +139,15 @@ namespace PheggMod.CustomEffects
 		{
 			Hub.hints.Show(new TextHint($"{item} had no effect on your infection!", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
 		}
-
-		//public bool GetSpectatorText(out string s)
 		public bool GetSpectatorText(out string s)
 		{
 			s = "Infected";
 			return true;
+		}
+
+		protected override void IntensityChanged(byte prevState, byte newState)
+		{
+			Intensity = newState;
 		}
 	}
 }

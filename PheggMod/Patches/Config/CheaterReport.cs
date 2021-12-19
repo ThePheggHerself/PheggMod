@@ -16,13 +16,11 @@ namespace PheggMod.Patches
     class PMCheaterReport : CheaterReport
     {
         [MonoModReplace]
-
-
         internal static bool SubmitReport(string reporterUserId, string reportedUserId, string reason, ref int reportedId, string reporterNickname, string reportedNickname, bool friendlyFire)
         {
             try
             {
-                string json = JsonSerializer.ToJsonString(new DiscordWebhook($"{ PMConfigFile.webhookMessage }", PMConfigFile.webhookName, PMConfigFile.webhookAvatar, false, new[] { new DiscordEmbed(
+				string json = JsonSerializer.ToJsonString(new DiscordWebhook($"{ PMConfigFile.webhookMessage }", PMConfigFile.webhookName, PMConfigFile.webhookAvatar, false, new[] { new DiscordEmbed(
                 PMConfigFile.reportHeader, "rich", PMConfigFile.reportContent, PMConfigFile.webhookColour, new[]
                 {
                     new DiscordEmbedField("Server Name", PMConfigFile.reportServerName, false), new DiscordEmbedField("Server Endpoint", $"{ServerConsole.Ip}:{ServerConsole.Port}", false),
@@ -32,15 +30,13 @@ namespace PheggMod.Patches
                     new DiscordEmbedField("Timestamp", TimeBehaviour.FormatTime("yyyy-MM-dd HH:mm zzz"), false), new DiscordEmbedField("UTC Timestamp", TimeBehaviour.FormatTime("yyyy-MM-dd HH:mm", DateTimeOffset.UtcNow), false)
                 })}));
 
+				HttpClient _client;
 
-                HttpClient _client;
-
-                _client = new HttpClient();
+				_client = new HttpClient();
                 _client.DefaultRequestHeaders.Add("User-Agent", "SCP SL");
                 _client.Timeout = TimeSpan.FromSeconds(20.0);
 
-                _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
-
+                var a = _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json")).Result;
                 return true;
             }
             catch (Exception e)

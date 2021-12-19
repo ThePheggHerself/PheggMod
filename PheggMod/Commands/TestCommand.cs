@@ -6,11 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Telepathy;
 
 namespace PheggMod.Commands
 {
-    public class TestCommand : ICommand
+    public class TestCommand : ICommand, IUsageProvider
     {
         public string Command => "nevergonna";
 
@@ -18,7 +17,9 @@ namespace PheggMod.Commands
 
         public string Description => "Test command. Try it :)";
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public string[] Usage { get; } = { "give", "you", "up" };
+
+		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
 			bool canRun = CommandManager.CanRun(sender, null, arguments, new[] { "give", "you", "up" }, out response);
 			if (!canRun)

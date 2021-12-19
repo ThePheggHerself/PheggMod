@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace PheggMod.Commands.PositionCommand
 {
-    public class PositionSetCommand : ICommand
+    public class PositionSetCommand : ICommand, IUsageProvider
     {
         public string Command => "set";
 
@@ -16,7 +16,9 @@ namespace PheggMod.Commands.PositionCommand
 
         public string Description => "Sets a player's position";
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public string[] Usage { get; } = { "%player%", "X", "Y", "Z" };
+
+		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             bool canRun = CommandManager.CanRun(sender, PlayerPermissions.PlayersManagement, arguments, new[] { "player", "X", "Y", "Z" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)

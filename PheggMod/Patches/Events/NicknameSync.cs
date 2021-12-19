@@ -22,7 +22,6 @@ namespace PheggMod.Patches
 			"duck", "frog", "bear", "lion", "unicorn", "boar", "kangaroo", "elephant", "goose", "turkey", "platypus", "pig", "cow", "horse"
 		};
 
-
 		public extern void orig_SetNick(string nick);
 		public void SetNick(string nick)
 		{
@@ -49,40 +48,67 @@ namespace PheggMod.Patches
 					}
 				}
 
-				string NewNick = nick;
+				if (AntiIdName(nick))
+					return;
 
-				foreach (var MatchedWord in filteredwords)
-				{
-					if (StringContains(NewNick, MatchedWord, StringComparison.OrdinalIgnoreCase))
-					{
-						NewNick = Regex.Replace(NewNick, MatchedWord, animals[new System.Random().Next(0, animals.Length - 1)], RegexOptions.IgnoreCase);
-					}
-				}
-
-				var newFilter = new List<string>();
-				var newFilterWord = string.Empty;
-
-				foreach (var singularWord in filteredwords)
-				{
-					newFilterWord = singularWord.Replace("ies", "y");
-					if (newFilterWord.EndsWith("s"))
-						newFilterWord = newFilterWord.Remove(newFilterWord.Length - 1, 1);
-
-					newFilter.Add(newFilterWord);
-				}
-
-				foreach (var MatchedWord in newFilter.Where(w => StringContains(NewNick, w, StringComparison.OrdinalIgnoreCase)))
-				{
-					NewNick = Regex.Replace(NewNick, MatchedWord, animals[new System.Random().Next(0, animals.Length - 1)], RegexOptions.IgnoreCase);
-				}
-
-				var RefHub = ReferenceHub.GetHub(gameObject);
-
-				RefHub.nicknameSync.DisplayName = NewNick;
+				NicknameFilter(nick);
 			}
 			catch (Exception e)
 			{
 				Base.Error($"Error: {e}");
+			}
+		}
+
+		private bool AntiIdName(string Nick)
+		{
+			var hub = ReferenceHub.GetHub(gameObject);
+
+			var UserId = hub.characterClassManager.UserId.Split('@');
+
+			if (UserId[1].ToLowerInvariant() == "northwood")
+				return false;
+
+			if(Nick.ToLowerInvariant() == UserId[0].ToLowerInvariant())
+			{
+				ServerConsole.Disconnect(hub.gameObject, "You must have a nickname to play on this server");
+				return true;
+			}
+			return false;
+		}
+
+		private void NicknameFilter(string nick)
+		{
+			string NewNick = nick;
+			foreach (var MatchedWord in filteredwords)
+			{
+				if (StringContains(NewNick, MatchedWord, StringComparison.OrdinalIgnoreCase))
+				{
+					NewNick = Regex.Replace(NewNick, MatchedWord, "duck", RegexOptions.IgnoreCase);
+				}
+			}
+
+			var newFilter = new List<string>();
+			var newFilterWord = string.Empty;
+
+			foreach (var singularWord in filteredwords)
+			{
+				newFilterWord = singularWord.Replace("ies", "y");
+				if (newFilterWord.EndsWith("s"))
+					newFilterWord = newFilterWord.Remove(newFilterWord.Length - 1, 1);
+
+				newFilter.Add(newFilterWord);
+			}
+
+			foreach (var MatchedWord in newFilter.Where(w => StringContains(NewNick, w, StringComparison.OrdinalIgnoreCase)))
+			{
+				NewNick = Regex.Replace(NewNick, MatchedWord, animals[new System.Random().Next(0, animals.Length - 1)], RegexOptions.IgnoreCase);
+			}
+
+			if (!string.Equals(nick, NewNick, StringComparison.OrdinalIgnoreCase))
+			{
+				var RefHub = ReferenceHub.GetHub(gameObject);
+
+				RefHub.nicknameSync.DisplayName = NewNick;
 			}
 		}
 

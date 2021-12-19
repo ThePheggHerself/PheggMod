@@ -12,20 +12,6 @@ namespace PheggMod.Patches
     [MonoModPatch("global::RemoteAdmin.QueryProcessor")]
     class PMQueryProcessor : RemoteAdmin.QueryProcessor
     {
-        public class SCPData
-        {
-            public RoleType roleType;
-            public float health;
-            public float artHealth;
-            public Vector3 position;
-            public float exp;
-            public float mana;
-        }
-
-        public static Dictionary<RoleType, SCPData> SCP = new Dictionary<RoleType, SCPData>();
-
-
-
         public extern void orig_OnDestroy();
         public void OnDestroy()
         {
@@ -43,39 +29,6 @@ namespace PheggMod.Patches
                 {
                     Base.Error($"Error triggering PlayerLeaveEvent: {e.InnerException}");
                 }
-
-            //if (refHub.characterClassManager.IsAnyScp() && refHub.characterClassManager.CurClass != RoleType.Scp0492)
-            //{
-            //    bool HasBeenReplaced = false;
-
-            //    foreach(var p in ReferenceHub.GetAllHubs())
-            //    {
-            //        if(p.Value.characterClassManager.CurClass == RoleType.Spectator && p.Value.serverRoles.over)
-            //    }
-
-            //    if (!HasBeenReplaced && SCP.ContainsKey(refHub.characterClassManager.CurClass))
-            //    {
-            //        SCPData data = new SCPData
-            //        {
-            //            roleType = refHub.characterClassManager.CurClass,
-            //            health = refHub.playerStats.Health,
-            //            artHealth = refHub.playerStats.syncArtificialHealth,
-            //            position = refHub.playerMovementSync.RealModelPosition,
-
-            //        };
-
-            //        if(data.roleType == RoleType.Scp079)
-            //        {
-            //            data.exp = refHub.scp079PlayerScript.Exp;
-            //            data.mana = refHub.scp079PlayerScript.Mana;
-            //        }
-
-            //        SCP.Add(data.roleType, data);
-            //    }
-            //}
-
-
-
 
             if (PlayerManager.players.Count - 1 < 1 && RoundSummary.RoundInProgress())
                 PMRoundSummary.RoundFix();

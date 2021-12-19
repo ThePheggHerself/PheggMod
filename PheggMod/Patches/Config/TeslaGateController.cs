@@ -9,6 +9,7 @@ using PheggMod.API.Events;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace PheggMod.Patches
 {
@@ -16,36 +17,100 @@ namespace PheggMod.Patches
 	public class PMTeslaGateController : TeslaGateController
 	{
 		private List<TeslaGate> TeslaGates = new List<TeslaGate>();
-
+		private static RoleType[] ignoreRoles = new RoleType[] { RoleType.Tutorial };
+    
 		public void FixedUpdate()
 		{
 			if (NetworkServer.active)
 			{
-				using (Dictionary<GameObject, ReferenceHub>.Enumerator enumerator = ReferenceHub.GetAllHubs().GetEnumerator())
+				Dictionary<GameObject, ReferenceHub> allHubs = ReferenceHub.GetAllHubs();
+				using (List<TeslaGate>.Enumerator enumerator = TeslaGates.GetEnumerator())
 				{
 					while (enumerator.MoveNext())
 					{
-						KeyValuePair<GameObject, ReferenceHub> keyValuePair = enumerator.Current;
-						ReferenceHub hub = keyValuePair.Value;
-
-						if (hub.characterClassManager.CurClass != RoleType.Spectator && hub.characterClassManager.CurClass != RoleType.Tutorial && !hub.isDedicatedServer && hub.Ready)
+						TeslaGate teslaGate = enumerator.Current;
+						if (teslaGate.isActiveAndEnabled)
 						{
-							foreach (TeslaGate teslaGate in this.TeslaGates)
+							bool playersInIdleRange = false;
+							bool playersInActivationRange = false;
+							foreach (var hub in allHubs)
 							{
-								if (teslaGate.PlayerInRange(hub) && !teslaGate.InProgress)
+								if (!hub.Value.isDedicatedServer && !ignoreRoles.Contains(hub.Value.characterClassManager.CurClass))
 								{
-									teslaGate.ServerSideCode();
+									if (!playersInIdleRange)
+									{
+										playersInIdleRange = teslaGate.PlayerInIdleRange(hub.Value);
+									}
+									if (hub.Value.characterClassManager.CurClass != RoleType.Spectator && !playersInActivationRange && teslaGate.PlayerInRange(hub.Value) && !teslaGate.InProgress)
+									{
+										playersInActivationRange = true;
+									}
 								}
+							}
+							if (playersInActivationRange)
+							{
+								teslaGate.ServerSideCode();
+							}
+							if (playersInIdleRange != teslaGate.isIdling)
+							{
+								teslaGate.ServerSideIdle(playersInIdleRange);
 							}
 						}
 					}
 					return;
 				}
 			}
-			foreach (TeslaGate teslaGate2 in this.TeslaGates)
+			foreach (TeslaGate teslaGate2 in TeslaGates)
 			{
 				teslaGate2.ClientSideCode();
 			}
+
+
+
+			//try
+			//{
+			//	if (NetworkServer.active)
+			//	{
+			//		Dictionary<GameObject, ReferenceHub> hubs = ReferenceHub.GetAllHubs();
+
+			//		foreach (TeslaGate tesla in TeslaGates)
+			//		{
+			//			Dictionary<ReferenceHub, bool> PlayersInRange = new Dictionary<ReferenceHub, bool>();
+
+			//			foreach (var player in ReferenceHub.GetAllHubs())
+			//			{
+			//				if (ReferenceHub.HostHub == null ||  !player.Value.isDedicatedServer || !ReferenceHub.HostHub.characterClassManager.RoundStarted || ignoreRoles.Contains(player.Value.characterClassManager.CurClass))
+			//					continue;
+
+			//				//Base.Info(ignoreRoles.Where(r => r == player.Value.characterClassManager.CurClass).Any() + " " + ignoreRoles.Contains(player.Value.characterClassManager.CurClass));
+
+			//				//Base.Info(player.Value.characterClassManager.CurClass.ToString() + " " + ignoreRoles.Contains(player.Value.characterClassManager.CurClass));
+
+
+			//				if (tesla.PlayerInRange(player.Value))
+			//					PlayersInRange.Add(player.Value, true);						
+			//				else if (tesla.PlayerInIdleRange(player.Value))
+			//					PlayersInRange.Add(player.Value, false);
+
+
+			//				if (PlayersInRange.Where(r => r.Value == true).Any() && !tesla.InProgress)
+			//					tesla.ServerSideCode();
+
+			//				if (PlayersInRange.Where(r => r.Value == false).Any() != tesla.isIdling)
+			//					tesla.ServerSideIdle(PlayersInRange.Where(r => r.Value == false).Any());
+
+			//			}
+			//		}
+			//	}
+			//	foreach (TeslaGate teslaGate2 in this.TeslaGates)
+			//	{
+			//		teslaGate2.ClientSideCode();
+			//	}
+			//}
+			//catch(Exception e)
+			//{
+			//	Base.Error(e.ToString());
+			//}
 		}
 	}
 }

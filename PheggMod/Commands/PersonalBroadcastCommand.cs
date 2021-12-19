@@ -4,18 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using CustomPlayerEffects;
+using MonoMod;
 
 namespace PheggMod.Commands
 {
-    public class PersonalBroadcastCommand : ICommand
-    {
+	[MonoModPatch("global::CommandSystem.Commands.RemoteAdmin.PlayerBroadcastCommand")]
+	public class PersonalBroadcastCommand : CommandSystem.Commands.RemoteAdmin.PlayerBroadcastCommand
+	{
         public string Command => "pbc";
-
-        public string[] Aliases { get; } = { "personalbroadcast", "privatebroadcast", "pbcmono", "personalbroadcastmono", "privatebroadcastmono" };
-
+        public string[] Aliases { get; } = { "personalbroadcast", "privatebroadcast" };
         public string Description => "Sends a private broadcast message to the specified player(s)";
 
-        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public string[] Usage { get; } = { "%player%", "duration", "message" };
+
+		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             bool canRun = CommandManager.CanRun(sender, PlayerPermissions.Broadcasting, arguments, new[] { "player", "duration", "message" }, out response, out List<ReferenceHub> hubs);
             if (!canRun)

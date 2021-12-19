@@ -44,7 +44,9 @@ namespace PheggMod
 		public static void PluginPreLoad()
 		{
 			bool universalConfigs = ConfigFile.ServerConfig.GetBool("universal_config_file", false);
-			string pluginsFolder = universalConfigs == false ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
+			string pluginsFolder = !universalConfigs ? FileManager.GetAppFolder(true, true) + "plugins" : AppDomain.CurrentDomain.BaseDirectory + FileManager.GetPathSeparator() + "plugins" + "/../plugins";
+
+			Base.Info("Plugin folder: " + pluginsFolder + " | "  + universalConfigs);
 
 			AddCommands(Assembly.GetExecutingAssembly());
 			CommandManager.RegisterInternalCommands();
@@ -69,6 +71,10 @@ namespace PheggMod
 					}
 				}
 				Base.Info("Dependancies loaded!");
+			}
+			else
+			{
+				Base.Info("No dependancies folder detected");
 			}
 		}
 
@@ -122,6 +128,10 @@ namespace PheggMod
 					}
 				}
 				Base.Info("Plugins loaded!");
+			}
+			else
+			{
+				Base.Info("No plugin folder detected");
 			}
 		}
 
@@ -336,7 +346,7 @@ namespace PheggMod
 		[Obsolete("Use the newer attribute based command system. This was only (re)added for backwards compatability!")]
 		public static void AddCommand(Plugin plugin, ICommand command, string name, string[] alias)
 		{
-			Base.Info(name);
+			//Base.Info(name);
 
 			if (allCommands.ContainsKey(name) || oldCommands.ContainsKey(name))
 			{
