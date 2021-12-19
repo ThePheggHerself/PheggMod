@@ -13,7 +13,6 @@ namespace PheggMod.Patches
 
             return orig_AllowChangeLevelState();
         }
-
         //public static void Enable() => FindObjectOfType<AlphaWarheadNukesitePanel>().Networkenabled = true;
         //public static void Disable() => FindObjectOfType<AlphaWarheadNukesitePanel>().Networkenabled = false;
     }

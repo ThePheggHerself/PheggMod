@@ -197,12 +197,12 @@ botClient.on('messageCreate', async message => {
                     message.channel.send("Bot is not connected to the server");
                 }
             }
-            else if (message.member.roles.cache.has(config.staffRoleID) || message.member.hasPermission(["MANAGE_ROLES"])) {
+            else if (message.member.roles.cache.has(config.staffRoleID) || message.member.permissions.has('ADMINISTRATOR')) {
                 if (!message.channel.permissionsFor(message.guild.roles.everyone).has('VIEW_CHANNEL')) {
                     var object = { Type: "cmd", channel: message.channel.id, Message: message.content, StaffID: message.author.id, Staff: message.member.user.tag }
 
                     if (mainSocket) {
-                        console.log("Sending ban command")
+                        console.log("Sending remote command")
                         mainSocket.write(JSON.stringify(object))
                     }
                 }

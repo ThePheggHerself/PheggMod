@@ -17,9 +17,8 @@ namespace PheggMod.Patches
 	public class PMTeslaGateController : TeslaGateController
 	{
 		private List<TeslaGate> TeslaGates = new List<TeslaGate>();
-
 		private static RoleType[] ignoreRoles = new RoleType[] { RoleType.Tutorial };
-
+    
 		public void FixedUpdate()
 		{
 			if (NetworkServer.active)

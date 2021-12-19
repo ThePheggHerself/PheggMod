@@ -37,7 +37,7 @@ namespace DiscordLab
 
 	public class Bot
 	{
-		private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|(www)|({)|(})|(<)|(>)|(\")|(\\[)|(\\])");
+		private static Regex _rgx = new Regex("(.gg/)|(<@)|(http)|({)|(})|(<)|(>)|(\")|(\\[)|(\\])");
 		private static Regex _filterNames = new Regex("(\\*)|(_)|({)|(})|(@)|(<)|(>)|(\")|(\\[)|(\\])");
 
 		private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -284,6 +284,7 @@ namespace DiscordLab
 					return "**No online players**";
 			}
 
+			int DNTCount = 0;
 			List<string> players = new List<string>();
 			foreach (var hub in ReferenceHub.GetAllHubs().Values)
 			{
@@ -291,8 +292,11 @@ namespace DiscordLab
 					continue;
 				else if (!hub.serverRoles.DoNotTrack)
 					players.Add(_filterNames.Replace(hub.nicknameSync.MyNick, string.Empty));
-				else players.Add("DNTUser");
+				else DNTCount++;
 			}
+
+			if (DNTCount > 0)
+				players.Add($"{(players.Count > 0 ? "and " : "")}{DNTCount} {(DNTCount > 1 ? "others DNT users" : "other DNT user")}");
 
 			return $"**{PlayerManager.players.Count()}/{ConfigFile.ServerConfig.GetInt("max_players", 20)}**\n```\n{string.Join(", ", players)}```";
 		}

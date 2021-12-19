@@ -39,6 +39,7 @@ namespace PheggMod.Patches
                 RespawnEffectsController.PlayCassieAnnouncement(PMConfigFile.chaosAnnouncement, false, true);
 
 			PMPlayerStats.LastRespawn = DateTime.Now;
+
         }
     }
 

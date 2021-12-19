@@ -37,7 +37,6 @@ namespace PheggMod.Patches
                 _client.Timeout = TimeSpan.FromSeconds(20.0);
 
                 var a = _client.PostAsync(PMConfigFile.webhookUrl, new StringContent(json, Encoding.UTF8, "application/json")).Result;
-
                 return true;
             }
             catch (Exception e)

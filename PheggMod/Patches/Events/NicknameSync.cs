@@ -48,7 +48,6 @@ namespace PheggMod.Patches
 					}
 				}
 
-
 				if (AntiIdName(nick))
 					return;
 
