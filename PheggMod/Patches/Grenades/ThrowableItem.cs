@@ -13,10 +13,10 @@ namespace PheggMod.Patches
 	[MonoModPatch("global::InventorySystem.Items.ThrowableProjectiles.ThrowableItem")]
 	public class ThrowableItem : InventorySystem.Items.ThrowableProjectiles.ThrowableItem
 	{
-		public extern void orig_ServerThrow(bool fullForce);
-		public void ServerThrow(bool fullForce)
+		public extern void orig_ServerThrow(float forceAmount, float upwardFactor, Vector3 torque, Vector3 startVel);
+		public void ServerThrow(float forceAmount, float upwardFactor, Vector3 torque, Vector3 startVel)
 		{
-			orig_ServerThrow(fullForce);
+			orig_ServerThrow(forceAmount, upwardFactor, torque, startVel);
 
 			try
 			{

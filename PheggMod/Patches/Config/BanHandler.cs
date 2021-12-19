@@ -17,7 +17,6 @@ namespace PheggMod.Patches.Config
 
 			if (a.Any())
 			{
-				Base.Info(a.First().Value.characterClassManager.Asn);
 				if (a.First().Value.characterClassManager.Asn == "50889")
 				{
 					Base.Info($"IP ban of user {ban.OriginalName} ({a.First().Value.characterClassManager.UserId}) has been blocked due to IP address belonging to ASN {a.First().Value.characterClassManager.Asn}");

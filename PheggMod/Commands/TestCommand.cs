@@ -25,11 +25,6 @@ namespace PheggMod.Commands
 			if (!canRun)
 				return false;
 
-			
-
-			foreach (var user in PMReservedSlots.Users)
-				Base.Info(user);
-
 			response = $"Never gonna give you up,\nNever gonna let you down.\nNever gonna run around,\nAnd desert you.\nNever gonna make you cry,\nNever gonna say goodbye.\nNever gonna tell a lie,\nAnd hurt you.";
             return true;
         }

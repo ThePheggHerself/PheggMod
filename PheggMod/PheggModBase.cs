@@ -151,7 +151,7 @@ namespace PheggMod
         public static void Error(string m) => AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
         public static void Debug(string m)
         {
-            if(PMConfigFile.DebugMode)
+            //if(PMConfigFile.DebugMode)
                 AddLog(string.Format("[{0}] {1}", "DEBUG", m));
         }
         public static void Warn(string m) => AddLog(string.Format("[{0}] {1}", "WARN", m));

@@ -74,8 +74,6 @@ namespace PheggMod.Patches
 			if (firstTime && !IsConfigLoaded)
 			{
 				IsConfigLoaded = true;
-
-				Base.Info(" AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 			}
 		}
 	}
