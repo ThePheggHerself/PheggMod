@@ -56,7 +56,7 @@ namespace PheggMod.Patches
 			///This is the time that the server will check for with the auto-restarting system.
 			///Uses 24 hour formatting (16:00 is 4PM), and uses the time relative to the server.
 			///Set to 25:00 to disable;
-			RestartTime = ServerConfig.GetString("auto_restart_time", "04:30");
+			RestartTime = ServerConfig.GetString("auto_restart_time", "25:00");
 
 			if (DebugMode)
 			{

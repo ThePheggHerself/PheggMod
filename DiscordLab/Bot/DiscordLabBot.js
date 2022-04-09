@@ -25,14 +25,38 @@ botClient.on("ready", () => {
     console.log("Bot online and listening to port " + config.port)
 
     setInterval(() => {
+
+        console.log(messages.length + " Messages");
+
         if (messages.length > 0) {
-            var DiscordMessage = messages.join('\n');
+            var DiscordMessages = [];
+            var discordMessage = "";
+            messages.forEach(message => {
+                console.log(message)
+
+                if (discordMessage.length < 1)
+                    discordMessage = message;
+                else if (discordMessage.length + message.length < 1950) {
+                    discordMessage += "\n" + message
+                }
+                else {
+                    DiscordMessages.push(discordMessage);
+
+                    discordMessage = message;
+                }
+
+                console.log(discordMessage.length + " message length")
+            })
+
+            if (discordMessage.length > 0)
+                DiscordMessages.push(discordMessage);
+
+            console.log(DiscordMessages.length);
+
+            DiscordMessages.forEach(dMessage => {
+                botClient.channels.cache.get(config.channel).send(`[${new Date().toLocaleTimeString()}]\n` + dMessage.replace(/.gg\//g, ""));
+            })
             messages.length = 0
-
-            if (DiscordMessage.length > 1950)
-                DiscordMessage = DiscordMessage.substring(0, 1950);
-
-            botClient.channels.cache.get(config.channel).send(`[${new Date().toLocaleTimeString()}]\n` + DiscordMessage.replace(/.gg\//g, ""));
         }
     }, 2000)
 

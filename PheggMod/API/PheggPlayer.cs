@@ -18,47 +18,20 @@ namespace PheggMod
 		public ReferenceHub refHub { get; internal set; }
 		public bool isEmpty = true;
 
-		//Basic user info
-		public string name { get; internal set; }
-		public string nameClean { get; internal set; }
-		public string userId { get; internal set; }
-		public string domain { get; internal set; }
-		public string ipAddress { get; internal set; }
-		public int playerId { get; internal set; }
-
-		public GameObject gameObject
-		{
-			get { return refHub.gameObject; }
-		}
-
-		private BanPlayer _banPlayer { get; set; }
-		private NetworkConnection _networkConnection { get; set; }
-		private Broadcast _broadcast { get; set; }
-
 		public PheggPlayer(GameObject player)
 		{
 			if (player == null)
 				throw new ArgumentNullException("Can't make PheggPlayer from null");
 			else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
-			{
 				throw new ArgumentNullException("Can't make PheggPlayer from server");
-			}
 			else
 			{
 				isEmpty = false;
-
 				refHub = player.GetComponent<ReferenceHub>();
 
 				_banPlayer = player.GetComponent<BanPlayer>();
 				_networkConnection = player.GetComponent<NetworkConnection>();
 				_broadcast = player.GetComponent<Broadcast>();
-
-				name = refHub.nicknameSync.MyNick;
-				nameClean = _filterNames.Replace(name, @"\$&");
-				userId = refHub.characterClassManager.UserId;
-				domain = refHub.characterClassManager.UserId.Split('@')[1].ToUpper();
-				ipAddress = refHub.nicknameSync.connectionToClient.address;
-				playerId = refHub.queryProcessor.PlayerId;
 			}
 		}
 
@@ -67,9 +40,7 @@ namespace PheggMod
 			if (player == null)
 				throw new ArgumentNullException("Can't make PheggPlayer from null");
 			else if (player.GetComponent<CharacterClassManager>().isLocalPlayer)
-			{
 				throw new ArgumentNullException("Can't make PheggPlayer from server");
-			}
 			else
 			{
 				isEmpty = false;
@@ -78,15 +49,20 @@ namespace PheggMod
 				_banPlayer = player.gameObject.GetComponent<BanPlayer>();
 				_networkConnection = player.gameObject.GetComponent<NetworkConnection>();
 				_broadcast = player.gameObject.GetComponent<Broadcast>();
-
-				name = player.nicknameSync.MyNick;
-				nameClean = _filterNames.Replace(name, @"\$&");
-				userId = player.characterClassManager.UserId;
-				domain = player.characterClassManager.UserId.Split('@')[1].ToUpper();
-				ipAddress = player.nicknameSync.connectionToClient.address;
-				playerId = player.queryProcessor.PlayerId;
 			}
 		}
+
+		//Basic user info
+		public string name => refHub.nicknameSync.MyNick;
+		public string nameClean => _filterNames.Replace(name, @"\$&");
+		public string userId => refHub.characterClassManager.UserId;
+		public string domain => refHub.characterClassManager.UserId.Split('@')[1].ToUpper();
+		public string ipAddress => refHub.nicknameSync.connectionToClient.address;
+		public int playerId => refHub.queryProcessor.PlayerId;
+		public GameObject gameObject =>  refHub.gameObject;
+		private BanPlayer _banPlayer { get; set; }
+		private NetworkConnection _networkConnection { get; set; }
+		private Broadcast _broadcast { get; set; }
 
 		public bool Godmode
 		{
@@ -124,23 +100,16 @@ namespace PheggMod
 
 		public float AHP
 		{
-			get
-			{
-				return refHub.playerStats.GetModule<AhpStat>().CurValue;
-			}
-			set
-			{
-				refHub.playerStats.GetModule<AhpStat>().CurValue = value;
-			}
+			get => refHub.playerStats.GetModule<AhpStat>().CurValue;		
+			set => refHub.playerStats.GetModule<AhpStat>().CurValue = value;			
 		}
-
 		public RoleType roleType
 		{
 			get => refHub.characterClassManager.CurClass;
 			set
 			{
 				refHub.characterClassManager.SetClassID(value, CharacterClassManager.SpawnReason.ForceClass);
-				this.Health = refHub.characterClassManager.Classes.Get(value).maxHP;
+				Health = refHub.characterClassManager.Classes.Get(value).maxHP;
 			}
 		}
 		public Team team
@@ -160,7 +129,7 @@ namespace PheggMod
 
 		public override string ToString() => $"{nameClean} ({userId})";
 		
-		public void Kill() => refHub.playerStats.DealDamage(new UniversalDamageHandler(UniversalDamageHandler.KillValue, DeathTranslations.Crushed));
+		public void Kill() => refHub.playerStats.DealDamage(new UniversalDamageHandler(StandardDamageHandler.KillValue, DeathTranslations.Crushed));
 
 		public void Ban(int duration, string reason = "No reason provided", string issuer = "SERVER", bool banIP = true)
 		{

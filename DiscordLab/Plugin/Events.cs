@@ -153,8 +153,6 @@ namespace DiscordLab
 		{
 			if (aDH is FirearmDamageHandler fDH)
 				return fDH.WeaponType.ToString();
-			else if (aDH is DisruptorDamageHandler dDH)
-				return "Particle Disruptor";
 			else if (aDH is ExplosionDamageHandler eDH)
 				return "Grenade";
 			else if (aDH is MicroHidDamageHandler mhidDH)
@@ -166,11 +164,51 @@ namespace DiscordLab
 			else if (aDH is Scp096DamageHandler scp096DH)
 				return "SCP 096";
 			else if (aDH is ScpDamageHandler scpDH)
-				return scpDH.Attacker.Hub.characterClassManager.CurRole.ToString();
+				return scpDH.Attacker.Hub.characterClassManager.CurClass.ToString();
 
 
 
 			else return "THIS SHOULD NEVER APPEAR!!!";
+		}
+
+		public static string BullshitNameChange(RoleType role)
+		{
+			switch (role)
+			{
+				case RoleType.Scp173:
+					return "173";
+				case RoleType.ClassD:
+					return "ClassD";
+				case RoleType.Spectator:
+					return "Spectator";
+				///...
+				///Skip all the classes
+
+				default:
+					return "Whatever";
+			}
+		}
+
+		public static string BullshitNameChange2(ItemType Item)
+		{
+			switch (Item)
+			{
+				case ItemType.KeycardJanitor:
+					return "Janitor";
+				case ItemType.KeycardScientist:
+					return "Scientist";
+				case ItemType.KeycardResearchCoordinator:
+					return "Research";
+				///...
+				///Skip all the items
+				case ItemType.GunCOM15:
+					return "COM15";
+				case ItemType.GunE11SR:
+					return "E11 Rifle";
+
+				default:
+					return "Whatever";
+			}
 		}
 	}
 }

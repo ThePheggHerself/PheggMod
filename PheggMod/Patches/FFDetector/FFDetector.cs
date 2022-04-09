@@ -13,53 +13,24 @@
 //using InventorySystem;
 //using InventorySystem.Items;
 //using InventorySystem.Disarming;
+//using PlayerStatsSystem;
 
-//namespace PheggMod.FFDetector
+//namespace PheggMod.Patches
 //{
 //	public class FFDetector
 //	{
 //		public static Dictionary<string, DateTime> DamageList = new Dictionary<string, DateTime>();
-
 //		public static Dictionary<string, FFPlayer> FFPlayers = new Dictionary<string, FFPlayer>();
+//		public static Dictionary<string, FFDGrenadeThrower> FFDGrenadeThrowers = new Dictionary<string, FFDGrenadeThrower>();
+
 //		public static bool DoCheck = false;
 //		public static bool DetectorEnabled = true;
 
-//		public class FFPlayer
-//		{
-//			public string UserID;
-//			public int Triggers;
-//			public DateTime LastTrigger;
-//		}
-
-//		public static Dictionary<string, GrenadeThrower> GrenadeThrowers = new Dictionary<string, GrenadeThrower>();
-//		public class GrenadeThrower
-//		{
-//			public string UserId;
-//			public DateTime ThrownAt;
-//			public Vector3 DetonatePosition;
-//			public RoleType Role;
-//			public Team Team;
-//		}
-
-//		public class FFInfo
-//		{
-//			public DamageTypes.DamageType DamageType;
-//			public PlayerStats.HitInfo HitInfo;
-//			public ReferenceHub Target;
-//			public ReferenceHub Attacker;
-//			public Team AttackerTeam;
-//			public List<ReferenceHub> Hostiles = new List<ReferenceHub>();
-//			public List<ReferenceHub> Friendlies = new List<ReferenceHub>();
-//			public List<ReferenceHub> NearbyPlayers = new List<ReferenceHub>();
-//			public GrenadeThrower GrenadeThrower;
-//			public FFPlayer FFPlayer;
-//			public DateTime LastLegitDamage;
-//		}
-//		internal static void CalculateFF(GameObject Victim, PlayerStats.HitInfo info, out float damage)
+//		internal static void CalculateFF(GameObject Victim, AttackerDamageHandler aDH, out float damage)
 //		{
 //			try
 //			{
-//				damage = info.Amount;
+//				damage = aDH.Damage;
 
 //				//if (!DetectorEnabled || !DoCheck || Victim.GetComponent<CharacterClassManager>().CurClass == RoleType.Spectator || (!info.Tool ! && info.GetDamageType() != DamageTypes.Grenade))
 //				//	return;
@@ -67,9 +38,9 @@
 //				FFInfo ffInfo = new FFInfo
 //				{
 //					//DamageType = info.Tool
-//					HitInfo = info,
+//					AttackerDamageHandler = aDH,
 //					Target = ReferenceHub.GetHub(Victim),
-//					Attacker = ReferenceHub.GetHub(info.GetPlayerObject()),
+//					Attacker = aDH.Attacker.Hub,
 //				};
 
 //				if (ffInfo.Attacker.playerId == ffInfo.Target.playerId)
@@ -81,17 +52,19 @@
 //					return;
 //				}
 
-//				if (ffInfo.DamageType == DamageTypes.Grenade)
-//				{
-//					if (GrenadeThrowers.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
-//					{
-//						ffInfo.GrenadeThrower = GrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId];
+//				var isGrenade = aDH is ExplosionDamageHandler;
 
-//						//Base.Info("FFInfoGrenadeThrower Set.");
+//				if (isGrenade)
+//				{
+//					if (FFDGrenadeThrowers.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
+//					{
+//						ffInfo.FFDGrenadeThrower = FFDGrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId];
+
+//						//Base.Info("FFInfoFFDGrenadeThrower Set.");
 //					}
 //					else
 //					{
-//						ffInfo.GrenadeThrower = new GrenadeThrower
+//						ffInfo.FFDGrenadeThrower = new FFDGrenadeThrower
 //						{
 //							Role = ffInfo.Attacker.characterClassManager.CurClass,
 //							Team = ffInfo.Attacker.characterClassManager.CurRole.team,
@@ -99,18 +72,16 @@
 //							DetonatePosition = ffInfo.Target.playerMovementSync.RealModelPosition
 //						};
 
-//						//Base.Info("FFInfoGrenadeThrower Default.");
+//						//Base.Info("FFInfoFFDGrenadeThrower Default.");
 //					}
 
-//					ffInfo.NearbyPlayers = GetNearbyPlayersGrenade(GrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId].DetonatePosition);
+//					ffInfo.NearbyPlayers = GetNearbyPlayersGrenade(FFDGrenadeThrowers[ffInfo.Attacker.characterClassManager.UserId].DetonatePosition);
 //				}
 //				else
 //					ffInfo.NearbyPlayers = GetNearbyPlayers(ffInfo);
 
-//				if (ffInfo.Attacker.characterClassManager.CurRole.team == Team.RIP && ffInfo.DamageType == DamageTypes.Grenade)
-//					ffInfo.AttackerTeam = ffInfo.GrenadeThrower.Team;
-
-//				//Base.Info(ffInfo.AttackerTeam.ToString());
+//				if (ffInfo.Attacker.characterClassManager.CurRole.team == Team.RIP && isGrenade)
+//					ffInfo.AttackerTeam = ffInfo.FFDGrenadeThrower.Team;
 
 //				foreach (ReferenceHub hub in ffInfo.NearbyPlayers)
 //				{
@@ -121,8 +92,6 @@
 //				}
 
 //				bool isFF = IsFF(ffInfo, ffInfo.Target);
-
-//				//Base.Info(isFF.ToString());
 
 //				if (DamageList.ContainsKey(ffInfo.Attacker.characterClassManager.UserId))
 //					ffInfo.LastLegitDamage = DamageList[ffInfo.Attacker.characterClassManager.UserId];
@@ -148,7 +117,7 @@
 //			catch (Exception e)
 //			{
 //				Base.Error(e.ToString());
-//				damage = info.Amount;
+//				damage = aDH.Damage;
 //			}
 
 //			#region E
@@ -185,8 +154,8 @@
 
 //			//if (info.GetDamageType() == DamageTypes.Grenade)
 //			//{
-//			//	if (GrenadeThrowers.ContainsKey(attHub.characterClassManager.UserId))
-//			//		Hubs = GetNearbyPlayersGrenade(GrenadeThrowers[attHub.characterClassManager.UserId].DetonatePosition);
+//			//	if (FFDGrenadeThrowers.ContainsKey(attHub.characterClassManager.UserId))
+//			//		Hubs = GetNearbyPlayersGrenade(FFDGrenadeThrowers[attHub.characterClassManager.UserId].DetonatePosition);
 //			//}
 //			//else
 //			//	Hubs = GetNearbyPlayers(attHub, Victim);
@@ -195,9 +164,9 @@
 
 //			//if (attHub.characterClassManager.CurClass == RoleType.Spectator && info.GetDamageType() == DamageTypes.Grenade)
 //			//{
-//			//	if (GrenadeThrowers.ContainsKey(attHub.characterClassManager.UserId))
+//			//	if (FFDGrenadeThrowers.ContainsKey(attHub.characterClassManager.UserId))
 //			//	{
-//			//		attackerTeam = GrenadeThrowers[attHub.characterClassManager.UserId].Team;
+//			//		attackerTeam = FFDGrenadeThrowers[attHub.characterClassManager.UserId].Team;
 //			//	}
 //			//}
 //			//else
@@ -256,10 +225,10 @@
 //		{
 //			ffInfo.Attacker.hints.Show(new TextHint("I Shouldn't Shoot Friendlies...", new HintParameter[] { new StringHintParameter("") }, HintEffectPresets.FadeInAndOut(1, 2.5f, 1.5f), 5));
 
-//			float damage = Mathf.Clamp(ffInfo.HitInfo.Amount / 4, 5, 50);
-//			damage = Mathf.Clamp(damage, 0, ffInfo.Attacker.playerStats.Health - 1);
+//			float damage = Mathf.Clamp(ffInfo.AttackerDamageHandler.Damage / 4, 5, 50);
+//			damage = Mathf.Clamp(damage, 0, ffInfo.AttackerDamageHandler.Attacker.Hub.characterClassManager. - 1);
 
-//			ffInfo.Attacker.playerStats.HurtPlayer(new PlayerStats.HitInfo(damage, ffInfo.HitInfo.Attacker, ffInfo.HitInfo.Tool, ffInfo.Attacker.playerId, false), ffInfo.Attacker.gameObject);
+//			ffInfo.AttackerDamageHandler.Attacker.Hub.playerStats.DealDamage(new PlayerStats.HitInfo(damage, ffInfo.HitInfo.Attacker, ffInfo.HitInfo.Tool, ffInfo.Attacker.playerId, false), ffInfo.Attacker.gameObject);
 //			//ffInfo.Attacker.inventory.
 
 //			if (ffInfo.FFPlayer.Triggers > 2)

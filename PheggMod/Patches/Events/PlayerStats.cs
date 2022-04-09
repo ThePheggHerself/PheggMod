@@ -6,7 +6,7 @@ using Mirror;
 using MonoMod;
 using PheggMod.API;
 using PheggMod.API.Events;
-using PheggMod.Patches.API;
+using PheggMod.Patches;
 using PheggMod.CustomEffects;
 using PlayerStatsSystem;
 using System;

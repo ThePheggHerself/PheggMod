@@ -5,7 +5,7 @@ using MonoMod;
 using UnityEngine;
 using PheggMod.API.Events;
 
-namespace PheggMod.Patches.Config
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::BanHandler")]
 	class PMBanHandler

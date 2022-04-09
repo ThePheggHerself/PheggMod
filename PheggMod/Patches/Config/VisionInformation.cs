@@ -12,11 +12,13 @@ namespace PheggMod.Patches
 	public readonly struct PMVisionInformation
 	{
 
-		public static extern VisionInformation orig_GetVisionInformation(ReferenceHub source, Vector3 target, float targetRadius = 0, float visionTriggerDistance = 0, bool checkFog = true, bool checkLineOfSight = true, LocalCurrentRoomEffects targetLightCheck = null);
-		public static VisionInformation GetVisionInformation(ReferenceHub source, Vector3 target, float targetRadius = 0, float visionTriggerDistance = 0, bool checkFog = true, bool checkLineOfSight = true, LocalCurrentRoomEffects targetLightCheck = null)
+		public static extern VisionInformation orig_GetVisionInformation(ReferenceHub source, Vector3 target, float targetRadius = 0, float visionTriggerDistance = 0, bool checkFog = true, bool checkLineOfSight = true, LocalCurrentRoomEffects targetLightCheck = null, int MaskLayer = 0);
+		public static VisionInformation GetVisionInformation(ReferenceHub source, Vector3 target, float targetRadius = 0, float visionTriggerDistance = 0, bool checkFog = true, bool checkLineOfSight = true, LocalCurrentRoomEffects targetLightCheck = null, int MaskLayer = 0)
 		{
 			if (source.characterClassManager.CurClass == RoleType.Tutorial)
-				return new VisionInformation(source, target, false, true, 0, 0, false, false, false);
+			{
+				return new VisionInformation(source, target, false, false, 0, 0, false, false, false);
+			}
 			else return orig_GetVisionInformation(source, target, targetRadius, visionTriggerDistance, checkFog, checkLineOfSight, targetLightCheck);
 		}
 	}

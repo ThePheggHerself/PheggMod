@@ -28,7 +28,7 @@ namespace PheggMod.Patches
 
 				string[] query = q.Split(new char[] { ' ' });
 
-				if (!q.ToUpper().Contains("SILENT"))
+				if (!q.ToUpper().Contains("SILENT") && !q.ToUpper().StartsWith("$"))
 				{
 					if (go != null)
 					{
@@ -36,7 +36,7 @@ namespace PheggMod.Patches
 						PheggPlayer pheggPlayer = new PheggPlayer(go);
 
 						if (q.ToUpper().StartsWith("CASSIE"))
-							q = q.ToUpper() + " PITCH_1";
+							q = q + " PITCH_1";
 
 						try
 						{

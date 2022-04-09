@@ -13,7 +13,7 @@ using InventorySystem.Configs;
 using InventorySystem.Items;
 using System.Linq;
 
-namespace PheggMod.Patches.Config
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::InventorySystem.Disarming.DisarmedPlayers")]
 	public static class PMDisarmPlayers

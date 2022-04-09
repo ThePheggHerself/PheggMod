@@ -4,7 +4,7 @@ using Mirror;
 using MonoMod;
 using System.Collections.Generic;
 
-namespace PheggMod.Patches.API
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::PlayerStatsSystem.ScpDamageHandler")]
 	internal class PMScpDamageHandler : PlayerStatsSystem.ScpDamageHandler

@@ -9,7 +9,7 @@ using Dissonance.Integrations.MirrorIgnorance;
 using GameCore;
 using System.Collections.Generic;
 
-namespace PheggMod.Patches.API
+namespace PheggMod.Patches
 {
 	[MonoModPatch("global::CustomNetworkManager")]
 	class PMCustomNetworkManager : CustomNetworkManager

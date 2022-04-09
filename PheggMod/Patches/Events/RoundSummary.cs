@@ -29,7 +29,7 @@ namespace PheggMod.Patches
 			//if (FFDetector.FFDetector.DetectorEnabled)
 			//{
 			//	FFDetector.FFDetector.FFPlayers.Clear();
-			//	FFDetector.FFDetector.GrenadeThrowers.Clear();
+			//	FFDetector.FFDetector.FFDGrenadeThrowers.Clear();
 			//	FFDetector.FFDetector.DoCheck = false;
 			//}
 
