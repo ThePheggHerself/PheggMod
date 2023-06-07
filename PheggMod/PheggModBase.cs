@@ -22,71 +22,71 @@ using PheggMod.Patches;
 
 namespace PheggMod
 {
-    [MonoModPatch("global::ServerConsole")]
-    public class Base : ServerConsole
-    {
+	[MonoModPatch("global::ServerConsole")]
+	public class Base : ServerConsole
+	{
 
-        private static string _serverName = string.Empty;
-        private bool _quitting = false;
-        internal static bool _debugMode => PMConfigFile.DebugMode;
-		internal string _restartTime => PMConfigFile.RestartTime;
-        private int[] _restartTimeClean;
-        public static int roundCount = 0;
-        public static DateTime? roundStartTime = null;
+		private static string _serverName = string.Empty;
+		private bool _quitting = false;
+		internal static bool _debugMode => PMConfigFile.DebugMode;
+		internal TimeSpan RestartTime;
+		internal string[] _timeDirty = new string[] { };
+		public static int roundCount = 0;
+		public static DateTime? roundStartTime = null;
 		private bool _isPluginsLoaded = false;
 
-        public static readonly List<string> colours = new List<string>
-        {
-            "RANDOMSTUPIDTEXTTOFORCEDEFAULT",
-            "pink",
-            "red",
-            "brown",
-            "silver",
-            "light_green",
-            "crimson",
-            "cyan",
-            "aqua",
-            "deep_pink",
-            "tomato",
-            "yellow",
-            "magenta",
-            "blue_green",
-            "orange",
-            "lime",
-            "green",
-            "emerald",
-            "carmine",
-            "nickel",
-            "mint",
-            "army_green",
-            "pumpkin"
-        };
+		public static readonly List<string> colours = new List<string>
+		{
+			"RANDOMSTUPIDTEXTTOFORCEDEFAULT",
+			"pink",
+			"red",
+			"brown",
+			"silver",
+			"light_green",
+			"crimson",
+			"cyan",
+			"aqua",
+			"deep_pink",
+			"tomato",
+			"yellow",
+			"magenta",
+			"blue_green",
+			"orange",
+			"lime",
+			"green",
+			"emerald",
+			"carmine",
+			"nickel",
+			"mint",
+			"army_green",
+			"pumpkin"
+		};
 
-        private extern void orig_FixedUpdate();
+		private extern void orig_FixedUpdate();
 
-        private new void FixedUpdate()
-        {
+		private new void FixedUpdate()
+		{
 			if (!PMConfigFile.IsConfigLoaded)
 			{
 				orig_FixedUpdate();
 			}
 			else
 			{
-				if (!_quitting && !string.IsNullOrEmpty(_restartTime))
+				_timeDirty = PMConfigFile.RestartTime.Split(':');
+
+				if (RestartTime == null || RestartTime.Hours.ToString() != _timeDirty[0] || RestartTime.Minutes.ToString() != _timeDirty[1])
 				{
-					if (_restartTimeClean == null || _restartTimeClean.Length == 0)
-					{
-						string[] array = _restartTime.Split(':');
-						array[1].Replace(":", string.Empty);
+					RestartTime = TimeSpan.Parse(PMConfigFile.RestartTime);
+					//AddLog($"Server is now set to restart at {RestartTime.ToString()}");
+				}
 
-						_restartTimeClean = array.Select(x => Int32.Parse(x)).ToArray();
-					}
-
+				if (!_quitting)
+				{
 					DateTime dTime = DateTime.Now;
 
 					///Checking for the startup time is simply a safety feature to ensure that the server isn't stuck in a boot loop for the while minute duration specified for the restart
 					///It's set for 60 seconds to ensure that the whole minute passes, meaning that regardless of server specs, it is impossible to start looping :D
-					if (dTime.Hour == _restartTimeClean[0] && dTime.Minute == _restartTimeClean[1] && Time.realtimeSinceStartup > 60)
+					if (dTime.Hour == RestartTime.Hours && dTime.Minute == RestartTime.Minutes && Time.realtimeSinceStartup > 60)
 					{
 						bool RoundOngoing = ReferenceHub.HostHub.characterClassManager.RoundStarted;
 
@@ -97,7 +97,7 @@ namespace PheggMod
 						{
 							PMRoundRestart.ChangeLevel(false);
 						}
-							
+
 
 						_quitting = true;
 					}
@@ -105,21 +105,21 @@ namespace PheggMod
 
 				orig_FixedUpdate();
 			}
-        }
+		}
 
-        public extern static void orig_ReloadServerName();
-        public new void ReloadServerName()
-        {
-            orig_ReloadServerName();
-            _serverName += "<color=#ffffff00><size=1>PheggMod</size></color>";
-        }
-        public extern void orig_Start();
-        public void Start()
-        {
-            orig_Start();
+		public extern static void orig_ReloadServerName();
+		public new void ReloadServerName()
+		{
+			orig_ReloadServerName();
+			_serverName += "<color=#ffffff00><size=1>PheggMod</size></color>";
+		}
+		public extern void orig_Start();
+		public void Start()
+		{
+			orig_Start();
 
-            CustomNetworkManager.Modded = true;
-            AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
+			CustomNetworkManager.Modded = true;
+			AddLog("[PHEGGMOD] THIS SERVER IS RUNNING PHEGGMOD");
 
 			//Commented out until SmartGuard is fixed
 			//new SmartGuard();
@@ -148,14 +148,14 @@ namespace PheggMod
 			//PluginManager.PluginPreLoad();
 		}
 
-        public static void Error(string m) => AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
-        public static void Debug(string m)
-        {
-            if(PMConfigFile.DebugMode)
-                AddLog(string.Format("[{0}] {1}", "DEBUG", m));
-        }
-        public static void Warn(string m) => AddLog(string.Format("[{0}] {1}", "WARN", m));
-        public static void Info(string m) => AddLog(string.Format("[{0}] {1}", "INFO", m));
-        public static void SmartGuard(string m) => AddLog(string.Format("[{0}] {1}", "SMART GUARD", m));
-    }
+		public static void Error(string m) => AddLog(string.Format("[{0}] {1}LOGTYPE-8", "ERROR", m));
+		public static void Debug(string m)
+		{
+			if (PMConfigFile.DebugMode)
+				AddLog(string.Format("[{0}] {1}", "DEBUG", m));
+		}
+		public static void Warn(string m) => AddLog(string.Format("[{0}] {1}", "WARN", m));
+		public static void Info(string m) => AddLog(string.Format("[{0}] {1}", "INFO", m));
+		public static void SmartGuard(string m) => AddLog(string.Format("[{0}] {1}", "SMART GUARD", m));
+	}
 }

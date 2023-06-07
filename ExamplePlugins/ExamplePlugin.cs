@@ -13,7 +13,7 @@ namespace ExamplePlugin
     /// Details of the plugin.
     /// </summary>
     [Plugin.PluginDetails(
-    author = "ThePheggHimself",
+    author = "ThePheggHerself",
     name = "TestPlugin",
     description = "Test plugin for Pheggmod",
     version = "1.0_BETA"

@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace PheggMod.Patches
 {
-	[MonoModPatch("global::TeslaGateController")]
+	//[MonoModPatch("global::TeslaGateController")]
 	public class PMTeslaGateController : TeslaGateController
 	{
 		private List<TeslaGate> TeslaGates = new List<TeslaGate>();

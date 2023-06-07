@@ -30,7 +30,7 @@ namespace PheggMod.Commands
 
 				if (refhub.characterClassManager.CurClass == RoleType.Spectator)
 					refhub.characterClassManager.SetClassID(RoleType.Tutorial, CharacterClassManager.SpawnReason.ForceClass);
-				refhub.playerMovementSync.OverridePosition(new Vector3(-21, 1021f, -43), 0);
+				refhub.playerMovementSync.OverridePosition(new Vector3(-21, 1021f, -43));
 			}
 
 			response = $"Teleported {hubs.Count} {(hubs.Count == 1 ? "player" : "players")} to tower 2";

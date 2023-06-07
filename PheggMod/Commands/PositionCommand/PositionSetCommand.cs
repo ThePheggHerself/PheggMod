@@ -30,7 +30,7 @@ namespace PheggMod.Commands.PositionCommand
 
             foreach (ReferenceHub refhub in hubs)
             {
-                refhub.playerMovementSync.OverridePosition(pos, 0);
+                refhub.playerMovementSync.OverridePosition(pos);
             }
 
             response = $"#Teleported {hubs.Count} {(hubs.Count == 1 ? "player" : "players")} to the specified position";

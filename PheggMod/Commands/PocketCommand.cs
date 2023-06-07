@@ -25,7 +25,7 @@ namespace PheggMod.Commands
                 return false;
 
             foreach (ReferenceHub refhub in hubs)
-                refhub.playerMovementSync.OverridePosition(Vector3.down * 1998.5f, 0);
+                refhub.playerMovementSync.OverridePosition(Vector3.down * 1998.5f);
 
             response = $"Teleported {hubs.Count} {(hubs.Count == 1 ? "player" : "players")} to the pocket dimension";
             return true;

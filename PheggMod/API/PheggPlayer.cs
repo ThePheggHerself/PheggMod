@@ -119,7 +119,7 @@ namespace PheggMod
 		public Vector3 position
 		{
 			get => refHub.playerMovementSync.RealModelPosition;
-			set => refHub.playerMovementSync.OverridePosition(value, 0, true);
+			set => refHub.playerMovementSync.OverridePosition(value, forceGround: true);
 		}
 		public Role role
 		{
